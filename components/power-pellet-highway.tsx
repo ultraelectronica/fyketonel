@@ -1,13 +1,24 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useMediaQuery } from "react-responsive";
 
 import { cn } from "@/lib/utils";
 
-const PELLET_COUNT = 32;
-
 export function PowerPelletHighway({ className }: { className?: string }) {
-  const pellets = Array.from({ length: PELLET_COUNT });
+  const isSmall = useMediaQuery({ maxWidth: 639 });
+  const isMedium = useMediaQuery({ minWidth: 640, maxWidth: 1023 });
+  const isLarge = useMediaQuery({ minWidth: 1024 });
+
+  const pelletCount = useMemo(() => {
+    if (isSmall) return 16;
+    if (isMedium) return 24;
+    if (isLarge) return 32;
+    return 16; // default fallback
+  }, [isSmall, isMedium, isLarge]);
+
+  const pellets = Array.from({ length: pelletCount });
 
   return (
     <section
@@ -20,7 +31,7 @@ export function PowerPelletHighway({ className }: { className?: string }) {
       <div className="space-y-3 min-[375px]:space-y-4 sm:space-y-5 md:space-y-6">
         <div className="space-y-1.5 text-center min-[375px]:space-y-2 sm:space-y-2.5 md:space-y-3">
           <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
-            Power Up
+            Powering Up
           </p>
           <h2 className="retro text-lg uppercase tracking-[0.2em] sm:text-xl sm:tracking-[0.25em] md:text-2xl md:tracking-[0.3em]">
             Power Pellet Highway
