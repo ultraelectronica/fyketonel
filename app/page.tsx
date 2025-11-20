@@ -97,12 +97,12 @@ export default async function Home() {
               <p className="retro text-xs uppercase tracking-[0.3em] text-muted-foreground">
                 Mission Planner
               </p>
-              <div className="mt-6 flex flex-1 items-center justify-center">
+              <div className="mt-6 flex flex-1 items-center justify-center w-full">
                 <Calendar
                   mode="single"
                   selected={today}
                   initialFocus
-                  className="text-center"
+                  className="text-center scale-95 w-full max-w-none"
                 />
               </div>
             </div>
@@ -140,7 +140,10 @@ export default async function Home() {
                 <ItemGroup className="gap-3 w-full">
                   {wishlistItems.map((item, index) => (
                     <div key={item.id}>
-                      <Item variant="outline" className="flex flex-col">
+                      <Item 
+                        variant="outline" 
+                        className="flex flex-col transition-all duration-200 hover:bg-accent/30 hover:border-primary hover:shadow-[4px_4px_0_var(--primary)] hover:-translate-y-1 cursor-pointer"
+                      >
                         <ItemContent className="flex-1">
                           <ItemTitle className="retro text-sm uppercase tracking-[0.2em]">
                             {item.title}
