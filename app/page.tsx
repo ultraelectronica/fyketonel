@@ -173,7 +173,7 @@ export default function Home() {
                       label: "Stamina",
                       value: 92,
                       max: 100,
-                      color: "bg-green-500",
+                      color: "bg-green-700",
                     },
                   ]}
                   showLevel={true}
