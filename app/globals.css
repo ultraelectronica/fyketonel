@@ -165,6 +165,14 @@
     font-family: var(--font-kongtext);
     @apply bg-background text-foreground;
   }
+  ::selection {
+    background-color: #FFD700;
+    color: #000000;
+  }
+  ::-moz-selection {
+    background-color: #FFD700;
+    color: #000000;
+  }
 }
 
 .retro-background {
@@ -234,6 +242,21 @@
   100% {
     transform: translate3d(-140vh, 0, 0);
     opacity: 0;
+  }
+}
+
+/* Prevent container overlap in Lab Control Center */
+@media (max-width: 374px) {
+  #lab-container .grid > * {
+    /* Ensure sufficient spacing between grid items */
+    margin-bottom: 8px !important;
+  }
+}
+
+@media (min-width: 375px) and (max-width: 639px) {
+  #lab-container .grid > * {
+    /* Ensure sufficient spacing between grid items */
+    margin-bottom: 4px !important;
   }
 }
 

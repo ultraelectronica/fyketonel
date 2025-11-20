@@ -97,12 +97,12 @@ export default function GitHubContributions() {
 
   if (loading) {
     return (
-      <div className="retro w-full flex flex-col gap-4">
+      <div className="retro w-full flex flex-col gap-3 sm:gap-3.5 md:gap-4">
         <div className="text-center">
-          <Skeleton className="h-5 w-64 mx-auto" />
+          <Skeleton className="h-4 w-48 mx-auto sm:h-4.5 sm:w-56 md:h-5 md:w-64" />
         </div>
-        <div className="h-[300px] w-full space-y-4">
-          <div className="flex justify-between items-end h-full gap-2 px-8">
+        <div className="h-[180px] w-full space-y-3 sm:h-[220px] sm:space-y-3.5 md:h-[300px] md:space-y-4">
+          <div className="flex justify-between items-end h-full gap-1 px-2 sm:gap-1.5 sm:px-4 md:gap-2 md:px-8">
             {skeletonHeights.map((height, i) => (
               <Skeleton
                 key={i}
@@ -120,7 +120,7 @@ export default function GitHubContributions() {
 
   if (error || !data) {
     return (
-      <div className="retro flex h-full w-full items-center justify-center text-sm text-muted-foreground">
+      <div className="retro flex h-full w-full items-center justify-center text-[0.5rem] text-muted-foreground sm:text-xs md:text-sm">
         Unable to load contributions
       </div>
     );
@@ -136,30 +136,30 @@ export default function GitHubContributions() {
   const totalContributions = data.reduce((sum, month) => sum + month.contributions, 0);
 
   return (
-    <div className="retro w-full flex flex-col gap-4">
+    <div className="retro w-full flex flex-col gap-3 sm:gap-3.5 md:gap-4">
       <div className="text-center">
-        <p className="text-sm text-muted-foreground uppercase">
+        <p className="text-[0.45rem] text-muted-foreground uppercase sm:text-[0.55rem] md:text-xs lg:text-sm">
           {totalContributions.toLocaleString()} contributions in the last year
         </p>
       </div>
-      <ChartContainer config={chartConfig} className="h-[300px] w-full">
+      <ChartContainer config={chartConfig} className="h-[180px] w-full sm:h-[220px] md:h-[300px]">
         <BarChart data={data} accessibilityLayer>
           <XAxis
             dataKey="month"
             tickLine={false}
-            tickMargin={10}
+            tickMargin={6}
             axisLine={false}
-            className="retro text-xs"
+            className="retro text-[0.4rem] sm:text-[0.5rem] md:text-xs"
           />
           <YAxis
             tickLine={false}
             axisLine={false}
-            className="retro text-xs"
+            className="retro text-[0.4rem] sm:text-[0.5rem] md:text-xs"
           />
           <ChartTooltip
             content={
               <ChartTooltipContent
-                className="retro"
+                className="retro text-[0.45rem] sm:text-[0.5rem] md:text-xs"
                 labelFormatter={(value) => `${value}`}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter={(value: any) => [`${value} contributions`, ""]}
