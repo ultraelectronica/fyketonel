@@ -9,7 +9,6 @@ import {
   NavigationMenuList,
 } from "@/components/ui/8bit/navigation-menu";
 import { cn } from "@/lib/utils";
-import { RetroModeSwitcher } from "@/components/ui/retro-mode-switcher";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -32,15 +31,15 @@ export function RetroNavigation() {
           viewport={false}
           className="justify-start text-[0.65rem] uppercase tracking-[0.2em] text-foreground [&_[data-slot=navigation-menu-trigger]]:rounded-none"
         >
-          <NavigationMenuList className="gap-3">
+          <NavigationMenuList className="gap-4">
             {navLinks.map((link) => (
               <NavigationMenuItem key={link.label}>
                 <NavigationMenuLink asChild className="retro">
                   <Link
                     href={link.href}
                     className={cn(
-                      "inline-flex items-center border-4 px-5 py-2 text-foreground transition hover:-translate-y-1",
-                      "border-border bg-card hover:bg-primary hover:text-primary-foreground shadow-[4px_4px_0_var(--border)]"
+                      "inline-flex items-center px-2 py-1 text-foreground transition hover:text-primary",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
                     )}
                   >
                     {link.label}
@@ -50,8 +49,6 @@ export function RetroNavigation() {
             ))}
           </NavigationMenuList>
         </NavigationMenu>
-
-        <RetroModeSwitcher />
       </div>
     </header>
   );

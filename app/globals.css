@@ -158,3 +158,71 @@
     @apply bg-background text-foreground;
   }
 }
+
+.retro-background {
+  pointer-events: none;
+}
+
+.retro-background::before,
+.retro-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.retro-background--stars {
+  background: radial-gradient(circle at 20% 20%, #ffffff 1px, transparent 2px),
+    radial-gradient(circle at 80% 10%, #ffe082 1px, transparent 2px),
+    radial-gradient(circle at 60% 70%, #bbdefb 1px, transparent 2px),
+    radial-gradient(circle at 10% 80%, #f8bbd0 1px, transparent 2px);
+  background-size: 140px 140px, 120px 120px, 160px 160px, 180px 180px;
+  animation: retroStarScroll 90s linear infinite;
+  backdrop-filter: blur(0.5px);
+}
+
+.retro-background--stars::after {
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.6) 0%, transparent 65%);
+}
+
+.retro-background__shooting-star {
+  position: absolute;
+  right: -20%;
+  width: 180px;
+  height: 2px;
+  background: linear-gradient(90deg, #fff 0%, rgba(255, 255, 255, 0) 70%);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  animation-name: retroShootingStar;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  opacity: 0;
+}
+
+@keyframes retroStarScroll {
+  0% {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: -300px 0, -200px 0, -400px 0, -500px 0;
+  }
+}
+
+@keyframes retroShootingStar {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  40% {
+    transform: translate3d(-140vh, 0, 0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(-140vh, 0, 0);
+    opacity: 0;
+  }
+}
+
