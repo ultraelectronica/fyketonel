@@ -74,7 +74,7 @@ export default async function Home() {
             Welcome to Fyke&apos;s Laboratory
           </h1>
           <p className="retro text-base leading-relaxed text-muted-foreground">
-            Where my plans, whatever the hell I want to do are listed here.
+            My laboratory, my playground, my sandbox.
           </p>
         </div>
         <Button
@@ -173,7 +173,7 @@ export default async function Home() {
 
             <div className={`${panelClass} flex flex-col`}>
               <p className="retro text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                Random Joke of the Day
+                A random joke for your mood.
               </p>
               <div className="mt-6 flex flex-1 items-center justify-center">
                 <p className="retro text-base leading-relaxed text-center text-muted-foreground">
