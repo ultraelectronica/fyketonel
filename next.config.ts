@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "ghchart.rshah.org",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
