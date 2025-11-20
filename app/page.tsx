@@ -12,10 +12,9 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "@/components/ui/8bit/item";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/8bit/avatar";
-import AnimatedStatBars from "@/components/animated-stat-bars";
 import GitHubContributions from "@/components/github-contributions";
 import TechnologiesCarousel from "@/components/technologies-carousel";
+import PlayerProfileCard from "@/components/ui/8bit/blocks/player-profile-card";
 
 const shellClass =
   "rounded-none border-4 border-border bg-card/80 p-8 shadow-[8px_8px_0_var(--border)] backdrop-blur-sm dark:border-ring";
@@ -108,28 +107,36 @@ export default async function Home() {
               </div>
             </div>
 
-            <div className={`${panelClass} text-center flex flex-col`}>
-              <p className="retro text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            <div className={`${panelClass} flex flex-col min-h-[500px]`}>
+              <p className="retro text-xs uppercase tracking-[0.3em] text-muted-foreground text-center">
                 Player Card
               </p>
-              <div className="mt-6 flex flex-1 flex-col items-center justify-center gap-4">
-                <Avatar className="size-24" variant="pixel">
-                  <AvatarImage
-                    src="/assets/minippix.png"
-                    alt="Fyke avatar"
-                    className="object-cover"
-                  />
-                  <AvatarFallback>FY</AvatarFallback>
-                </Avatar>
-                <div className="space-y-2">
-                  <p className="retro text-xl uppercase tracking-[0.3em]">
-                    Fyke
-                  </p>
-                  <p className="retro text-xs uppercase tracking-[0.4em] text-muted-foreground">
-                    Guardian of Chaotic Plans
-                  </p>
-                </div>
-                <AnimatedStatBars healthValue={86} manaValue={64} />
+              <div className="mt-6 flex flex-1 items-center justify-center">
+                <PlayerProfileCard
+                  playerName="Fyke"
+                  avatarSrc="/assets/minippix.png"
+                  avatarFallback="FY"
+                  level={54}
+                  playerClass="Guardian of Chaotic Plans"
+                  stats={{
+                    health: { current: 86, max: 100 },
+                    mana: { current: 64, max: 100 },
+                    experience: { current: 7850, max: 10000 },
+                  }}
+                  customStats={[
+                    {
+                      label: "Stamina",
+                      value: 92,
+                      max: 100,
+                      color: "bg-green-500",
+                    },
+                  ]}
+                  showLevel={true}
+                  showHealth={true}
+                  showMana={true}
+                  showExperience={true}
+                  className="w-full max-w-full border-4 border-border shadow-none bg-transparent"
+                />
               </div>
             </div>
 
