@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { cn } from "@/lib/utils";
 
 const shootingStarPresets = [
@@ -19,6 +21,28 @@ export function RetroBackground({
   className,
   children,
 }: RetroBackgroundProps) {
+  const stars = useMemo(() => {
+    const randomFromSeed = (seed: number) => {
+      const x = Math.sin(seed) * 10000;
+      return x - Math.floor(x);
+    };
+
+    return Array.from({ length: 140 }, (_, index) => {
+      const baseSeed = index + 1;
+      const size = 1 + randomFromSeed(baseSeed) * 2.2;
+      return {
+        id: `star-${index}`,
+        top: `${randomFromSeed(baseSeed * 2) * 100}%`,
+        left: `${randomFromSeed(baseSeed * 3) * 100}%`,
+        size: `${size}px`,
+        blur: `${size * 0.6}px`,
+        opacity: 0.4 + randomFromSeed(baseSeed * 4) * 0.6,
+        twinkleDelay: `${randomFromSeed(baseSeed * 5) * 6}s`,
+        driftDuration: `${50 + randomFromSeed(baseSeed * 6) * 40}s`,
+      };
+    });
+  }, []);
+
   return (
     <div
       className={cn(
@@ -30,6 +54,23 @@ export function RetroBackground({
         aria-hidden="true"
         className="retro-background retro-background--stars absolute inset-0"
       >
+        {stars.map((star) => (
+          <span
+            key={star.id}
+            className="retro-background__star"
+            style={{
+              top: star.top,
+              left: star.left,
+              width: star.size,
+              height: star.size,
+              filter: `blur(${star.blur})`,
+              opacity: star.opacity,
+              animationDelay: star.twinkleDelay,
+              animationDuration: star.driftDuration,
+            }}
+          />
+        ))}
+
         {shootingStarPresets.map((preset) => (
           <span
             key={preset.id}
