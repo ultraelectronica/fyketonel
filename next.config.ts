@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
+const projectRoot = decodeURIComponent(new URL(".", import.meta.url).pathname);
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  turbopack: {
+    root: projectRoot,
+  },
 };
 
 export default nextConfig;
