@@ -163,27 +163,14 @@
   pointer-events: none;
 }
 
-.retro-background::before,
-.retro-background::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
 .retro-background--stars {
-  background: radial-gradient(circle at top, rgba(24, 24, 35, 0.85), rgba(1, 2, 8, 1));
+  background: #000000;
   overflow: hidden;
-}
-
-.retro-background--stars::after {
-  background: radial-gradient(circle, rgba(0, 0, 0, 0.65) 0%, transparent 65%);
-  pointer-events: none;
 }
 
 .retro-background__star {
   position: absolute;
-  background: radial-gradient(circle, #ffffff, rgba(255, 255, 255, 0.1));
+  background: radial-gradient(circle, #ffffff, rgba(255, 255, 255, 0.05));
   border-radius: 50%;
   animation-name: retroStarDrift, retroStarTwinkle;
   animation-timing-function: linear, ease-in-out;
@@ -195,7 +182,7 @@
   right: -20%;
   width: 180px;
   height: 2px;
-  background: linear-gradient(90deg, #fff 0%, rgba(255, 255, 255, 0) 70%);
+  background: linear-gradient(90deg, #fff 0%, rgba(255, 255, 255, 0.753) 70%);
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
   border-radius: 999px;
   animation-name: retroShootingStar;

@@ -12,6 +12,15 @@ const shootingStarPresets = [
   { id: "shoot-5", top: "78%", delay: "16s", duration: "8s", scale: 1.1 },
 ];
 
+const roundTo = (value: number, decimals = 3) => {
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
+};
+
+const percent = (value: number) => `${roundTo(value * 100, 3)}%`;
+const px = (value: number) => `${roundTo(value, 3)}px`;
+const seconds = (value: number) => `${roundTo(value, 3)}s`;
+
 interface RetroBackgroundProps {
   className?: string;
   children: React.ReactNode;
@@ -32,13 +41,13 @@ export function RetroBackground({
       const size = 1 + randomFromSeed(baseSeed) * 2.2;
       return {
         id: `star-${index}`,
-        top: `${randomFromSeed(baseSeed * 2) * 100}%`,
-        left: `${randomFromSeed(baseSeed * 3) * 100}%`,
-        size: `${size}px`,
-        blur: `${size * 0.6}px`,
-        opacity: 0.4 + randomFromSeed(baseSeed * 4) * 0.6,
-        twinkleDelay: `${randomFromSeed(baseSeed * 5) * 6}s`,
-        driftDuration: `${50 + randomFromSeed(baseSeed * 6) * 40}s`,
+        top: percent(randomFromSeed(baseSeed * 2)),
+        left: percent(randomFromSeed(baseSeed * 3)),
+        size: px(size),
+        blur: px(size * 0.6),
+        opacity: roundTo(0.4 + randomFromSeed(baseSeed * 4) * 0.6, 6),
+        twinkleDelay: seconds(randomFromSeed(baseSeed * 5) * 6),
+        driftDuration: seconds(50 + randomFromSeed(baseSeed * 6) * 40),
       };
     });
   }, []);
