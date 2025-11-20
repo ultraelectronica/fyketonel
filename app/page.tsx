@@ -228,8 +228,44 @@ export default async function Home() {
             Contact Me
           </h2>
         </div>
-        <div className={`${panelClass} max-w-4xl mx-auto`}>
-          <ContactForm />
+        <div className={`${shellClass} border-dashed border-foreground/50 dark:border-ring/50`}>
+          <div className="grid gap-8 lg:grid-cols-2">
+            {/* Left Side - Contact Info */}
+            <div className={`${panelClass} flex flex-col justify-center space-y-6`}>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="retro text-2xl uppercase tracking-[0.3em] text-foreground">
+                    Fyke Simon V. Tonel
+                  </h3>
+                  <p className="retro mt-3 text-base uppercase tracking-[0.25em] text-primary">
+                    Full-stack Developer
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="retro text-sm uppercase tracking-[0.2em] text-muted-foreground">
+                      📍
+                    </span>
+                    <p className="retro text-sm uppercase tracking-[0.2em] text-muted-foreground">
+                      Metro Manila, Philippines
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-t-4 border-dashed border-border pt-6 dark:border-ring">
+                <p className="retro text-sm leading-relaxed text-muted-foreground">
+                  Let&apos;s work together! Feel free to reach out for collaborations, projects, or just to say hi.
+                </p>
+              </div>
+            </div>
+
+            {/* Right Side - Contact Form */}
+            <div className={`${panelClass} flex flex-col`}>
+              <ContactForm />
+            </div>
+          </div>
         </div>
       </section>
     </main>
