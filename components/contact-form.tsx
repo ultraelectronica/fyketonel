@@ -45,12 +45,12 @@ export default function ContactForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="space-y-6">
-        <div className="space-y-3">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 md:space-y-8">
+      <div className="space-y-4 sm:space-y-5 md:space-y-6">
+        <div className="space-y-2 sm:space-y-2.5 md:space-y-3">
           <label
             htmlFor="email"
-            className="retro block text-base uppercase tracking-[0.25em] text-muted-foreground"
+            className="retro block text-[0.5rem] uppercase tracking-[0.18em] text-muted-foreground sm:text-xs sm:tracking-[0.22em] md:text-sm lg:text-base md:tracking-[0.25em]"
           >
             Email
           </label>
@@ -62,14 +62,14 @@ export default function ContactForm() {
             placeholder="your@email.com"
             required
             disabled={isSubmitting}
-            className="w-full h-14 text-base px-6"
+            className="w-full h-10 text-xs px-3 sm:h-12 sm:text-sm sm:px-4 md:h-14 md:text-base md:px-6"
           />
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-2.5 md:space-y-3">
           <label
             htmlFor="message"
-            className="retro block text-base uppercase tracking-[0.25em] text-muted-foreground"
+            className="retro block text-[0.5rem] uppercase tracking-[0.18em] text-muted-foreground sm:text-xs sm:tracking-[0.22em] md:text-sm lg:text-base md:tracking-[0.25em]"
           >
             Message
           </label>
@@ -80,8 +80,8 @@ export default function ContactForm() {
             placeholder="Got any goodies? Send me a message.."
             required
             disabled={isSubmitting}
-            rows={10}
-            className="w-full resize-none text-base px-6 py-4"
+            rows={8}
+            className="w-full resize-none text-xs px-3 py-3 sm:text-sm sm:px-4 sm:py-3 sm:rows-9 md:text-base md:px-6 md:py-4 md:rows-10"
           />
         </div>
       </div>
@@ -89,19 +89,19 @@ export default function ContactForm() {
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="retro w-full uppercase tracking-[0.3em] h-16 text-base"
+        className="retro w-full uppercase tracking-[0.2em] h-10 text-xs sm:h-12 sm:text-sm sm:tracking-[0.25em] md:h-14 lg:h-16 md:text-base md:tracking-[0.3em]"
       >
         {isSubmitting ? "Sending..." : "Send Message"}
       </Button>
 
       {submitStatus === "success" && (
-        <div className="retro rounded-none border-4 border-green-500 bg-green-500/10 p-4 text-center text-sm uppercase tracking-[0.2em] text-green-500">
+        <div className="retro rounded-none border-2 border-green-500 bg-green-500/10 p-3 text-center text-[0.5rem] uppercase tracking-[0.15em] text-green-500 sm:border-3 sm:p-3.5 sm:text-xs sm:tracking-[0.18em] md:border-4 md:p-4 md:text-sm md:tracking-[0.2em]">
           Message sent successfully!
         </div>
       )}
 
       {submitStatus === "error" && (
-        <div className="retro rounded-none border-4 border-destructive bg-destructive/10 p-4 text-center text-sm uppercase tracking-[0.2em] text-destructive">
+        <div className="retro rounded-none border-2 border-destructive bg-destructive/10 p-3 text-center text-[0.5rem] uppercase tracking-[0.15em] text-destructive sm:border-3 sm:p-3.5 sm:text-xs sm:tracking-[0.18em] md:border-4 md:p-4 md:text-sm md:tracking-[0.2em]">
           Failed to send message. Please try again.
         </div>
       )}

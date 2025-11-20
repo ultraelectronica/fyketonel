@@ -45,7 +45,7 @@ import { TbDatabase, TbBrandVscode, TbBrandWindows, TbBrandPowershell, TbBrandVi
 import type { IconType } from "react-icons";
 
 const panelClass =
-  "rounded-none border-4 border-border bg-card/80 p-6 text-center shadow-[6px_6px_0_var(--border)] backdrop-blur-sm dark:border-ring";
+  "rounded-none border-4 border-border bg-card/80 p-3 text-center shadow-[3px_3px_0_var(--border)] backdrop-blur-sm dark:border-ring sm:p-4 sm:shadow-[4px_4px_0_var(--border)] md:p-5 lg:p-6 md:shadow-[5px_5px_0_var(--border)] lg:shadow-[6px_6px_0_var(--border)]";
 
 const technologies: Array<{ name: string; icon: IconType }> = [
   { name: "Dart", icon: SiDart },
@@ -91,16 +91,16 @@ const technologies: Array<{ name: string; icon: IconType }> = [
 
 export default function TechnologiesCarousel() {
   return (
-    <section className="space-y-6">
-      <div className="space-y-3 text-center">
-        <p className="retro text-xs uppercase tracking-[0.4em] text-muted-foreground">
+    <section className="space-y-4 sm:space-y-5 md:space-y-6">
+      <div className="space-y-2 text-center sm:space-y-2.5 md:space-y-3">
+        <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
           Tech Arsenal
         </p>
-        <h2 className="retro text-2xl uppercase tracking-[0.3em]">
+        <h2 className="retro text-lg uppercase tracking-[0.2em] sm:text-xl sm:tracking-[0.25em] md:text-2xl md:tracking-[0.3em]">
           Technologies I Use
         </h2>
       </div>
-      <div className="relative px-12 md:px-16">
+      <div className="relative px-8 sm:px-10 md:px-12 lg:px-16">
         <Carousel
           opts={{
             align: "start",
@@ -121,12 +121,12 @@ export default function TechnologiesCarousel() {
               return (
                 <CarouselItem
                   key={`${tech.name}-${index}`}
-                  className="md:basis-1/2 lg:basis-1/3"
+                  className="basis-full sm:basis-1/2 md:basis-1/2 lg:basis-1/3"
                 >
                   <div className={panelClass}>
-                    <div className="flex flex-col items-center gap-3">
-                      <Icon className="h-12 w-12" />
-                      <p className="retro text-sm uppercase tracking-[0.2em]">
+                    <div className="flex flex-col items-center gap-2 sm:gap-2.5 md:gap-3">
+                      <Icon className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12" />
+                      <p className="retro text-[0.5rem] uppercase tracking-[0.15em] sm:text-xs sm:tracking-[0.18em] md:text-sm md:tracking-[0.2em]">
                         {tech.name}
                       </p>
                     </div>
@@ -135,8 +135,8 @@ export default function TechnologiesCarousel() {
               );
             })}
           </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
+          <CarouselPrevious className="h-8 w-8 sm:h-10 sm:w-10" />
+          <CarouselNext className="h-8 w-8 sm:h-10 sm:w-10" />
         </Carousel>
       </div>
     </section>
