@@ -20,7 +20,13 @@ export const metadata: Metadata = {
   title: "Fyke's Laboratory",
   description: "My laboratory, my playground, my sandbox.",
   icons: {
-    icon: "/assets/logobrain.png",
+    icon: [
+      { url: "/assets/logobrain.png" },
+      { url: "/assets/logobrain.png", sizes: "32x32", type: "image/png" },
+      { url: "/assets/logobrain.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: "/assets/logobrain.png",
+    shortcut: "/assets/logobrain.png",
   },
 };
 
