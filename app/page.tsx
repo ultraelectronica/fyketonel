@@ -16,6 +16,7 @@ import GitHubContributions from "@/components/github-contributions";
 import TechnologiesCarousel from "@/components/technologies-carousel";
 import PlayerProfileCard from "@/components/ui/8bit/blocks/player-profile-card";
 import ContactForm from "@/components/contact-form";
+import PowerPelletHighway from "@/components/power-pellet-highway";
 import { useMediaQuery } from "react-responsive";
 import { useState, useEffect } from "react";
 
@@ -173,7 +174,7 @@ export default function Home() {
                       label: "Stamina",
                       value: 92,
                       max: 100,
-                      color: "bg-green-500",
+                      color: "bg-green-700",
                     },
                   ]}
                   showLevel={true}
@@ -198,10 +199,10 @@ export default function Home() {
                         className="flex flex-col transition-all duration-200 hover:bg-accent/30 hover:border-primary hover:shadow-[3px_3px_0_var(--primary)] sm:hover:shadow-[4px_4px_0_var(--primary)] hover:-translate-y-1 cursor-pointer"
                       >
                         <ItemContent className="flex-1">
-                          <ItemTitle className="retro text-[0.5rem] uppercase tracking-[0.15em] sm:text-xs sm:tracking-[0.18em] md:text-sm md:tracking-[0.2em]">
+                          <ItemTitle className="retro text-center text-[0.5rem] uppercase tracking-[0.15em] sm:text-xs sm:tracking-[0.18em] md:text-sm md:tracking-[0.2em]">
                             {item.title}
                           </ItemTitle>
-                          <ItemDescription className="retro text-[0.45rem] text-muted-foreground mt-1 sm:text-[0.55rem] md:text-xs">
+                          <ItemDescription className="retro text-center text-[0.45rem] text-muted-foreground mt-1 sm:text-[0.55rem] md:text-xs">
                             {item.description}
                           </ItemDescription>
                         </ItemContent>
@@ -312,6 +313,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <PowerPelletHighway />
     </main>
   );
 }

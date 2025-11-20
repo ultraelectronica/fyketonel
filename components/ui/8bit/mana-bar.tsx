@@ -19,7 +19,7 @@ export default function ManaBar({
       value={value}
       variant={variant}
       className={className}
-      progressBg="bg-blue-500"
+      progressBg="bg-cyan-500"
     />
   );
 }

@@ -155,7 +155,7 @@ export default function PlayerProfileCard({
             <Progress
               value={experiencePercentage}
               variant="retro"
-              progressBg="bg-yellow-500"
+              progressBg="bg-yellow-600"
               className="h-3"
             />
           </div>
