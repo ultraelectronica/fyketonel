@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: "Fyke's Laboratory",
   description: "My laboratory, my playground, my sandbox.",
   icons: {
-    icon: "/assets/logo.png",
+    icon: "/assets/logobrain.png",
   },
 };
 
