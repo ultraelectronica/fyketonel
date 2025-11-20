@@ -187,7 +187,6 @@
 
 .retro-background__shooting-star {
   position: absolute;
-  right: -20%;
   width: 180px;
   height: 2px;
   background: linear-gradient(90deg, #fff 0%, rgba(255, 255, 255, 0.753) 70%);

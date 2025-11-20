@@ -4,13 +4,6 @@ import { useMemo } from "react";
 
 import { cn } from "@/lib/utils";
 
-const shootingStarPresets = [
-  { id: "shoot-1", top: "12%", delay: "4s", duration: "6s", scale: 0.8 },
-  { id: "shoot-2", top: "28%", delay: "12s", duration: "7s", scale: 1 },
-  { id: "shoot-3", top: "46%", delay: "20s", duration: "5.5s", scale: 0.7 },
-  { id: "shoot-4", top: "63%", delay: "9s", duration: "6.5s", scale: 0.9 },
-  { id: "shoot-5", top: "78%", delay: "16s", duration: "8s", scale: 1.1 },
-];
 
 const roundTo = (value: number, decimals = 3) => {
   const factor = 10 ** decimals;
@@ -30,13 +23,13 @@ export function RetroBackground({
   className,
   children,
 }: RetroBackgroundProps) {
-  const stars = useMemo(() => {
-    const randomFromSeed = (seed: number) => {
-      const x = Math.sin(seed) * 10000;
-      return x - Math.floor(x);
-    };
+  const randomFromSeed = (seed: number) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
 
-    return Array.from({ length: 140 }, (_, index) => {
+  const stars = useMemo(() => {
+    return Array.from({ length: 300 }, (_, index) => {
       const baseSeed = index + 1;
       const size = 1 + randomFromSeed(baseSeed) * 2.2;
       return {
@@ -48,6 +41,20 @@ export function RetroBackground({
         opacity: roundTo(1.0 + randomFromSeed(baseSeed * 4) * 0.3, 6),
         twinkleDelay: seconds(randomFromSeed(baseSeed * 5) * 6),
         driftDuration: seconds(50 + randomFromSeed(baseSeed * 6) * 40),
+      };
+    });
+  }, []);
+
+  const shootingStars = useMemo(() => {
+    return Array.from({ length: 12 }, (_, index) => {
+      const baseSeed = index + 100;
+      return {
+        id: `shoot-${index}`,
+        top: percent(randomFromSeed(baseSeed)),
+        left: percent(-0.2 + randomFromSeed(baseSeed * 2) * 0.1),
+        delay: seconds(randomFromSeed(baseSeed * 3) * 20),
+        duration: seconds(5 + randomFromSeed(baseSeed * 4) * 4),
+        scale: 0.6 + randomFromSeed(baseSeed * 5) * 0.6,
       };
     });
   }, []);
@@ -80,15 +87,16 @@ export function RetroBackground({
           />
         ))}
 
-        {shootingStarPresets.map((preset) => (
+        {shootingStars.map((star) => (
           <span
-            key={preset.id}
+            key={star.id}
             className="retro-background__shooting-star"
             style={{
-              top: preset.top,
-              animationDelay: preset.delay,
-              animationDuration: preset.duration,
-              transform: `scale(${preset.scale})`,
+              top: star.top,
+              left: star.left,
+              animationDelay: star.delay,
+              animationDuration: star.duration,
+              transform: `scale(${star.scale})`,
             }}
           />
         ))}

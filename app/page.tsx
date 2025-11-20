@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/8bit/button";
 import { Calendar } from "@/components/ui/8bit/calendar";
 import {
   Item,
+  ItemActions,
   ItemContent,
   ItemDescription,
   ItemGroup,
@@ -23,24 +24,22 @@ const panelClass =
 
 const wishlistItems = [
   {
-    id: "crt-monitor",
-    title: "JVC CRT Monitor",
-    description: "Need razor-sharp scanlines for proper sprite testing.",
+    id: "frieren-manga",
+    title: "Frieren: Remnants of the Departed",
+    price: "₱400-500",
+    description: "I still haven&apos;t completed the volumes yet.",
   },
   {
-    id: "synth-module",
-    title: "Modular Synth Kit",
-    description: "Fuel for the lab&apos;s ambient radar pings.",
+    id: "chrollo-figure",
+    title: "Banpresto Hunting Archives Chrollo Lucilfer",
+    price: "₱1000",
+    description: "He looks cool.",
   },
   {
-    id: "nano-drone",
-    title: "Pixelated Nano Drone",
-    description: "For scouting secret boss rooms around the city.",
-  },
-  {
-    id: "mech-keyboard",
-    title: "Magenta Switch Keyboard",
-    description: "Because plotting chaos deserves the perfect click.",
+    id: "genshin-figures",
+    title: "Arlecchino, Alhaitham, or Neuvilette",
+    price: "???",
+    description: "They are my faves in Genshin Impact.",
   },
 ] as const;
 
@@ -171,24 +170,27 @@ export default async function Home() {
               </p>
               <div className="mt-6 flex flex-1 items-center">
                 <ItemGroup className="gap-3 w-full">
-                  {wishlistItems.slice(0, 3).map((item, index) => (
+                  {wishlistItems.map((item, index) => (
                     <div key={item.id}>
-                      <Item variant="outline" className="flex flex-col items-center">
-                        <ItemContent className="items-center text-center">
-                          <ItemTitle className="retro text-base uppercase tracking-[0.2em]">
+                      <Item variant="outline" className="flex flex-col">
+                        <ItemContent className="flex-1">
+                          <ItemTitle className="retro text-sm uppercase tracking-[0.2em]">
                             {item.title}
                           </ItemTitle>
-                          <ItemDescription className="retro text-sm text-muted-foreground">
+                          <ItemDescription className="retro text-xs text-muted-foreground mt-1">
                             {item.description}
                           </ItemDescription>
                         </ItemContent>
-                        <ItemContent className="mt-2 flex justify-center">
-                          <span className="retro text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                            #{String(index + 1).padStart(2, "0")}
+                        <ItemActions className="mt-3 flex items-center justify-between w-full">
+                          <span className="retro text-xs font-bold text-primary">
+                            {item.price}
                           </span>
-                        </ItemContent>
+                          <span className="retro text-xs text-muted-foreground">
+                            Haven&apos;t bought yet :(
+                          </span>
+                        </ItemActions>
                       </Item>
-                      {index < 2 && (
+                      {index < wishlistItems.length - 1 && (
                         <ItemSeparator className="my-3 border-dashed border-border" />
                       )}
                     </div>
