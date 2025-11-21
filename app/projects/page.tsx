@@ -867,6 +867,301 @@ const RetroVisitorCounter = () => {
   );
 };
 
+const TechStackConstellation = ({ 
+  projects, 
+  panelClass 
+}: { 
+  projects: ProjectEntry[];
+  panelClass: string;
+}) => {
+  const [hoveredTech, setHoveredTech] = useState<string | null>(null);
+  const [selectedTech, setSelectedTech] = useState<string | null>(null);
+
+  // Generate stable random positions for stars (only once on mount)
+  const [starPositions] = useState(() => 
+    Array.from({ length: 30 }).map(() => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: 2 + Math.random() * 2,
+      delay: Math.random() * 2,
+    }))
+  );
+
+  // Build tech stack data
+  const techData = useMemo(() => {
+    const techMap = new Map<string, { projects: string[]; count: number }>();
+    
+    projects.forEach((project) => {
+      project.tech.forEach((tech) => {
+        if (!techMap.has(tech)) {
+          techMap.set(tech, { projects: [], count: 0 });
+        }
+        const data = techMap.get(tech)!;
+        data.projects.push(project.title);
+        data.count += 1;
+      });
+    });
+
+    return Array.from(techMap.entries())
+      .map(([name, data]) => ({
+        name,
+        projects: data.projects,
+        count: data.count,
+      }))
+      .sort((a, b) => b.count - a.count);
+  }, [projects]);
+
+  // Find connections between technologies
+  const connections = useMemo(() => {
+    const conns: Array<{ from: string; to: string; strength: number }> = [];
+    
+    projects.forEach((project) => {
+      for (let i = 0; i < project.tech.length; i++) {
+        for (let j = i + 1; j < project.tech.length; j++) {
+          const from = project.tech[i];
+          const to = project.tech[j];
+          
+          const existing = conns.find(
+            (c) => (c.from === from && c.to === to) || (c.from === to && c.to === from)
+          );
+          
+          if (existing) {
+            existing.strength += 1;
+          } else {
+            conns.push({ from, to, strength: 1 });
+          }
+        }
+      }
+    });
+    
+    return conns;
+  }, [projects]);
+
+  const activeTech = hoveredTech || selectedTech;
+
+  // Get connected technologies
+  const connectedTechs = useMemo(() => {
+    if (!activeTech) return new Set<string>();
+    
+    const connected = new Set<string>([activeTech]);
+    connections.forEach((conn) => {
+      if (conn.from === activeTech) connected.add(conn.to);
+      if (conn.to === activeTech) connected.add(conn.from);
+    });
+    
+    return connected;
+  }, [activeTech, connections]);
+
+  const getTechSize = (count: number) => {
+    if (count >= 8) return "text-xl sm:text-2xl px-4 py-2";
+    if (count >= 5) return "text-lg sm:text-xl px-3.5 py-1.5";
+    if (count >= 3) return "text-base sm:text-lg px-3 py-1.5";
+    return "text-sm sm:text-base px-2.5 py-1";
+  };
+
+  const getTechGlow = (count: number) => {
+    if (count >= 8) return "shadow-[0_0_20px_var(--primary),0_0_40px_var(--primary)]";
+    if (count >= 5) return "shadow-[0_0_15px_var(--primary),0_0_30px_var(--primary)]";
+    if (count >= 3) return "shadow-[0_0_10px_var(--primary),0_0_20px_var(--primary)]";
+    return "shadow-[0_0_8px_var(--primary)]";
+  };
+
+  return (
+    <div className={cn(panelClass, "overflow-hidden")}>
+      <div className="space-y-4">
+        <div className="flex flex-col gap-1 text-left">
+          <p className="retro text-[0.55rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem]">
+            Tech Stack Constellation
+          </p>
+          <p className="retro text-[0.55rem] leading-relaxed text-muted-foreground">
+            <span className="hidden sm:inline">Hover or tap</span>
+            <span className="sm:hidden">Tap</span> to see connections between technologies across projects.
+          </p>
+        </div>
+
+        {/* Constellation Container */}
+        <div className="relative min-h-[300px] overflow-hidden rounded-sm border-2 border-dashed border-border/40 bg-gradient-to-b from-background via-background/50 to-background p-3 sm:min-h-[400px] sm:p-4 dark:border-ring/40">
+          {/* Background stars effect */}
+          <div className="pointer-events-none absolute inset-0">
+            {starPositions.map((star, i) => (
+              <motion.div
+                key={i}
+                className="absolute size-1 rounded-full bg-primary/20"
+                style={{
+                  left: `${star.left}%`,
+                  top: `${star.top}%`,
+                }}
+                animate={{
+                  opacity: [0.2, 0.5, 0.2],
+                  scale: [1, 1.5, 1],
+                }}
+                transition={{
+                  duration: star.duration,
+                  repeat: Infinity,
+                  delay: star.delay,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Connection Lines */}
+          <svg className="pointer-events-none absolute inset-0 h-full w-full">
+            {connections.map((conn, i) => {
+              const fromIndex = techData.findIndex((t) => t.name === conn.from);
+              const toIndex = techData.findIndex((t) => t.name === conn.to);
+              
+              if (fromIndex === -1 || toIndex === -1) return null;
+
+              const isActive =
+                activeTech &&
+                (conn.from === activeTech || conn.to === activeTech);
+              const isConnected =
+                activeTech &&
+                (connectedTechs.has(conn.from) && connectedTechs.has(conn.to));
+
+              // Simple positioning in a circular/scattered layout
+              const angle1 = (fromIndex / techData.length) * 2 * Math.PI;
+              const angle2 = (toIndex / techData.length) * 2 * Math.PI;
+              
+              const radius = 40; // percentage
+              const centerX = 50;
+              const centerY = 50;
+              
+              const x1 = centerX + radius * Math.cos(angle1);
+              const y1 = centerY + radius * Math.sin(angle1);
+              const x2 = centerX + radius * Math.cos(angle2);
+              const y2 = centerY + radius * Math.sin(angle2);
+
+              return (
+                <motion.line
+                  key={`${conn.from}-${conn.to}-${i}`}
+                  x1={`${x1}%`}
+                  y1={`${y1}%`}
+                  x2={`${x2}%`}
+                  y2={`${y2}%`}
+                  stroke="currentColor"
+                  strokeWidth={isActive ? 2 : 1}
+                  className={cn(
+                    "transition-all duration-300",
+                    isActive
+                      ? "text-primary opacity-80"
+                      : isConnected
+                      ? "text-primary/50 opacity-50"
+                      : "text-muted-foreground/20 opacity-20"
+                  )}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: isActive ? 0.8 : isConnected ? 0.5 : 0.2 }}
+                  transition={{ duration: 1, delay: i * 0.02 }}
+                />
+              );
+            })}
+          </svg>
+
+          {/* Tech Stack Nodes */}
+          <div className="relative flex flex-wrap items-center justify-center gap-2 p-2 sm:gap-3 sm:p-4">
+            {techData.map((tech, index) => {
+              const isActive = activeTech === tech.name;
+              const isConnected = connectedTechs.has(tech.name);
+              const isHidden = activeTech && !isConnected;
+
+              return (
+                <motion.button
+                  key={tech.name}
+                  type="button"
+                  className={cn(
+                    "retro rounded-sm border-2 transition-all duration-300 touch-manipulation",
+                    getTechSize(tech.count),
+                    isActive
+                      ? cn(
+                          "border-primary bg-primary text-primary-foreground",
+                          getTechGlow(tech.count)
+                        )
+                      : isConnected
+                      ? "border-primary/70 bg-primary/20 text-foreground active:bg-primary/40 sm:hover:bg-primary/30"
+                      : "border-border bg-background/80 text-foreground active:border-primary/50 active:bg-primary/10 sm:hover:border-primary/50 sm:hover:bg-primary/10 dark:border-ring"
+                  )}
+                  style={{
+                    opacity: isHidden ? 0.2 : 1,
+                    transform: isActive ? "scale(1.1)" : "scale(1)",
+                  }}
+                  onMouseEnter={() => setHoveredTech(tech.name)}
+                  onMouseLeave={() => setHoveredTech(null)}
+                  onTouchStart={() => setHoveredTech(tech.name)}
+                  onClick={() => setSelectedTech(selectedTech === tech.name ? null : tech.name)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: isHidden ? 0.2 : 1, scale: isActive ? 1.1 : 1 }}
+                  transition={{ duration: 0.3, delay: index * 0.03 }}
+                >
+                  <span className="text-[0.55rem] sm:text-[0.6rem] md:text-[0.7rem]">
+                    {tech.name}
+                  </span>
+                  <span className="ml-1 text-[0.45rem] opacity-70 sm:ml-1.5 sm:text-[0.5rem]">
+                    ×{tech.count}
+                  </span>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/* Info Panel */}
+          <AnimatePresence>
+            {activeTech && (
+              <motion.div
+                className="absolute bottom-2 left-2 right-2 rounded-sm border-2 border-primary/60 bg-card/95 p-2 backdrop-blur-sm sm:bottom-4 sm:left-4 sm:right-4 sm:p-3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 overflow-hidden">
+                    <p className="retro text-xs font-bold text-primary sm:text-sm">
+                      {activeTech}
+                    </p>
+                    <p className="retro mt-0.5 text-[0.45rem] text-muted-foreground sm:mt-1 sm:text-[0.5rem]">
+                      Used in {techData.find((t) => t.name === activeTech)?.count} project(s)
+                    </p>
+                    <div className="mt-1.5 flex flex-wrap gap-1 sm:mt-2">
+                      {techData
+                        .find((t) => t.name === activeTech)
+                        ?.projects.slice(0, 6)
+                        .map((project) => (
+                          <span
+                            key={project}
+                            className="retro rounded-sm bg-primary/20 px-1.5 py-0.5 text-[0.4rem] leading-tight text-foreground sm:px-2 sm:text-[0.45rem]"
+                          >
+                            {project}
+                          </span>
+                        ))}
+                      {(techData.find((t) => t.name === activeTech)?.projects.length ?? 0) > 6 && (
+                        <span className="retro rounded-sm bg-primary/20 px-1.5 py-0.5 text-[0.4rem] leading-tight text-foreground/70 sm:px-2 sm:text-[0.45rem]">
+                          +{(techData.find((t) => t.name === activeTech)?.projects.length ?? 0) - 6}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedTech(null);
+                      setHoveredTech(null);
+                    }}
+                    className="retro flex size-5 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-[0.6rem] touch-manipulation active:bg-primary/20 sm:size-6 sm:text-xs sm:hover:bg-primary/20 dark:border-ring"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const LabStatusMonitor = ({ 
   activeCount, 
   archivedCount 
@@ -1521,6 +1816,9 @@ export default function ProjectsPage() {
           </div>
         </div>
 
+        {/* Tech Stack Constellation - Between Matrix and Accordions */}
+        <TechStackConstellation projects={sortedProjects} panelClass={panelBaseClass} />
+
         <div className={cn(panelBaseClass, "p-0 sm:p-0 md:p-0 lg:p-0")}>
           {filteredProjects.length > 0 ? (
             <Accordion
@@ -1694,9 +1992,9 @@ export default function ProjectsPage() {
                 No archive entries match the current filter. Toggle another tier to continue exploring the lab files.
               </p>
             </div>
-          )}
-        </div>
-      </section>
+            )}
+          </div>
+        </section>
       {activeImage && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-6"
