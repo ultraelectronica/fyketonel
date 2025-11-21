@@ -40,8 +40,11 @@ import {
   SiLinux,
   SiGnubash,
   SiGit,
+  SiNamecheap,
+  SiOpenstreetmap,
+  SiMaplibre,
 } from "react-icons/si";
-import { TbDatabase, TbBrandVscode, TbBrandWindows, TbBrandPowershell, TbBrandVisualStudio } from "react-icons/tb";
+import { TbDatabase, TbBrandVscode, TbBrandWindows, TbBrandPowershell, TbBrandVisualStudio, TbWorld } from "react-icons/tb";
 import type { IconType } from "react-icons";
 
 const panelClass =
@@ -87,6 +90,10 @@ const technologies: Array<{ name: string; icon: IconType }> = [
   { name: "Powershell", icon: TbBrandPowershell },
   { name: "PostgreSQL", icon: SiPostgresql },
   { name: "Git", icon: SiGit },
+  { name: "Namecheap", icon: SiNamecheap },
+  { name: "Porkbun", icon: TbWorld },
+  { name: "MapLibre GL JS", icon: SiMaplibre },
+  { name: "OpenStreetMaps", icon: SiOpenstreetmap },
 ];
 
 export default function TechnologiesCarousel() {
