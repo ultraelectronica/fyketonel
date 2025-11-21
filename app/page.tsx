@@ -17,6 +17,7 @@ import TechnologiesCarousel from "@/components/technologies-carousel";
 import PlayerProfileCard from "@/components/ui/8bit/blocks/player-profile-card";
 import ContactForm from "@/components/contact-form";
 import PowerPelletHighway from "@/components/power-pellet-highway";
+import AchievementWall from "@/components/achievement-wall";
 import { useMediaQuery } from "react-responsive";
 import { useState, useEffect } from "react";
 
@@ -261,6 +262,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <AchievementWall />
 
       <TechnologiesCarousel />
 
