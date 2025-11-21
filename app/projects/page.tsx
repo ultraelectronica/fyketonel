@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useMediaQuery } from "react-responsive";
+import { motion } from "framer-motion";
 
 import {
   Accordion,
@@ -526,6 +527,65 @@ const classificationLegend: {
   },
 ];
 
+const LabSpecimenScanner = () => (
+  <motion.div
+    className="pointer-events-none absolute inset-0 z-10 overflow-hidden"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+  >
+    {/* Primary scan line */}
+    <motion.div
+      className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_8px_var(--primary),0_0_16px_var(--primary)]"
+      initial={{ top: "0%", opacity: 0 }}
+      animate={{
+        top: ["0%", "100%"],
+        opacity: [0, 1, 1, 0],
+      }}
+      transition={{
+        duration: 1.2,
+        ease: "easeInOut",
+        times: [0, 0.1, 0.9, 1],
+      }}
+    />
+    {/* Secondary scan line (offset) */}
+    <motion.div
+      className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent"
+      initial={{ top: "0%", opacity: 0 }}
+      animate={{
+        top: ["0%", "100%"],
+        opacity: [0, 0.6, 0.6, 0],
+      }}
+      transition={{
+        duration: 1.2,
+        ease: "easeInOut",
+        times: [0, 0.1, 0.9, 1],
+        delay: 0.1,
+      }}
+    />
+    {/* Scan field overlay */}
+    <motion.div
+      className="absolute inset-0 bg-gradient-to-b from-primary/5 via-primary/10 to-primary/5"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 0.4, 0] }}
+      transition={{
+        duration: 1.2,
+        ease: "easeInOut",
+      }}
+    />
+    {/* Grid overlay effect */}
+    <motion.div
+      className="absolute inset-0 bg-[linear-gradient(transparent_calc(100%_-_1px),rgba(var(--primary-rgb,147,51,234),0.1)_1px)] bg-[length:100%_4px]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 0.3, 0] }}
+      transition={{
+        duration: 1.2,
+        ease: "easeInOut",
+      }}
+    />
+  </motion.div>
+);
+
 const QuestionMarkBlock = ({
   title,
   caption,
@@ -835,8 +895,24 @@ export default function ProjectsPage() {
                     </p>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="bg-background/70">
+                <AccordionContent className="bg-background/70 relative overflow-hidden">
+                  <LabSpecimenScanner />
                   <div className="flex flex-col gap-6 p-3 sm:p-4">
+                    <motion.div
+                      className="flex items-center gap-2 rounded-sm border border-dashed border-primary/40 bg-primary/5 px-3 py-2"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: [0, 1, 1, 0] }}
+                      transition={{ duration: 1.5, times: [0, 0.2, 0.8, 1] }}
+                    >
+                      <motion.span
+                        className="inline-block size-2 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]"
+                        animate={{ opacity: [1, 0.3, 1] }}
+                        transition={{ duration: 1, repeat: 2, ease: "easeInOut" }}
+                      />
+                      <span className="retro text-[0.5rem] uppercase tracking-[0.25em] text-primary">
+                        Specimen Analysis in Progress...
+                      </span>
+                    </motion.div>
                     <div className="space-y-4">
                       <div>
                         <p className="retro text-sm text-foreground">
