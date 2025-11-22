@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useMediaQuery } from "react-responsive";
 
 interface InventoryItem {
   id: string;
@@ -204,6 +205,8 @@ const emptySlots = 3; // Number of empty inventory slots to show
 
 export function InventorySystem({ className }: { className?: string }) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const isMobile = useMediaQuery({ maxWidth: 767 });
 
   const totalStats = inventoryItems
     .filter((item) => item.equipped)
@@ -266,6 +269,11 @@ export function InventorySystem({ className }: { className?: string }) {
             isHovered={hoveredItem === item.id}
             onHoverStart={() => setHoveredItem(item.id)}
             onHoverEnd={() => setHoveredItem(null)}
+            isSelected={selectedItem === item.id}
+            onSelect={() =>
+              setSelectedItem((prev) => (prev === item.id ? null : item.id))
+            }
+            isMobile={isMobile}
           />
         ))}
         {/* Empty slots */}
@@ -273,6 +281,69 @@ export function InventorySystem({ className }: { className?: string }) {
           <EmptySlot key={`empty-${index}`} />
         ))}
       </div>
+
+      <AnimatePresence>
+        {isMobile && selectedItem && (
+          <motion.div
+            key="mobile-item-panel"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.2 }}
+            className="rounded-none border-2 border-border bg-card/90 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-md dark:border-ring sm:border-3 sm:p-4"
+          >
+            {(() => {
+              const item = inventoryItems.find((i) => i.id === selectedItem);
+              if (!item) return null;
+              return (
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="retro text-sm uppercase tracking-[0.18em] text-foreground">
+                        {item.name}
+                      </p>
+                      <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
+                        {item.slot} slot · {item.rarity}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedItem(null)}
+                      className="retro rounded-sm border border-border px-2 py-0.5 text-[0.45rem] uppercase tracking-[0.15em] text-muted-foreground hover:border-primary hover:bg-primary/10 dark:border-ring"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div className="rounded-none border border-border/60 bg-background/80 p-2 dark:border-ring/60">
+                    <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+                      Buffs & Effects
+                    </p>
+                    <div className="mt-1 space-y-0.5">
+                      {item.stats.map((stat) => (
+                        <p
+                          key={stat.label}
+                          className={cn(
+                            "retro text-[0.45rem] tracking-[0.12em]",
+                            stat.type === "positive"
+                              ? "text-green-600 dark:text-green-400"
+                              : "text-red-600 dark:text-red-400"
+                          )}
+                        >
+                          {stat.label}: {stat.value >= 0 ? "+" : ""}
+                          {stat.value}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="retro text-[0.45rem] leading-relaxed tracking-[0.12em] text-muted-foreground">
+                    {item.description}
+                  </p>
+                </div>
+              );
+            })()}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
@@ -282,11 +353,17 @@ function InventorySlot({
   isHovered,
   onHoverStart,
   onHoverEnd,
+  isSelected,
+  onSelect,
+  isMobile,
 }: {
   item: InventoryItem;
   isHovered: boolean;
   onHoverStart: () => void;
   onHoverEnd: () => void;
+  isSelected: boolean;
+  onSelect: () => void;
+  isMobile: boolean;
 }) {
   const rarityColors = {
     common: "border-gray-500 dark:border-gray-400",
@@ -312,6 +389,8 @@ function InventorySlot({
     legendary: "bg-gradient-to-br from-card/80 to-amber-500/10",
   };
 
+  const shouldShowTooltip = !isMobile && isHovered;
+
   return (
     <motion.div
       className="group relative"
@@ -327,6 +406,15 @@ function InventorySlot({
           "shadow-[1px_1px_0_var(--border)] hover:bg-accent/30 hover:border-primary hover:shadow-[3px_3px_0_var(--primary)] sm:hover:shadow-[4px_4px_0_var(--primary)] hover:-translate-y-1 sm:shadow-[2px_2px_0_var(--border)]",
           rarityGlow[item.rarity]
         )}
+        onClick={() => {
+          if (isMobile) {
+            onSelect();
+          }
+        }}
+        style={{
+          transform: isSelected ? "scale(1.03)" : undefined,
+          boxShadow: isSelected ? "0 0 0 2px var(--primary)" : undefined,
+        }}
       >
         {/* Equipped badge */}
         {item.equipped && (
@@ -373,7 +461,7 @@ function InventorySlot({
 
       {/* Tooltip */}
       <AnimatePresence>
-        {isHovered && (
+        {shouldShowTooltip && (
           <motion.div
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
