@@ -140,18 +140,18 @@ export default function Home() {
         <p className="retro mb-4 text-center text-[0.5rem] uppercase tracking-[0.25em] text-muted-foreground sm:mb-5 sm:text-[0.6rem] sm:tracking-[0.3em] md:mb-6 md:text-xs md:tracking-[0.35em]">
           Lab Control Center
         </p>
-        <div className={`flex flex-col ${gridGap}`}>
-          <div className={`grid ${gridGap} lg:grid-cols-2 lg:grid-rows-2 lg:auto-rows-fr`}>
-            <div className={`${panelClass} flex flex-col`}>
+        <div className="flex flex-col gap-4 min-[375px]:gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 gap-4 min-[375px]:gap-5 sm:gap-6 lg:grid-cols-2 lg:auto-rows-[minmax(0,1fr)]">
+            <div className={`${panelClass} flex flex-col h-full`}>
               <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
                 Mission Planner
               </p>
-              <div className="mt-4 flex flex-1 items-center justify-center w-full sm:mt-5 md:mt-6">
-                <InteractiveCalendar className="scale-75 w-full max-w-none sm:scale-90 md:scale-95" />
+              <div className="mt-4 flex flex-1 w-full items-center justify-center sm:mt-5 md:mt-6">
+                <InteractiveCalendar className="w-full max-w-md text-[clamp(0.4rem,2vw,0.65rem)] sm:max-w-lg sm:text-[0.75rem]" />
               </div>
             </div>
 
-            <div className={`${panelClass} flex flex-col min-h-[350px] sm:min-h-[400px] md:min-h-[500px]`}>
+            <div className={`${panelClass} flex flex-col h-full`}>
               <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground text-center sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
                 Player Card
               </p>
@@ -184,12 +184,12 @@ export default function Home() {
               </div>
             </div>
 
-            <div id="wishlist" className={`${panelClass} flex flex-col`}>
+            <div id="wishlist" className={`${panelClass} flex flex-col h-full`}>
               <p className="retro text-center text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
                 Wishlist
               </p>
-              <div className="mt-4 flex flex-1 items-center sm:mt-5 md:mt-6">
-                <ItemGroup className="gap-2 w-full sm:gap-2.5 md:gap-3">
+              <div className="mt-4 flex flex-1 w-full sm:mt-5 md:mt-6">
+                <ItemGroup className="flex w-full flex-col gap-2 sm:gap-2.5 md:gap-3">
                   {wishlistItems.map((item, index) => (
                     <div key={item.id}>
                       <Item 
@@ -222,7 +222,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className={`${panelClass} flex flex-col`}>
+            <div className={`${panelClass} flex flex-col h-full`}>
               <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
                 A random joke for your mood.
               </p>

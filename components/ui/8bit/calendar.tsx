@@ -35,7 +35,7 @@ function Calendar({ className, classNames, font, ...props }: CalendarProps) {
   return (
     <div
       className={cn(
-        "bg-popover relative border-y-6 border-foreground dark:border-ring w-max",
+        "bg-popover relative border-y-6 border-foreground dark:border-ring w-max text-[clamp(0.4rem,2vw,0.6rem)] sm:text-[0.7rem]",
         className
       )}
     >
@@ -49,16 +49,17 @@ function Calendar({ className, classNames, font, ...props }: CalendarProps) {
         classNames={{
           nav_button: cn(
             buttonVariants({ variant: "outline" }),
-            "size-7 bg-transparent p-0 flex items-center justify-center hover:opacity-50 border-2 border-foreground dark:border-ring"
+            "size-6 bg-transparent p-0 flex items-center justify-center hover:opacity-50 border-2 border-foreground dark:border-ring sm:size-7"
           ),
           day_button: cn(
             buttonVariants({ variant: "ghost" }),
-            "h-10 font-normal aria-selected:opacity-100"
+            "h-8 w-8 font-normal aria-selected:opacity-100 text-[0.5rem] sm:h-10 sm:w-10 sm:text-[0.6rem]"
           ),
           day: cn(
             "relative w-full h-full p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md group/day select-none"
           ),
-          caption_label: "text-xs font-medium",
+          caption_label: "text-[0.55rem] font-medium sm:text-xs",
+          head_cell: "text-[0.4rem] font-normal text-muted-foreground sm:text-[0.5rem]",
           ...classNames,
         }}
         components={{
