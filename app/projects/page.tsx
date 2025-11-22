@@ -1354,27 +1354,6 @@ const ProjectDependenciesGraph = ({
                     }}
                     transition={{ duration: 0.8, delay: i * 0.05 }}
                   />
-                  {/* Animated particles on active connections */}
-                  {isActive && (
-                    <motion.circle
-                      r="3"
-                      className={cn("fill-current", getConnectionColor(rel.type))}
-                      initial={{ offsetDistance: "0%" }}
-                      animate={{ offsetDistance: "100%" }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                    >
-                      <animateMotion dur="2s" repeatCount="indefinite">
-                        <mpath
-                          xlinkHref={`#path-${rel.from}-${rel.to}`}
-                          href={`#path-${rel.from}-${rel.to}`}
-                        />
-                      </animateMotion>
-                    </motion.circle>
-                  )}
                 </g>
               );
             })}
