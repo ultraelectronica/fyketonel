@@ -1,22 +1,28 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useMediaQuery } from "react-responsive";
 
 import { cn } from "@/lib/utils";
 
 export function PowerPelletHighway({ className }: { className?: string }) {
+  const [isMounted, setIsMounted] = useState(false);
   const isSmall = useMediaQuery({ maxWidth: 639 });
   const isMedium = useMediaQuery({ minWidth: 640, maxWidth: 1023 });
   const isLarge = useMediaQuery({ minWidth: 1024 });
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const pelletCount = useMemo(() => {
+    if (!isMounted) return 16; // ensure SSR/CSR match
     if (isSmall) return 16;
     if (isMedium) return 24;
     if (isLarge) return 32;
     return 16; // default fallback
-  }, [isSmall, isMedium, isLarge]);
+  }, [isMounted, isSmall, isMedium, isLarge]);
 
   const pellets = Array.from({ length: pelletCount });
 

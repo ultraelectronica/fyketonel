@@ -35,7 +35,7 @@ function Calendar({ className, classNames, font, ...props }: CalendarProps) {
   return (
     <div
       className={cn(
-        "bg-popover relative border-y-6 border-foreground dark:border-ring w-max text-[clamp(0.4rem,2vw,0.6rem)] sm:text-[0.7rem]",
+        "bg-popover relative border-y-6 border-foreground dark:border-ring w-full text-[clamp(0.4rem,2vw,0.6rem)] sm:text-[0.7rem]",
         className
       )}
     >
@@ -53,13 +53,16 @@ function Calendar({ className, classNames, font, ...props }: CalendarProps) {
           ),
           day_button: cn(
             buttonVariants({ variant: "ghost" }),
-            "h-8 w-8 font-normal aria-selected:opacity-100 text-[0.5rem] sm:h-10 sm:w-10 sm:text-[0.6rem]"
+            "mx-auto flex h-8 w-8 items-center justify-center font-normal aria-selected:opacity-100 text-[0.5rem] sm:h-10 sm:w-10 sm:text-[0.6rem]"
           ),
           day: cn(
             "relative w-full h-full p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md group/day select-none"
           ),
+          table: "w-full table-fixed border-collapse",
+          head_row: "text-center",
+          row: "text-center",
           caption_label: "text-[0.55rem] font-medium sm:text-xs",
-          head_cell: "text-[0.4rem] font-normal text-muted-foreground sm:text-[0.5rem]",
+          head_cell: "text-center text-[0.4rem] font-normal text-muted-foreground sm:text-[0.5rem]",
           ...classNames,
         }}
         components={{

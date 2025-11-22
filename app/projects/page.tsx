@@ -781,7 +781,7 @@ const RetroVisitorCounter = () => {
 
   return (
     <motion.div
-      className="mx-auto w-fit"
+      className="mx-auto w-full max-w-xl px-3"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
@@ -809,20 +809,24 @@ const RetroVisitorCounter = () => {
           </div>
           
           <div className="rounded-sm border-2 border-yellow-800 bg-black px-4 py-2 dark:border-yellow-400">
-            <motion.div
-              key={visitorCount}
-              className="retro text-center font-mono text-2xl tabular-nums text-green-400 sm:text-3xl"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                textShadow: "0 0 10px rgba(74, 222, 128, 0.8), 0 0 20px rgba(74, 222, 128, 0.4)",
-                letterSpacing: displayMode === "binary" ? "0.1em" : "0.2em",
-                fontSize: displayMode === "binary" ? "0.75rem" : undefined,
-              }}
-            >
-              {visitorCount}
-            </motion.div>
+            <div className="max-w-full overflow-x-auto">
+              <motion.div
+                key={visitorCount}
+                className="retro mx-auto text-center font-mono text-xl tabular-nums text-green-400 sm:text-2xl md:text-3xl"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  textShadow: "0 0 10px rgba(74, 222, 128, 0.8), 0 0 20px rgba(74, 222, 128, 0.4)",
+                  letterSpacing: displayMode === "binary" ? "0.08em" : "0.18em",
+                  fontSize: displayMode === "binary" ? "0.7rem" : undefined,
+                  wordBreak: "break-all",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {visitorCount}
+              </motion.div>
+            </div>
           </div>
 
           <div className="flex items-center justify-center gap-1">
@@ -1350,27 +1354,6 @@ const ProjectDependenciesGraph = ({
                     }}
                     transition={{ duration: 0.8, delay: i * 0.05 }}
                   />
-                  {/* Animated particles on active connections */}
-                  {isActive && (
-                    <motion.circle
-                      r="3"
-                      className={cn("fill-current", getConnectionColor(rel.type))}
-                      initial={{ offsetDistance: "0%" }}
-                      animate={{ offsetDistance: "100%" }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                    >
-                      <animateMotion dur="2s" repeatCount="indefinite">
-                        <mpath
-                          xlinkHref={`#path-${rel.from}-${rel.to}`}
-                          href={`#path-${rel.from}-${rel.to}`}
-                        />
-                      </animateMotion>
-                    </motion.circle>
-                  )}
                 </g>
               );
             })}
@@ -2738,9 +2721,6 @@ export default function ProjectsPage() {
                   priority
                 />
               </div>
-              <p className="retro mt-3 text-center text-[0.55rem] uppercase tracking-[0.15em] text-muted-foreground">
-                {activeImage.alt}
-              </p>
             </div>
           </div>
         </div>
