@@ -457,7 +457,6 @@ export function SkillTree({ className }: { className?: string }) {
 function SkillNode({
   skill,
   isSelected,
-  isHovered,
   onSelect,
   onHover,
   onHoverEnd,
