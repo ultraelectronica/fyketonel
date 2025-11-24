@@ -760,13 +760,19 @@ export function RetroTerminal() {
     addLines([{ type: "input", content: `$ ${trimmed}`, timestamp: new Date() }]);
 
     // Parse command string for logical operators: &&, ||, ;
-    // Use regex to split by operators while preserving them
+    // Smart parsing: combine flags from the same command
     const parts: Array<{ command: string; operator?: "&&" | "||" | ";" }> = [];
     
+    // Use regex to match operators with whitespace boundaries to avoid splitting within arguments
+    // Match: whitespace + operator + whitespace OR start/end + operator + whitespace
+    const operatorPattern = /(\s+&&\s+|\s+\|\|\s+|\s+;\s+|^&&\s+|\s+&&$|^\|\|\s+|\s+\|\|$|^;\s+|\s+;$)/;
+    
     // Split by operators, keeping them in the array
-    const tokens = trimmed.split(/(\s*&&\s*|\s*\|\|\s*|\s*;\s*)/).filter(token => token.trim());
+    const tokens = trimmed.split(operatorPattern).filter(token => token.trim());
     
     let currentOperator: "&&" | "||" | ";" | undefined = undefined;
+    let previousCommandName = "";
+    let previousCommandBase = "";
     
     for (const token of tokens) {
       const trimmedToken = token.trim();
@@ -778,6 +784,30 @@ export function RetroTerminal() {
       } else if (trimmedToken === ";") {
         currentOperator = ";";
       } else if (trimmedToken) {
+        // If token starts with -- (a flag) and we have a previous command with && operator,
+        // combine flags with the previous command
+        if (trimmedToken.startsWith("--") && previousCommandName && currentOperator === "&&") {
+          // Combine flags: merge with previous command
+          const previousIndex = parts.length - 1;
+          if (previousIndex >= 0) {
+            // Extract flags from current token
+            const newFlags = trimmedToken.split(/\s+/);
+            // Combine with previous command
+            const combinedCommand = `${previousCommandBase} ${newFlags.join(" ")}`.trim();
+            parts[previousIndex].command = combinedCommand;
+            // Update previousCommandBase so more flags can be chained
+            previousCommandBase = combinedCommand;
+            // Don't add a new part, just update the previous one
+            currentOperator = undefined;
+            continue;
+          }
+        }
+        
+        // Extract command name for next iteration
+        const commandParts = trimmedToken.split(/\s+/);
+        previousCommandName = commandParts[0].toLowerCase();
+        previousCommandBase = trimmedToken;
+        
         // It's a command
         if (parts.length > 0 && currentOperator) {
           // Add operator to previous entry
