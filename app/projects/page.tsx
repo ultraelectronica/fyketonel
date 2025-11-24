@@ -22,6 +22,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/8bit/carousel";
 import { cn } from "@/lib/utils";
+import RetroTerminal from "@/components/retro-terminal";
 
 const tierOrder = ["S", "A", "B", "C", "D"] as const;
 
@@ -2510,6 +2511,9 @@ export default function ProjectsPage() {
 
         {/* Tech Stack Constellation - Between Matrix and Accordions */}
         <TechStackConstellation projects={sortedProjects} panelClass={panelBaseClass} />
+
+        {/* Retro Terminal */}
+        <RetroTerminal />
 
         <div className={cn(panelBaseClass, "p-0 sm:p-0 md:p-0 lg:p-0")}>
           {filteredProjects.length > 0 ? (
