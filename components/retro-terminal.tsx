@@ -685,13 +685,83 @@ export function RetroTerminal() {
     },
     echo: {
       name: "echo",
-      description: "Echo back the text",
-      execute: (args) => [
-        {
-          type: "output",
-          content: args.join(" ") || "",
-        },
-      ],
+      description: "Echo back the text with data type support",
+      execute: (args) => {
+        if (args.length === 0) {
+          return [
+            {
+              type: "output",
+              content: "",
+            },
+          ];
+        }
+
+        const input = args.join(" ");
+        const output: TerminalLine[] = [];
+
+        // Try to detect and format data types
+        // Check for boolean
+        if (input.toLowerCase() === "true" || input.toLowerCase() === "false") {
+          const boolValue = input.toLowerCase() === "true";
+          output.push({
+            type: "output",
+            content: `${input} (bool: ${boolValue})`,
+          });
+        }
+        // Check for integer
+        else if (/^-?\d+$/.test(input)) {
+          const intValue = parseInt(input, 10);
+          output.push({
+            type: "output",
+            content: `${input} (int: ${intValue})`,
+          });
+        }
+        // Check for float/double
+        else if (/^-?\d+\.\d+$/.test(input)) {
+          const floatValue = parseFloat(input);
+          output.push({
+            type: "output",
+            content: `${input} (float: ${floatValue})`,
+          });
+        }
+        // Check for null
+        else if (input.toLowerCase() === "null") {
+          output.push({
+            type: "output",
+            content: `${input} (null)`,
+          });
+        }
+        // Check for undefined
+        else if (input.toLowerCase() === "undefined") {
+          output.push({
+            type: "output",
+            content: `${input} (undefined)`,
+          });
+        }
+        // Check for array-like syntax [item1, item2, ...]
+        else if (/^\[.*\]$/.test(input)) {
+          output.push({
+            type: "output",
+            content: `${input} (array)`,
+          });
+        }
+        // Check for object-like syntax {key: value, ...}
+        else if (/^\{.*\}$/.test(input)) {
+          output.push({
+            type: "output",
+            content: `${input} (object)`,
+          });
+        }
+        // Default: treat as string
+        else {
+          output.push({
+            type: "output",
+            content: `${input} (string)`,
+          });
+        }
+
+        return output;
+      },
     },
     date: {
       name: "date",
