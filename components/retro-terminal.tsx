@@ -329,6 +329,8 @@ const themes = {
 };
 
 export function RetroTerminal() {
+  const MAX_LINES = 70;
+  
   const [lines, setLines] = useState<TerminalLine[]>([
     {
       type: "success",
@@ -347,6 +349,15 @@ export function RetroTerminal() {
       content: "Type 'help' to see available commands.",
     },
   ]);
+
+  // Helper function to limit lines to MAX_LINES
+  const addLines = (newLines: TerminalLine[]) => {
+    setLines((prev) => {
+      const combined = [...prev, ...newLines];
+      // Keep only the last MAX_LINES
+      return combined.slice(-MAX_LINES);
+    });
+  };
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -360,13 +371,17 @@ export function RetroTerminal() {
 
   // Load theme from localStorage after mount to avoid hydration mismatch
   useEffect(() => {
-    setIsMounted(true);
-    if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem("terminal-theme");
-      if (savedTheme && themes[savedTheme as keyof typeof themes]) {
-        setCurrentTheme(savedTheme);
+    // Use requestAnimationFrame to avoid synchronous setState in effect
+    const rafId = requestAnimationFrame(() => {
+      setIsMounted(true);
+      if (typeof window !== "undefined") {
+        const savedTheme = localStorage.getItem("terminal-theme");
+        if (savedTheme && themes[savedTheme as keyof typeof themes]) {
+          setCurrentTheme(savedTheme);
+        }
       }
-    }
+    });
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
   // Auto-scroll to bottom when new lines are added
@@ -407,7 +422,9 @@ export function RetroTerminal() {
     if (Object.keys(themeValues).length > 0) {
       // Apply theme variables
       Object.entries(themeValues).forEach(([property, value]) => {
-        root.style.setProperty(property, value, "important");
+        if (typeof value === "string") {
+          root.style.setProperty(property, value, "important");
+        }
       });
     } else {
       // Reset to default by removing all theme custom properties
@@ -523,7 +540,7 @@ export function RetroTerminal() {
         }
 
         output.push({ type: "output", content: "" });
-        output.push({ type: "success", content: "Full-Stack Developer | Building awesome projects" });
+        output.push({ type: "success", content: "Full-Stack Developer | Guardian of Chaotic Plans" });
         
         return output;
       },
@@ -688,10 +705,7 @@ export function RetroTerminal() {
     setHistoryIndex(-1);
 
     // Add input line
-    setLines((prev) => [
-      ...prev,
-      { type: "input", content: `$ ${trimmed}`, timestamp: new Date() },
-    ]);
+    addLines([{ type: "input", content: `$ ${trimmed}`, timestamp: new Date() }]);
 
     // Parse command and arguments
     const parts = trimmed.split(/\s+/);
@@ -702,10 +716,9 @@ export function RetroTerminal() {
     const command = commands[commandName];
     if (command) {
       const output = command.execute(args);
-      setLines((prev) => [...prev, ...output]);
+      addLines(output);
     } else {
-      setLines((prev) => [
-        ...prev,
+      addLines([
         {
           type: "error",
           content: `Command not found: ${commandName}`,
