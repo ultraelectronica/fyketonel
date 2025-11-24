@@ -80,16 +80,16 @@ export function RetroTerminal() {
     }
   }, [lines]);
 
-  // Apply theme to document root
+  // Apply theme to document body to avoid conflicts with next-themes
   useEffect(() => {
-    const html = document.documentElement;
+    const body = document.body;
     // Remove all theme classes
     Object.values(themes).forEach(theme => {
-      html.classList.remove(theme.class);
+      body.classList.remove(theme.class);
     });
     // Add current theme class if not default
     if (currentTheme !== "default") {
-      html.classList.add(themes[currentTheme as keyof typeof themes].class);
+      body.classList.add(themes[currentTheme as keyof typeof themes].class);
     }
   }, [currentTheme]);
 
@@ -534,24 +534,16 @@ export function RetroTerminal() {
               {/* Input Line */}
               <div className="mt-2 flex items-center gap-2">
                 <span className="retro text-xs text-primary">$</span>
-                <div className="relative flex-1 flex items-center">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    className="retro w-full bg-transparent text-xs text-foreground outline-none"
-                    placeholder="Type a command..."
-                    autoFocus
-                  />
-                  {/* Cursor blink - positioned after input */}
-                  <motion.span
-                    className="ml-0.5 inline-block h-3 w-1.5 bg-primary"
-                    animate={{ opacity: [1, 0] }}
-                    transition={{ duration: 0.8, repeat: Infinity }}
-                  />
-                </div>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="retro flex-1 bg-transparent text-xs text-foreground outline-none caret-primary"
+                  placeholder="Type a command..."
+                  autoFocus
+                />
               </div>
             </div>
 

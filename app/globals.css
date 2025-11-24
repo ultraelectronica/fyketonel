@@ -319,3 +319,99 @@ button:not(:disabled):hover {
   }
 }
 
+/* ======================================== 
+   TERMINAL ORPHEUS THEME COLORWAYS
+   ======================================== */
+
+/* Atari Theme */
+body.theme-atari {
+  --primary: oklch(0.5 0.2 60) !important;
+  --primary-foreground: oklch(0 0 0) !important;
+  --background: oklch(0.7 0 0) !important;
+  --foreground: oklch(0 0 0) !important;
+  --card: oklch(1 0 0) !important;
+  --border: oklch(0.5 0.2 60) !important;
+  --accent: oklch(0.5 0.2 60) !important;
+}
+
+.dark body.theme-atari {
+  --primary: oklch(0.4 0.2 60) !important;
+  --background: oklch(0.2 0 0) !important;
+  --foreground: oklch(0.9 0 0) !important;
+  --card: oklch(0.4 0 0) !important;
+  --border: oklch(0.4 0 0) !important;
+}
+
+/* Nintendo Theme */
+body.theme-nintendo {
+  --primary: oklch(0.5 0.2 280) !important;
+  --primary-foreground: oklch(0 0 0) !important;
+  --background: oklch(1 0 0) !important;
+  --foreground: oklch(0 0 0) !important;
+  --card: oklch(1 0 0) !important;
+  --border: oklch(0.5 0.2 280) !important;
+  --accent: oklch(0.7 0.1 260) !important;
+}
+
+.dark body.theme-nintendo {
+  --primary: oklch(0.5 0.2 280) !important;
+  --background: oklch(0.16 0.05 260) !important;
+  --foreground: oklch(1 0 0) !important;
+  --card: oklch(0.2 0.06 260) !important;
+  --border: oklch(1 0 0) !important;
+}
+
+/* VHS Theme */
+body.theme-vhs {
+  --background: oklch(0.9768 0.0142 308.299) !important;
+  --foreground: oklch(0.2905 0.1432 302.7167) !important;
+  --card: oklch(1 0 0) !important;
+  --primary: oklch(0.5915 0.2569 322.8961) !important;
+  --border: oklch(0.9024 0.0604 306.703) !important;
+  --accent: oklch(0.903 0.0732 319.6198) !important;
+}
+
+.dark body.theme-vhs {
+  --background: oklch(0.166 0.0254 298.9423) !important;
+  --foreground: oklch(0.9024 0.0604 306.703) !important;
+  --card: oklch(0.1962 0.0365 301.0125) !important;
+  --primary: oklch(0.6668 0.2591 322.1499) !important;
+  --border: oklch(0.2905 0.1432 302.7167) !important;
+}
+
+/* Gameboy Theme */
+body.theme-gameboy {
+  --primary: oklch(0.7 0.2 120) !important;
+  --primary-foreground: oklch(0.2 0.1 140) !important;
+  --background: oklch(0.8 0.2 140) !important;
+  --foreground: oklch(0.2 0.1 140) !important;
+  --card: oklch(0.8 0.2 140) !important;
+  --border: oklch(0.4 0.2 140) !important;
+  --accent: oklch(0.3 0.2 140) !important;
+}
+
+.dark body.theme-gameboy {
+  --primary: oklch(0.7 0.2 120) !important;
+  --background: oklch(0.2 0.1 140) !important;
+  --foreground: oklch(0.8 0.2 120) !important;
+  --card: oklch(0.2 0.1 140) !important;
+  --border: oklch(0.4 0.2 140) !important;
+}
+
+/* Soft-pop Theme */
+body.theme-softpop {
+  --background: oklch(0.9789 0.0082 121.6272) !important;
+  --foreground: oklch(0 0 0) !important;
+  --card: oklch(1 0 0) !important;
+  --primary: oklch(0.5106 0.2301 276.9656) !important;
+  --border: oklch(0 0 0) !important;
+  --accent: oklch(0.7686 0.1647 70.0804) !important;
+}
+
+.dark body.theme-softpop {
+  --background: oklch(0 0 0) !important;
+  --foreground: oklch(1 0 0) !important;
+  --card: oklch(0.2455 0.0217 257.2823) !important;
+  --primary: oklch(0.6801 0.1583 276.9349) !important;
+  --border: oklch(0.4459 0 0) !important;
+}
