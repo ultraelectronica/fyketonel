@@ -103,7 +103,7 @@ export default function PlayerProfileCard({
         tone: "text-purple-400",
       },
     ];
-  }, [healthPercentage, manaPercentage, level, stats?.mana?.current, stats?.health?.max]);
+  }, [healthPercentage, manaPercentage, level, stats]);
 
   const statusEffects = useMemo(() => {
     const effects = [
@@ -122,7 +122,7 @@ export default function PlayerProfileCard({
     }
 
     return effects;
-  }, [playerClass, stats?.mana]);
+  }, [playerClass, stats]);
 
   const [activeEffectIndex, setActiveEffectIndex] = useState(0);
 
@@ -150,8 +150,158 @@ export default function PlayerProfileCard({
         )}
         {...props}
       >
+        {/* Background gradients */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(250,204,21,0.15),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(59,130,246,0.15),transparent_35%)]" />
         <div className="pointer-events-none absolute inset-0 border border-dashed border-border/40" />
+
+        {/* Corner Decorations - Pixel Art Style */}
+        {/* Top-left corner */}
+        <div className="absolute left-0 top-0 z-20">
+          <div className="relative h-8 w-8">
+            {/* Outer corner pixels */}
+            <motion.div 
+              className="absolute left-0 top-0 h-2 w-6 bg-primary"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <motion.div 
+              className="absolute left-0 top-0 h-6 w-2 bg-primary"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+            />
+            {/* Inner detail */}
+            <div className="absolute left-2 top-2 h-1 w-1 animate-pulse bg-accent" />
+          </div>
+        </div>
+
+        {/* Top-right corner */}
+        <div className="absolute right-0 top-0 z-20">
+          <div className="relative h-8 w-8">
+            <motion.div 
+              className="absolute right-0 top-0 h-2 w-6 bg-primary"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.25 }}
+            />
+            <motion.div 
+              className="absolute right-0 top-0 h-6 w-2 bg-primary"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.75 }}
+            />
+            <div className="absolute right-2 top-2 h-1 w-1 animate-pulse bg-accent" />
+          </div>
+        </div>
+
+        {/* Bottom-left corner */}
+        <div className="absolute bottom-0 left-0 z-20">
+          <div className="relative h-8 w-8">
+            <motion.div 
+              className="absolute bottom-0 left-0 h-2 w-6 bg-secondary"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+            />
+            <motion.div 
+              className="absolute bottom-0 left-0 h-6 w-2 bg-secondary"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <div className="absolute bottom-2 left-2 h-1 w-1 animate-pulse bg-accent" />
+          </div>
+        </div>
+
+        {/* Bottom-right corner */}
+        <div className="absolute bottom-0 right-0 z-20">
+          <div className="relative h-8 w-8">
+            <motion.div 
+              className="absolute bottom-0 right-0 h-2 w-6 bg-secondary"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.75 }}
+            />
+            <motion.div 
+              className="absolute bottom-0 right-0 h-6 w-2 bg-secondary"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.25 }}
+            />
+            <div className="absolute bottom-2 right-2 h-1 w-1 animate-pulse bg-accent" />
+          </div>
+        </div>
+
+        {/* Chaos Symbols on sides - Guardian themed */}
+        {/* Left side */}
+        <div className="absolute left-0 top-1/2 z-20 -translate-y-1/2">
+          <motion.div
+            className="flex flex-col gap-1 px-0.5"
+            animate={{ x: [-2, 0, -2] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="h-1.5 w-1.5 bg-primary shadow-[0_0_4px_var(--primary)]" />
+            <div className="h-2 w-2 bg-accent shadow-[0_0_6px_var(--accent)]" />
+            <div className="h-1.5 w-1.5 bg-primary shadow-[0_0_4px_var(--primary)]" />
+          </motion.div>
+        </div>
+
+        {/* Right side */}
+        <div className="absolute right-0 top-1/2 z-20 -translate-y-1/2">
+          <motion.div
+            className="flex flex-col gap-1 px-0.5"
+            animate={{ x: [2, 0, 2] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          >
+            <div className="h-1.5 w-1.5 bg-secondary shadow-[0_0_4px_var(--secondary)]" />
+            <div className="h-2 w-2 bg-accent shadow-[0_0_6px_var(--accent)]" />
+            <div className="h-1.5 w-1.5 bg-secondary shadow-[0_0_4px_var(--secondary)]" />
+          </motion.div>
+        </div>
+
+        {/* Top chaos pattern */}
+        <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2">
+          <motion.div
+            className="flex gap-1 py-0.5"
+            animate={{ 
+              opacity: [0.6, 1, 0.6],
+              y: [-1, 0, -1]
+            }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="h-1.5 w-1.5 bg-primary" />
+            <div className="h-1.5 w-2 bg-accent" />
+            <div className="h-1.5 w-1.5 bg-primary" />
+          </motion.div>
+        </div>
+
+        {/* Bottom chaos pattern */}
+        <div className="absolute bottom-0 left-1/2 z-20 -translate-x-1/2">
+          <motion.div
+            className="flex gap-1 py-0.5"
+            animate={{ 
+              opacity: [0.6, 1, 0.6],
+              y: [1, 0, 1]
+            }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 1.25 }}
+          >
+            <div className="h-1.5 w-1.5 bg-secondary" />
+            <div className="h-1.5 w-2 bg-accent" />
+            <div className="h-1.5 w-1.5 bg-secondary" />
+          </motion.div>
+        </div>
+
+        {/* Energy flow animation along border */}
+        <motion.div
+          className="pointer-events-none absolute inset-0 z-10 rounded-none border-2 border-primary/30"
+          animate={{
+            borderColor: [
+              'rgba(var(--primary-rgb, 234, 179, 8), 0.3)',
+              'rgba(var(--accent-rgb, 251, 191, 36), 0.5)',
+              'rgba(var(--primary-rgb, 234, 179, 8), 0.3)',
+            ],
+            boxShadow: [
+              '0 0 5px rgba(234, 179, 8, 0.2)',
+              '0 0 15px rgba(251, 191, 36, 0.4)',
+              '0 0 5px rgba(234, 179, 8, 0.2)',
+            ]
+          }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        />
+
 
       <CardHeader className="pb-4">
         <div className="flex items-center gap-4">
