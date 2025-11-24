@@ -716,16 +716,10 @@ export function RetroTerminal() {
     },
   };
 
-  const executeCommand = (commandString: string) => {
+  // Helper function to execute a single command and return success status
+  const executeSingleCommand = (commandString: string): boolean => {
     const trimmed = commandString.trim();
-    if (!trimmed) return;
-
-    // Add command to history
-    setHistory((prev) => [...prev, trimmed]);
-    setHistoryIndex(-1);
-
-    // Add input line
-    addLines([{ type: "input", content: `$ ${trimmed}`, timestamp: new Date() }]);
+    if (!trimmed) return true;
 
     // Parse command and arguments
     const parts = trimmed.split(/\s+/);
@@ -737,6 +731,8 @@ export function RetroTerminal() {
     if (command) {
       const output = command.execute(args);
       addLines(output);
+      // Command succeeded if no error lines in output
+      return !output.some(line => line.type === "error");
     } else {
       addLines([
         {
@@ -748,6 +744,79 @@ export function RetroTerminal() {
           content: "Type 'help' to see available commands.",
         },
       ]);
+      return false; // Command failed
+    }
+  };
+
+  const executeCommand = (commandString: string) => {
+    const trimmed = commandString.trim();
+    if (!trimmed) return;
+
+    // Add command to history
+    setHistory((prev) => [...prev, trimmed]);
+    setHistoryIndex(-1);
+
+    // Add input line
+    addLines([{ type: "input", content: `$ ${trimmed}`, timestamp: new Date() }]);
+
+    // Parse command string for logical operators: &&, ||, ;
+    // Use regex to split by operators while preserving them
+    const parts: Array<{ command: string; operator?: "&&" | "||" | ";" }> = [];
+    
+    // Split by operators, keeping them in the array
+    const tokens = trimmed.split(/(\s*&&\s*|\s*\|\|\s*|\s*;\s*)/).filter(token => token.trim());
+    
+    let currentOperator: "&&" | "||" | ";" | undefined = undefined;
+    
+    for (const token of tokens) {
+      const trimmedToken = token.trim();
+      
+      if (trimmedToken === "&&") {
+        currentOperator = "&&";
+      } else if (trimmedToken === "||") {
+        currentOperator = "||";
+      } else if (trimmedToken === ";") {
+        currentOperator = ";";
+      } else if (trimmedToken) {
+        // It's a command
+        if (parts.length > 0 && currentOperator) {
+          // Add operator to previous entry
+          parts[parts.length - 1].operator = currentOperator;
+        }
+        parts.push({ command: trimmedToken });
+        currentOperator = undefined;
+      }
+    }
+
+    // Execute commands based on operators
+    let lastSuccess = true;
+
+    for (let j = 0; j < parts.length; j++) {
+      const part = parts[j];
+      let shouldExecute = true;
+
+      // Determine if we should execute based on operator from previous command
+      if (j > 0 && parts[j - 1].operator) {
+        const operator = parts[j - 1].operator;
+        if (operator === "&&") {
+          // Execute only if previous succeeded
+          shouldExecute = lastSuccess;
+        } else if (operator === "||") {
+          // Execute only if previous failed
+          shouldExecute = !lastSuccess;
+        } else if (operator === ";") {
+          // Always execute (sequential)
+          shouldExecute = true;
+        }
+      }
+
+      // Execute command if conditions are met
+      if (shouldExecute && part.command) {
+        lastSuccess = executeSingleCommand(part.command);
+      } else if (part.command) {
+        // Command skipped due to operator logic
+        lastSuccess = false;
+      }
     }
 
     setInput("");
