@@ -52,7 +52,7 @@ export default function GitHubContributions() {
             });
           });
 
-          // Convert to chart data with Pacman colors
+          // Convert to chart data using CSS variables for theming
           const chartData: ChartData[] = Object.entries(monthlyData)
             .sort(([a], [b]) => a.localeCompare(b))
             .slice(-12) // Last 12 months
@@ -61,18 +61,12 @@ export default function GitHubContributions() {
               const date = new Date(parseInt(year), parseInt(month) - 1);
               const monthLabel = date.toLocaleDateString("en-US", { month: "short" });
               
-              // Pacman yellow/gold gradient based on contribution level
-              let fill = "#FFD700"; // Default Pacman gold
-              if (value > 100) fill = "#FFA500"; // High: Orange-gold
-              else if (value > 50) fill = "#FFCC00"; // Medium-high: Bright gold
-              else if (value > 20) fill = "#FFD700"; // Medium: Classic Pacman
-              else if (value > 0) fill = "#FFE55C"; // Low: Light yellow
-              else fill = "rgba(255, 215, 0, 0.2)"; // None: Faded yellow
-              
+              // Use CSS variables for theming - will be styled via chart config
+              // The actual color will come from --color-contributions CSS variable
               return {
                 month: monthLabel,
                 contributions: value,
-                fill,
+                fill: "var(--color-contributions, var(--chart-1))",
               };
             });
 
@@ -129,7 +123,7 @@ export default function GitHubContributions() {
   const chartConfig = {
     contributions: {
       label: "Contributions",
-      color: "#FFD700",
+      color: "var(--chart-1)",
     },
   };
 

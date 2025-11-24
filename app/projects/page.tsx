@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,6 +22,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/8bit/carousel";
 import { cn } from "@/lib/utils";
+import RetroTerminal from "@/components/retro-terminal";
 
 const tierOrder = ["S", "A", "B", "C", "D"] as const;
 
@@ -814,12 +815,13 @@ const RetroVisitorCounter = () => {
             <div className="max-w-full overflow-x-auto">
               <motion.div
                 key={visitorCount}
-                className="retro mx-auto text-center font-mono text-xl tabular-nums text-green-400 sm:text-2xl md:text-3xl"
+                className="retro mx-auto text-center font-mono text-xl tabular-nums sm:text-2xl md:text-3xl"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
                 style={{
-                  textShadow: "0 0 10px rgba(74, 222, 128, 0.8), 0 0 20px rgba(74, 222, 128, 0.4)",
+                  color: "var(--visitor-counter, oklch(0.6 0.25 140))",
+                  textShadow: "0 0 10px var(--visitor-counter, oklch(0.6 0.25 140) / 0.8), 0 0 20px var(--visitor-counter, oklch(0.6 0.25 140) / 0.4)",
                   letterSpacing: displayMode === "binary" ? "0.08em" : "0.18em",
                   fontSize: displayMode === "binary" ? "0.7rem" : undefined,
                   wordBreak: "break-all",
@@ -1505,15 +1507,32 @@ const TechStackConstellation = ({
   const [hoveredTech, setHoveredTech] = useState<string | null>(null);
   const [selectedTech, setSelectedTech] = useState<string | null>(null);
 
-  // Generate stable random positions for stars (only once on mount)
-  const [starPositions] = useState(() => 
-    Array.from({ length: 30 }).map(() => ({
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      duration: 2 + Math.random() * 2,
-      delay: Math.random() * 2,
-    }))
-  );
+  // Generate stable random positions for stars (only on client to avoid hydration mismatch)
+  const [starPositions, setStarPositions] = useState<Array<{
+    left: number;
+    top: number;
+    duration: number;
+    delay: number;
+  }>>([]);
+  const hasInitialized = useRef(false);
+
+  useEffect(() => {
+    // Only generate positions once on client side after mount to prevent hydration mismatch
+    // Using startTransition to make this a non-blocking update
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      startTransition(() => {
+        setStarPositions(
+          Array.from({ length: 30 }).map(() => ({
+            left: Math.random() * 100,
+            top: Math.random() * 100,
+            duration: 2 + Math.random() * 2,
+            delay: Math.random() * 2,
+          }))
+        );
+      });
+    }
+  }, []);
 
   // Build tech stack data
   const techData = useMemo(() => {
@@ -1593,6 +1612,8 @@ const TechStackConstellation = ({
     if (count >= 3) return "shadow-[0_0_10px_var(--primary),0_0_20px_var(--primary)]";
     return "shadow-[0_0_8px_var(--primary)]";
   };
+
+  const formatPercent = (value: number) => value.toFixed(3);
 
   return (
     <div className={cn(panelClass, "overflow-hidden")}>
@@ -1708,10 +1729,10 @@ const TechStackConstellation = ({
               const centerX = 50;
               const centerY = 50;
               
-              const x1 = centerX + radius * Math.cos(angle1);
-              const y1 = centerY + radius * Math.sin(angle1);
-              const x2 = centerX + radius * Math.cos(angle2);
-              const y2 = centerY + radius * Math.sin(angle2);
+              const x1 = formatPercent(centerX + radius * Math.cos(angle1));
+              const y1 = formatPercent(centerY + radius * Math.sin(angle1));
+              const x2 = formatPercent(centerX + radius * Math.cos(angle2));
+              const y2 = formatPercent(centerY + radius * Math.sin(angle2));
 
               return (
                 <motion.line
@@ -1745,8 +1766,8 @@ const TechStackConstellation = ({
               const radius = 40;
               const centerX = 50;
               const centerY = 50;
-              const x = centerX + radius * Math.cos(angle);
-              const y = centerY + radius * Math.sin(angle);
+              const x = formatPercent(centerX + radius * Math.cos(angle));
+              const y = formatPercent(centerY + radius * Math.sin(angle));
               const isActive = activeTech === tech.name;
               const isConnected = connectedTechs.has(tech.name);
 
@@ -1838,11 +1859,17 @@ const LabStatusMonitor = ({
   archivedCount: number;
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [labTime, setLabTime] = useState(new Date());
+  // Initialize as null to avoid hydration mismatch, set after mount
+  const [labTime, setLabTime] = useState<Date | null>(null);
   const [caffeineLevel, setCaffeineLevel] = useState(75);
   const [currentQuote, setCurrentQuote] = useState(motivationalQuotes[0]);
 
   useEffect(() => {
+    // Set initial time on client mount to avoid hydration mismatch
+    startTransition(() => {
+      setLabTime(new Date());
+    });
+    
     // Update time every second
     const timeInterval = setInterval(() => {
       setLabTime(new Date());
@@ -1877,6 +1904,7 @@ const LabStatusMonitor = ({
   };
 
   const getInspirationLevel = () => {
+    if (!labTime) return { level: 60, color: "bg-slate-600" };
     const hour = labTime.getHours();
     if (hour >= 9 && hour < 12) return { level: 85, color: "bg-blue-600" };
     if (hour >= 14 && hour < 17) return { level: 72, color: "bg-cyan-600" };
@@ -1950,19 +1978,19 @@ const LabStatusMonitor = ({
             </p>
             <div className="rounded-sm border border-dashed border-border/60 bg-background/70 px-2 py-1.5 dark:border-ring/60">
               <p className="retro text-center text-sm tabular-nums text-primary">
-                {labTime.toLocaleTimeString('en-US', { 
+                {labTime ? labTime.toLocaleTimeString('en-US', { 
                   hour12: false,
                   hour: '2-digit',
                   minute: '2-digit',
                   second: '2-digit'
-                })}
+                }) : '--:--:--'}
               </p>
               <p className="retro text-center text-[0.45rem] text-muted-foreground">
-                {labTime.toLocaleDateString('en-US', { 
+                {labTime ? labTime.toLocaleDateString('en-US', { 
                   weekday: 'short',
                   month: 'short',
                   day: 'numeric'
-                })}
+                }) : '---'}
               </p>
             </div>
           </div>
@@ -2105,19 +2133,19 @@ const LabStatusMonitor = ({
                 </p>
                 <div className="rounded-sm border border-dashed border-border/60 bg-background/70 px-2 py-1.5 dark:border-ring/60">
                   <p className="retro text-center text-xs tabular-nums text-primary">
-                    {labTime.toLocaleTimeString('en-US', { 
+                    {labTime ? labTime.toLocaleTimeString('en-US', { 
                       hour12: false,
                       hour: '2-digit',
                       minute: '2-digit',
                       second: '2-digit'
-                    })}
+                    }) : '--:--:--'}
                   </p>
                   <p className="retro text-center text-[0.4rem] text-muted-foreground">
-                    {labTime.toLocaleDateString('en-US', { 
+                    {labTime ? labTime.toLocaleDateString('en-US', { 
                       weekday: 'short',
                       month: 'short',
                       day: 'numeric'
-                    })}
+                    }) : '---'}
                   </p>
                 </div>
               </div>
@@ -2371,6 +2399,9 @@ export default function ProjectsPage() {
         </Button>
         <RetroVisitorCounter />
       </section>
+
+      {/* TERMINAL ORPHEUS - Positioned for visibility */}
+      <RetroTerminal />
 
       <section
         id="archive-container"

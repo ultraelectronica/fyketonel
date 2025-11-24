@@ -198,17 +198,17 @@
 
 @keyframes energyWave {
   0% {
-    box-shadow: 0 0 5px rgba(255, 215, 0, 0.3),
-                0 0 10px rgba(255, 165, 0, 0.2);
+    box-shadow: 0 0 5px var(--shadow-color, rgba(255, 215, 0, 0.3)),
+                0 0 10px var(--shadow-color, rgba(255, 165, 0, 0.2));
   }
   50% {
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5),
-                0 0 20px rgba(255, 165, 0, 0.3),
-                0 0 30px rgba(255, 140, 0, 0.2);
+    box-shadow: 0 0 10px var(--shadow-color, rgba(255, 215, 0, 0.5)),
+                0 0 20px var(--shadow-color, rgba(255, 165, 0, 0.3)),
+                0 0 30px var(--shadow-color, rgba(255, 140, 0, 0.2));
   }
   100% {
-    box-shadow: 0 0 5px rgba(255, 215, 0, 0.3),
-                0 0 10px rgba(255, 165, 0, 0.2);
+    box-shadow: 0 0 5px var(--shadow-color, rgba(255, 215, 0, 0.3)),
+                0 0 10px var(--shadow-color, rgba(255, 165, 0, 0.2));
   }
 }
 
@@ -221,12 +221,12 @@ a:hover {
 /* Enhance borders with warm glow */
 .border-primary,
 [class*="border-primary"] {
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 8px var(--shadow-color, rgba(255, 215, 0, 0.3));
 }
 
 .dark .border-primary,
 .dark [class*="border-primary"] {
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 12px var(--shadow-color, rgba(255, 215, 0, 0.4));
 }
 
 /* Add energy to interactive elements */
@@ -319,3 +319,134 @@ button:not(:disabled):hover {
   }
 }
 
+/* ======================================== 
+   TERMINAL ORPHEUS THEME COLORWAYS
+   ======================================== */
+
+/* Atari Theme */
+:root.theme-atari,
+html.theme-atari,
+body.theme-atari {
+  --primary: oklch(0.5 0.2 60) !important;
+  --primary-foreground: oklch(0 0 0) !important;
+  --background: oklch(0.7 0 0) !important;
+  --foreground: oklch(0 0 0) !important;
+  --card: oklch(1 0 0) !important;
+  --border: oklch(0.5 0.2 60) !important;
+  --accent: oklch(0.5 0.2 60) !important;
+}
+
+:root.dark.theme-atari,
+.dark:root.theme-atari,
+.dark html.theme-atari,
+.dark body.theme-atari,
+html.dark.theme-atari,
+body.dark.theme-atari {
+  --primary: oklch(0.4 0.2 60) !important;
+  --background: oklch(0.2 0 0) !important;
+  --foreground: oklch(0.9 0 0) !important;
+  --card: oklch(0.4 0 0) !important;
+  --border: oklch(0.4 0 0) !important;
+}
+
+/* Nintendo Theme */
+:root.theme-nintendo,
+html.theme-nintendo,
+body.theme-nintendo {
+  --primary: oklch(0.5 0.2 280) !important;
+  --primary-foreground: oklch(0 0 0) !important;
+  --background: oklch(1 0 0) !important;
+  --foreground: oklch(0 0 0) !important;
+  --card: oklch(1 0 0) !important;
+  --border: oklch(0.5 0.2 280) !important;
+  --accent: oklch(0.7 0.1 260) !important;
+}
+
+:root.dark.theme-nintendo,
+.dark:root.theme-nintendo,
+.dark html.theme-nintendo,
+.dark body.theme-nintendo,
+html.dark.theme-nintendo,
+body.dark.theme-nintendo {
+  --primary: oklch(0.5 0.2 280) !important;
+  --background: oklch(0.16 0.05 260) !important;
+  --foreground: oklch(1 0 0) !important;
+  --card: oklch(0.2 0.06 260) !important;
+  --border: oklch(1 0 0) !important;
+}
+
+/* VHS Theme */
+:root.theme-vhs,
+html.theme-vhs,
+body.theme-vhs {
+  --background: oklch(0.9768 0.0142 308.299) !important;
+  --foreground: oklch(0.2905 0.1432 302.7167) !important;
+  --card: oklch(1 0 0) !important;
+  --primary: oklch(0.5915 0.2569 322.8961) !important;
+  --border: oklch(0.9024 0.0604 306.703) !important;
+  --accent: oklch(0.903 0.0732 319.6198) !important;
+}
+
+:root.dark.theme-vhs,
+.dark:root.theme-vhs,
+.dark html.theme-vhs,
+.dark body.theme-vhs,
+html.dark.theme-vhs,
+body.dark.theme-vhs {
+  --background: oklch(0.166 0.0254 298.9423) !important;
+  --foreground: oklch(0.9024 0.0604 306.703) !important;
+  --card: oklch(0.1962 0.0365 301.0125) !important;
+  --primary: oklch(0.6668 0.2591 322.1499) !important;
+  --border: oklch(0.2905 0.1432 302.7167) !important;
+}
+
+/* Gameboy Theme */
+:root.theme-gameboy,
+html.theme-gameboy,
+body.theme-gameboy {
+  --primary: oklch(0.7 0.2 120) !important;
+  --primary-foreground: oklch(0.2 0.1 140) !important;
+  --background: oklch(0.8 0.2 140) !important;
+  --foreground: oklch(0.2 0.1 140) !important;
+  --card: oklch(0.8 0.2 140) !important;
+  --border: oklch(0.4 0.2 140) !important;
+  --accent: oklch(0.3 0.2 140) !important;
+}
+
+:root.dark.theme-gameboy,
+.dark:root.theme-gameboy,
+.dark html.theme-gameboy,
+.dark body.theme-gameboy,
+html.dark.theme-gameboy,
+body.dark.theme-gameboy {
+  --primary: oklch(0.7 0.2 120) !important;
+  --background: oklch(0.2 0.1 140) !important;
+  --foreground: oklch(0.8 0.2 120) !important;
+  --card: oklch(0.2 0.1 140) !important;
+  --border: oklch(0.4 0.2 140) !important;
+}
+
+/* Soft-pop Theme */
+:root.theme-softpop,
+html.theme-softpop,
+body.theme-softpop {
+  --background: oklch(0.9789 0.0082 121.6272) !important;
+  --foreground: oklch(0 0 0) !important;
+  --card: oklch(1 0 0) !important;
+  --primary: oklch(0.5106 0.2301 276.9656) !important;
+  --border: oklch(0 0 0) !important;
+  --accent: oklch(0.7686 0.1647 70.0804) !important;
+}
+
+:root.dark.theme-softpop,
+.dark:root.theme-softpop,
+.dark html.theme-softpop,
+.dark body.theme-softpop,
+html.dark.theme-softpop,
+body.dark.theme-softpop {
+  --background: oklch(0 0 0) !important;
+  --foreground: oklch(1 0 0) !important;
+  --card: oklch(0.2455 0.0217 257.2823) !important;
+  --primary: oklch(0.6801 0.1583 276.9349) !important;
+  --border: oklch(0.4459 0 0) !important;
+}
