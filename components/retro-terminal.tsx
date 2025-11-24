@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Terminal, Minimize2, Maximize2, X } from "lucide-react";
+import { useTheme } from "next-themes";
 
 interface TerminalLine {
   type: "input" | "output" | "error" | "success";
@@ -21,27 +22,309 @@ interface Command {
 const themes = {
   default: {
     name: "Default",
-    class: "theme-default"
+    class: "theme-default",
+    light: {},
+    dark: {}
   },
   atari: {
     name: "Atari",
-    class: "theme-atari"
+    class: "theme-atari",
+    light: {
+      "--primary": "oklch(0.5 0.2 60)",
+      "--primary-foreground": "oklch(0 0 0)",
+      "--background": "oklch(0.7 0 0)",
+      "--foreground": "oklch(0 0 0)",
+      "--card": "oklch(1 0 0)",
+      "--card-foreground": "oklch(0 0 0)",
+      "--popover": "oklch(1 0 0)",
+      "--popover-foreground": "oklch(0 0 0)",
+      "--secondary": "oklch(0.6 0.15 60)",
+      "--secondary-foreground": "oklch(0 0 0)",
+      "--muted": "oklch(0.75 0.05 60)",
+      "--muted-foreground": "oklch(0.3 0.05 60)",
+      "--accent": "oklch(0.5 0.2 60)",
+      "--accent-foreground": "oklch(0 0 0)",
+      "--destructive": "oklch(0.55 0.25 25)",
+      "--destructive-foreground": "oklch(1 0 0)",
+      "--border": "oklch(0.5 0.2 60)",
+      "--input": "oklch(0.5 0.2 60)",
+      "--ring": "oklch(0.5 0.2 60)",
+      "--chart-1": "oklch(0.5 0.2 60)",
+      "--chart-2": "oklch(0.55 0.2 50)",
+      "--chart-3": "oklch(0.6 0.2 40)",
+      "--chart-4": "oklch(0.45 0.2 70)",
+      "--chart-5": "oklch(0.5 0.2 60)",
+      "--visitor-counter": "oklch(0.6 0.25 140)",
+      "--shadow-color": "oklch(0.5 0.2 60 / 0.3)",
+    },
+    dark: {
+      "--primary": "oklch(0.4 0.2 60)",
+      "--primary-foreground": "oklch(0.9 0 0)",
+      "--background": "oklch(0.2 0 0)",
+      "--foreground": "oklch(0.9 0 0)",
+      "--card": "oklch(0.4 0 0)",
+      "--card-foreground": "oklch(0.9 0 0)",
+      "--popover": "oklch(0.15 0 0)",
+      "--popover-foreground": "oklch(0.9 0 0)",
+      "--secondary": "oklch(0.35 0.15 60)",
+      "--secondary-foreground": "oklch(0.9 0 0)",
+      "--muted": "oklch(0.25 0.03 60)",
+      "--muted-foreground": "oklch(0.7 0.05 60)",
+      "--accent": "oklch(0.4 0.2 60)",
+      "--accent-foreground": "oklch(0.9 0 0)",
+      "--destructive": "oklch(0.6 0.28 20)",
+      "--destructive-foreground": "oklch(0.9 0 0)",
+      "--border": "oklch(0.4 0 0)",
+      "--input": "oklch(0.4 0 0)",
+      "--ring": "oklch(0.4 0.2 60)",
+      "--chart-1": "oklch(0.4 0.2 60)",
+      "--chart-2": "oklch(0.45 0.2 50)",
+      "--chart-3": "oklch(0.5 0.2 40)",
+      "--chart-4": "oklch(0.35 0.2 70)",
+      "--chart-5": "oklch(0.4 0.2 60)",
+      "--visitor-counter": "oklch(0.6 0.25 140)",
+      "--shadow-color": "oklch(0.4 0.2 60 / 0.4)",
+    }
   },
   nintendo: {
     name: "Nintendo",
-    class: "theme-nintendo"
+    class: "theme-nintendo",
+    light: {
+      "--primary": "oklch(0.5 0.2 280)",
+      "--primary-foreground": "oklch(0 0 0)",
+      "--background": "oklch(1 0 0)",
+      "--foreground": "oklch(0 0 0)",
+      "--card": "oklch(1 0 0)",
+      "--card-foreground": "oklch(0 0 0)",
+      "--popover": "oklch(1 0 0)",
+      "--popover-foreground": "oklch(0 0 0)",
+      "--secondary": "oklch(0.6 0.15 280)",
+      "--secondary-foreground": "oklch(0 0 0)",
+      "--muted": "oklch(0.95 0.02 280)",
+      "--muted-foreground": "oklch(0.5 0.04 280)",
+      "--accent": "oklch(0.7 0.1 260)",
+      "--accent-foreground": "oklch(0 0 0)",
+      "--destructive": "oklch(0.55 0.25 25)",
+      "--destructive-foreground": "oklch(1 0 0)",
+      "--border": "oklch(0.5 0.2 280)",
+      "--input": "oklch(0.5 0.2 280)",
+      "--ring": "oklch(0.5 0.2 280)",
+      "--chart-1": "oklch(0.5 0.2 280)",
+      "--chart-2": "oklch(0.55 0.2 270)",
+      "--chart-3": "oklch(0.6 0.2 290)",
+      "--chart-4": "oklch(0.45 0.2 260)",
+      "--chart-5": "oklch(0.7 0.1 260)",
+      "--visitor-counter": "oklch(0.6 0.25 280)",
+      "--shadow-color": "oklch(0.5 0.2 280 / 0.3)",
+    },
+    dark: {
+      "--primary": "oklch(0.5 0.2 280)",
+      "--primary-foreground": "oklch(1 0 0)",
+      "--background": "oklch(0.16 0.05 260)",
+      "--foreground": "oklch(1 0 0)",
+      "--card": "oklch(0.2 0.06 260)",
+      "--card-foreground": "oklch(1 0 0)",
+      "--popover": "oklch(0.15 0.02 260)",
+      "--popover-foreground": "oklch(1 0 0)",
+      "--secondary": "oklch(0.45 0.15 280)",
+      "--secondary-foreground": "oklch(1 0 0)",
+      "--muted": "oklch(0.25 0.03 260)",
+      "--muted-foreground": "oklch(0.7 0.05 280)",
+      "--accent": "oklch(0.7 0.1 260)",
+      "--accent-foreground": "oklch(1 0 0)",
+      "--destructive": "oklch(0.6 0.28 20)",
+      "--destructive-foreground": "oklch(1 0 0)",
+      "--border": "oklch(1 0 0)",
+      "--input": "oklch(1 0 0)",
+      "--ring": "oklch(0.5 0.2 280)",
+      "--chart-1": "oklch(0.5 0.2 280)",
+      "--chart-2": "oklch(0.55 0.2 270)",
+      "--chart-3": "oklch(0.6 0.2 290)",
+      "--chart-4": "oklch(0.45 0.2 260)",
+      "--chart-5": "oklch(0.7 0.1 260)",
+      "--visitor-counter": "oklch(0.6 0.25 280)",
+      "--shadow-color": "oklch(0.5 0.2 280 / 0.4)",
+    }
   },
   vhs: {
     name: "VHS",
-    class: "theme-vhs"
+    class: "theme-vhs",
+    light: {
+      "--primary": "oklch(0.5915 0.2569 322.8961)",
+      "--primary-foreground": "oklch(0.2905 0.1432 302.7167)",
+      "--background": "oklch(0.9768 0.0142 308.299)",
+      "--foreground": "oklch(0.2905 0.1432 302.7167)",
+      "--card": "oklch(1 0 0)",
+      "--card-foreground": "oklch(0.2905 0.1432 302.7167)",
+      "--popover": "oklch(1 0 0)",
+      "--popover-foreground": "oklch(0.2905 0.1432 302.7167)",
+      "--secondary": "oklch(0.7 0.15 310)",
+      "--secondary-foreground": "oklch(0.2905 0.1432 302.7167)",
+      "--muted": "oklch(0.95 0.02 308)",
+      "--muted-foreground": "oklch(0.5 0.1 310)",
+      "--accent": "oklch(0.903 0.0732 319.6198)",
+      "--accent-foreground": "oklch(0.2905 0.1432 302.7167)",
+      "--destructive": "oklch(0.55 0.25 25)",
+      "--destructive-foreground": "oklch(1 0 0)",
+      "--border": "oklch(0.9024 0.0604 306.703)",
+      "--input": "oklch(0.9024 0.0604 306.703)",
+      "--ring": "oklch(0.5915 0.2569 322.8961)",
+      "--chart-1": "oklch(0.5915 0.2569 322.8961)",
+      "--chart-2": "oklch(0.65 0.25 310)",
+      "--chart-3": "oklch(0.7 0.25 330)",
+      "--chart-4": "oklch(0.55 0.25 315)",
+      "--chart-5": "oklch(0.903 0.0732 319.6198)",
+      "--visitor-counter": "oklch(0.6 0.25 320)",
+      "--shadow-color": "oklch(0.5915 0.2569 322.8961 / 0.3)",
+    },
+    dark: {
+      "--primary": "oklch(0.6668 0.2591 322.1499)",
+      "--primary-foreground": "oklch(0.9024 0.0604 306.703)",
+      "--background": "oklch(0.166 0.0254 298.9423)",
+      "--foreground": "oklch(0.9024 0.0604 306.703)",
+      "--card": "oklch(0.1962 0.0365 301.0125)",
+      "--card-foreground": "oklch(0.9024 0.0604 306.703)",
+      "--popover": "oklch(0.15 0.02 300)",
+      "--popover-foreground": "oklch(0.9024 0.0604 306.703)",
+      "--secondary": "oklch(0.4 0.15 310)",
+      "--secondary-foreground": "oklch(0.9024 0.0604 306.703)",
+      "--muted": "oklch(0.25 0.03 300)",
+      "--muted-foreground": "oklch(0.7 0.05 310)",
+      "--accent": "oklch(0.7 0.1 320)",
+      "--accent-foreground": "oklch(0.9024 0.0604 306.703)",
+      "--destructive": "oklch(0.6 0.28 20)",
+      "--destructive-foreground": "oklch(0.9024 0.0604 306.703)",
+      "--border": "oklch(0.2905 0.1432 302.7167)",
+      "--input": "oklch(0.2905 0.1432 302.7167)",
+      "--ring": "oklch(0.6668 0.2591 322.1499)",
+      "--chart-1": "oklch(0.6668 0.2591 322.1499)",
+      "--chart-2": "oklch(0.7 0.25 310)",
+      "--chart-3": "oklch(0.75 0.25 330)",
+      "--chart-4": "oklch(0.6 0.25 315)",
+      "--chart-5": "oklch(0.7 0.1 320)",
+      "--visitor-counter": "oklch(0.6 0.25 320)",
+      "--shadow-color": "oklch(0.6668 0.2591 322.1499 / 0.4)",
+    }
   },
   gameboy: {
     name: "Gameboy", 
-    class: "theme-gameboy"
+    class: "theme-gameboy",
+    light: {
+      "--primary": "oklch(0.7 0.2 120)",
+      "--primary-foreground": "oklch(0.2 0.1 140)",
+      "--background": "oklch(0.8 0.2 140)",
+      "--foreground": "oklch(0.2 0.1 140)",
+      "--card": "oklch(0.8 0.2 140)",
+      "--card-foreground": "oklch(0.2 0.1 140)",
+      "--popover": "oklch(0.8 0.2 140)",
+      "--popover-foreground": "oklch(0.2 0.1 140)",
+      "--secondary": "oklch(0.6 0.2 130)",
+      "--secondary-foreground": "oklch(0.2 0.1 140)",
+      "--muted": "oklch(0.75 0.15 135)",
+      "--muted-foreground": "oklch(0.3 0.1 140)",
+      "--accent": "oklch(0.3 0.2 140)",
+      "--accent-foreground": "oklch(0.8 0.2 120)",
+      "--destructive": "oklch(0.55 0.25 25)",
+      "--destructive-foreground": "oklch(0.8 0.2 120)",
+      "--border": "oklch(0.4 0.2 140)",
+      "--input": "oklch(0.4 0.2 140)",
+      "--ring": "oklch(0.7 0.2 120)",
+      "--chart-1": "oklch(0.7 0.2 120)",
+      "--chart-2": "oklch(0.65 0.2 130)",
+      "--chart-3": "oklch(0.75 0.2 110)",
+      "--chart-4": "oklch(0.6 0.2 150)",
+      "--chart-5": "oklch(0.3 0.2 140)",
+      "--visitor-counter": "oklch(0.6 0.25 140)",
+      "--shadow-color": "oklch(0.7 0.2 120 / 0.3)",
+    },
+    dark: {
+      "--primary": "oklch(0.7 0.2 120)",
+      "--primary-foreground": "oklch(0.2 0.1 140)",
+      "--background": "oklch(0.2 0.1 140)",
+      "--foreground": "oklch(0.8 0.2 120)",
+      "--card": "oklch(0.2 0.1 140)",
+      "--card-foreground": "oklch(0.8 0.2 120)",
+      "--popover": "oklch(0.18 0.08 140)",
+      "--popover-foreground": "oklch(0.8 0.2 120)",
+      "--secondary": "oklch(0.35 0.15 130)",
+      "--secondary-foreground": "oklch(0.8 0.2 120)",
+      "--muted": "oklch(0.25 0.1 140)",
+      "--muted-foreground": "oklch(0.7 0.1 135)",
+      "--accent": "oklch(0.3 0.2 140)",
+      "--accent-foreground": "oklch(0.8 0.2 120)",
+      "--destructive": "oklch(0.6 0.28 20)",
+      "--destructive-foreground": "oklch(0.8 0.2 120)",
+      "--border": "oklch(0.4 0.2 140)",
+      "--input": "oklch(0.4 0.2 140)",
+      "--ring": "oklch(0.7 0.2 120)",
+      "--chart-1": "oklch(0.7 0.2 120)",
+      "--chart-2": "oklch(0.65 0.2 130)",
+      "--chart-3": "oklch(0.75 0.2 110)",
+      "--chart-4": "oklch(0.6 0.2 150)",
+      "--chart-5": "oklch(0.3 0.2 140)",
+      "--visitor-counter": "oklch(0.6 0.25 140)",
+      "--shadow-color": "oklch(0.7 0.2 120 / 0.4)",
+    }
   },
   softpop: {
     name: "Soft-pop",
-    class: "theme-softpop"
+    class: "theme-softpop",
+    light: {
+      "--primary": "oklch(0.5106 0.2301 276.9656)",
+      "--primary-foreground": "oklch(0 0 0)",
+      "--background": "oklch(0.9789 0.0082 121.6272)",
+      "--foreground": "oklch(0 0 0)",
+      "--card": "oklch(1 0 0)",
+      "--card-foreground": "oklch(0 0 0)",
+      "--popover": "oklch(1 0 0)",
+      "--popover-foreground": "oklch(0 0 0)",
+      "--secondary": "oklch(0.7 0.15 270)",
+      "--secondary-foreground": "oklch(0 0 0)",
+      "--muted": "oklch(0.95 0.01 120)",
+      "--muted-foreground": "oklch(0.5 0.02 270)",
+      "--accent": "oklch(0.7686 0.1647 70.0804)",
+      "--accent-foreground": "oklch(0 0 0)",
+      "--destructive": "oklch(0.55 0.25 25)",
+      "--destructive-foreground": "oklch(1 0 0)",
+      "--border": "oklch(0 0 0)",
+      "--input": "oklch(0 0 0)",
+      "--ring": "oklch(0.5106 0.2301 276.9656)",
+      "--chart-1": "oklch(0.5106 0.2301 276.9656)",
+      "--chart-2": "oklch(0.6 0.2 270)",
+      "--chart-3": "oklch(0.65 0.2 280)",
+      "--chart-4": "oklch(0.45 0.2 260)",
+      "--chart-5": "oklch(0.7686 0.1647 70.0804)",
+      "--visitor-counter": "oklch(0.6 0.25 270)",
+      "--shadow-color": "oklch(0.5106 0.2301 276.9656 / 0.3)",
+    },
+    dark: {
+      "--primary": "oklch(0.6801 0.1583 276.9349)",
+      "--primary-foreground": "oklch(1 0 0)",
+      "--background": "oklch(0 0 0)",
+      "--foreground": "oklch(1 0 0)",
+      "--card": "oklch(0.2455 0.0217 257.2823)",
+      "--card-foreground": "oklch(1 0 0)",
+      "--popover": "oklch(0.15 0.02 260)",
+      "--popover-foreground": "oklch(1 0 0)",
+      "--secondary": "oklch(0.5 0.15 270)",
+      "--secondary-foreground": "oklch(1 0 0)",
+      "--muted": "oklch(0.25 0.02 260)",
+      "--muted-foreground": "oklch(0.7 0.02 270)",
+      "--accent": "oklch(0.75 0.15 70)",
+      "--accent-foreground": "oklch(1 0 0)",
+      "--destructive": "oklch(0.6 0.28 20)",
+      "--destructive-foreground": "oklch(1 0 0)",
+      "--border": "oklch(0.4459 0 0)",
+      "--input": "oklch(0.4459 0 0)",
+      "--ring": "oklch(0.6801 0.1583 276.9349)",
+      "--chart-1": "oklch(0.6801 0.1583 276.9349)",
+      "--chart-2": "oklch(0.7 0.15 270)",
+      "--chart-3": "oklch(0.75 0.15 280)",
+      "--chart-4": "oklch(0.6 0.15 260)",
+      "--chart-5": "oklch(0.75 0.15 70)",
+      "--visitor-counter": "oklch(0.6 0.25 270)",
+      "--shadow-color": "oklch(0.6801 0.1583 276.9349 / 0.4)",
+    }
   }
 };
 
@@ -69,9 +352,22 @@ export function RetroTerminal() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState("default");
+  const [currentTheme, setCurrentTheme] = useState<string>("default");
+  const [isMounted, setIsMounted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const outputRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
+
+  // Load theme from localStorage after mount to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("terminal-theme");
+      if (savedTheme && themes[savedTheme as keyof typeof themes]) {
+        setCurrentTheme(savedTheme);
+      }
+    }
+  }, []);
 
   // Auto-scroll to bottom when new lines are added
   useEffect(() => {
@@ -80,45 +376,62 @@ export function RetroTerminal() {
     }
   }, [lines]);
 
-  // Apply theme to document body to avoid conflicts with next-themes
+  // Apply theme by directly setting CSS variables
   useEffect(() => {
     // Ensure we're in the browser
     if (typeof window === "undefined") return;
     
-    const applyTheme = () => {
-      const body = document.body;
-      if (!body) return;
-      
-      const themeClass = themes[currentTheme as keyof typeof themes]?.class;
-      
-      // Remove all theme classes first
-      Object.values(themes).forEach(theme => {
-        body.classList.remove(theme.class);
+    const root = document.documentElement;
+    if (!root) return;
+    
+    const theme = themes[currentTheme as keyof typeof themes];
+    const isDark = resolvedTheme === "dark";
+    
+    // Get theme values based on dark/light mode
+    const themeValues = currentTheme !== "default" && theme 
+      ? (isDark ? theme.dark : theme.light)
+      : {};
+    
+    // List of all CSS variables that themes can override
+    const allThemeVariables = [
+      "--primary", "--primary-foreground", "--background", "--foreground",
+      "--card", "--card-foreground", "--popover", "--popover-foreground",
+      "--secondary", "--secondary-foreground", "--muted", "--muted-foreground",
+      "--accent", "--accent-foreground", "--destructive", "--destructive-foreground",
+      "--border", "--input", "--ring",
+      "--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-5",
+      "--visitor-counter", "--shadow-color"
+    ];
+    
+    // Apply CSS variables directly
+    if (Object.keys(themeValues).length > 0) {
+      // Apply theme variables
+      Object.entries(themeValues).forEach(([property, value]) => {
+        root.style.setProperty(property, value, "important");
       });
-      
-      // Add current theme class if not default
-      if (currentTheme !== "default" && themeClass) {
-        body.classList.add(themeClass);
-        // Force a reflow to ensure styles are applied
-        void body.offsetHeight;
-      }
-    };
+    } else {
+      // Reset to default by removing all theme custom properties
+      allThemeVariables.forEach(property => {
+        root.style.removeProperty(property);
+      });
+    }
     
-    // Apply theme immediately
-    applyTheme();
+    // Also apply theme class for CSS fallback
+    const body = document.body;
+    const html = document.documentElement;
     
-    // Also apply after a short delay to ensure it persists after next-themes initialization
-    const timeoutId = setTimeout(applyTheme, 10);
+    // Remove all theme classes
+    Object.values(themes).forEach(t => {
+      body?.classList.remove(t.class);
+      html?.classList.remove(t.class);
+    });
     
-    // Also apply on next animation frame as a fallback
-    const rafId = requestAnimationFrame(applyTheme);
-    
-    // Cleanup function
-    return () => {
-      clearTimeout(timeoutId);
-      cancelAnimationFrame(rafId);
-    };
-  }, [currentTheme]);
+    // Add current theme class if not default
+    if (currentTheme !== "default" && theme) {
+      body?.classList.add(theme.class);
+      html?.classList.add(theme.class);
+    }
+  }, [currentTheme, resolvedTheme]);
 
   // Commands definition
   const commands: Record<string, Command> = {
@@ -309,6 +622,10 @@ export function RetroTerminal() {
         const themeName = args[0].toLowerCase();
         if (themes[themeName as keyof typeof themes]) {
           setCurrentTheme(themeName);
+          // Persist theme to localStorage
+          if (typeof window !== "undefined") {
+            localStorage.setItem("terminal-theme", themeName);
+          }
           return [
             {
               type: "success",
@@ -578,7 +895,7 @@ export function RetroTerminal() {
             <div className="relative border-t-4 border-border bg-primary/10 px-4 py-2 dark:border-ring">
               <div className="flex items-center justify-between text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
                 <span className="retro">Ready</span>
-                <span className="retro">Theme: {themes[currentTheme as keyof typeof themes].name}</span>
+                <span className="retro">Theme: {isMounted ? themes[currentTheme as keyof typeof themes].name : "Default"}</span>
                 <span className="retro">Lines: {lines.length}</span>
               </div>
             </div>

@@ -815,12 +815,13 @@ const RetroVisitorCounter = () => {
             <div className="max-w-full overflow-x-auto">
               <motion.div
                 key={visitorCount}
-                className="retro mx-auto text-center font-mono text-xl tabular-nums text-green-400 sm:text-2xl md:text-3xl"
+                className="retro mx-auto text-center font-mono text-xl tabular-nums sm:text-2xl md:text-3xl"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
                 style={{
-                  textShadow: "0 0 10px rgba(74, 222, 128, 0.8), 0 0 20px rgba(74, 222, 128, 0.4)",
+                  color: "var(--visitor-counter, oklch(0.6 0.25 140))",
+                  textShadow: "0 0 10px var(--visitor-counter, oklch(0.6 0.25 140) / 0.8), 0 0 20px var(--visitor-counter, oklch(0.6 0.25 140) / 0.4)",
                   letterSpacing: displayMode === "binary" ? "0.08em" : "0.18em",
                   fontSize: displayMode === "binary" ? "0.7rem" : undefined,
                   wordBreak: "break-all",
