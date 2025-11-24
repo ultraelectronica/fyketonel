@@ -247,6 +247,8 @@ const projects: ProjectEntry[] = [
       "React",
       "TypeScript",
       "Next.js",
+      "MapLibre GL JS",
+      "OpenStreetMap",
       "Vercel",
       "Supabase",
       "Three.js",
