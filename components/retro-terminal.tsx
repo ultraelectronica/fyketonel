@@ -493,7 +493,7 @@ export function RetroTerminal() {
         { type: "output", content: "  theme [name]      - Change color theme" },
         { type: "output", content: "                      default/atari/nintendo/vhs/" },
         { type: "output", content: "                      gameboy/softpop" },
-        { type: "output", content: "  echo [text]       - Echo back the text" },
+        { type: "output", content: "  shout [text]      - Shout back the text with data type and arithmetic support" },
         { type: "output", content: "  date              - Display current date/time" },
         { type: "output", content: "" },
         { type: "success", content: "Use ↑/↓ arrows to navigate command history" },
@@ -683,9 +683,9 @@ export function RetroTerminal() {
         }
       },
     },
-    echo: {
-      name: "echo",
-      description: "Echo back the text with data type support",
+    shout: {
+      name: "shout",
+      description: "Shout back the text with data type and arithmetic support",
       execute: (args) => {
         if (args.length === 0) {
           return [
@@ -698,6 +698,70 @@ export function RetroTerminal() {
 
         const input = args.join(" ");
         const output: TerminalLine[] = [];
+
+        // Try to evaluate arithmetic expressions first
+        // Match patterns like: number operator number (with optional spaces)
+        const arithmeticPattern = /^(-?\d+\.?\d*)\s*([+\-*/%])\s*(-?\d+\.?\d*)$/;
+        const arithmeticMatch = input.match(arithmeticPattern);
+        
+        if (arithmeticMatch) {
+          const left = parseFloat(arithmeticMatch[1]);
+          const operator = arithmeticMatch[2];
+          const right = parseFloat(arithmeticMatch[3]);
+          let result: number;
+          let resultType: string;
+
+          try {
+            switch (operator) {
+              case "+":
+                result = left + right;
+                break;
+              case "-":
+                result = left - right;
+                break;
+              case "*":
+                result = left * right;
+                break;
+              case "/":
+                if (right === 0) {
+                  output.push({
+                    type: "error",
+                    content: "Division by zero is not allowed",
+                  });
+                  return output;
+                }
+                result = left / right;
+                break;
+              case "%":
+                if (right === 0) {
+                  output.push({
+                    type: "error",
+                    content: "Modulo by zero is not allowed",
+                  });
+                  return output;
+                }
+                result = left % right;
+                break;
+              default:
+                result = left;
+            }
+
+            // Determine result type
+            resultType = Number.isInteger(result) ? "int" : "float";
+            
+            output.push({
+              type: "output",
+              content: `${input} = ${result} (${resultType})`,
+            });
+            return output;
+          } catch (error) {
+            output.push({
+              type: "error",
+              content: `Arithmetic error: ${error instanceof Error ? error.message : "Unknown error"}`,
+            });
+            return output;
+          }
+        }
 
         // Try to detect and format data types
         // Check for boolean
