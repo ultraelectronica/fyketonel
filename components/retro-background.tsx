@@ -154,7 +154,7 @@ export function RetroBackground({
     return Array.from({ length: 30 }, (_, index) => {
       const baseSeed = index + 400;
       const position = randomFromSeed(baseSeed);
-      let left: string, bottom: string | undefined, top: string | undefined, right: string | undefined;
+      let left: string | undefined, bottom: string | undefined, top: string | undefined, right: string | undefined;
       
       // Position flowers around containers (at edges)
       if (position < 0.3) {
@@ -185,10 +185,10 @@ export function RetroBackground({
       
       return {
         id: `flower-${index}`,
-        ...(left !== undefined && { left }),
-        ...(bottom !== undefined && { bottom }),
-        ...(top !== undefined && { top }),
-        ...(right !== undefined && { right }),
+        left,
+        bottom,
+        top,
+        right,
         scale: 0.6 + randomFromSeed(baseSeed * 4) * 0.6,
         type: Math.floor(randomFromSeed(baseSeed * 5) * 3), // 0, 1, 2
         swayDuration: seconds(2 + randomFromSeed(baseSeed * 6) * 2),
