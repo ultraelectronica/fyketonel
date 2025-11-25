@@ -24,6 +24,7 @@ export function RetroBackground({
   children,
 }: RetroBackgroundProps) {
   const [isMarioMode, setIsMarioMode] = useState(false);
+  const [, forceUpdate] = useState(0);
 
   // Detect Simon light theme from localStorage
   useEffect(() => {
@@ -32,8 +33,9 @@ export function RetroBackground({
         const theme = localStorage.getItem("terminal-theme");
         const simonMode = localStorage.getItem("terminal-simon-mode");
         const shouldBeMario = theme === "simon" && simonMode === "light";
-        console.log("[RetroBackground] Theme check:", { theme, simonMode, shouldBeMario });
         setIsMarioMode(shouldBeMario);
+        // Force re-render to ensure background updates
+        forceUpdate(prev => prev + 1);
       }
     };
 
@@ -45,8 +47,8 @@ export function RetroBackground({
     // Listen for storage changes (for cross-tab)
     window.addEventListener("storage", checkTheme);
     
-    // Also check periodically in case localStorage is updated in same tab
-    const interval = setInterval(checkTheme, 200);
+    // Check more frequently in development for faster response
+    const interval = setInterval(checkTheme, 100);
 
     return () => {
       window.removeEventListener("themeChanged", checkTheme);
