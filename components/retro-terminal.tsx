@@ -376,8 +376,8 @@ const themes = {
       "--chart-5": "oklch(0.85 0.22 90)",
       "--visitor-counter": "oklch(0.7 0.25 350)",
       "--shadow-color": "oklch(0.65 0.25 350 / 0.3)",
-      "--hover-bg": "oklch(0.65 0.25 350 / 0.2)",
-      "--hover-text": "oklch(0.65 0.25 350)",
+      "--hover-bg": "oklch(0.65 0.25 350)",
+      "--hover-text": "oklch(1 0 0)",
     },
     dark: {
       // Ally Dark is now just Ally Light (but maybe slightly softer/warmer to differentiate?)
@@ -408,8 +408,8 @@ const themes = {
       "--chart-5": "oklch(0.85 0.22 90)",
       "--visitor-counter": "oklch(0.7 0.25 350)",
       "--shadow-color": "oklch(0.65 0.25 350 / 0.3)",
-      "--hover-bg": "oklch(0.65 0.25 350 / 0.2)",
-      "--hover-text": "oklch(0.65 0.25 350)",
+      "--hover-bg": "oklch(0.65 0.25 350)",
+      "--hover-text": "oklch(1 0 0)",
     }
   },
   simon: {

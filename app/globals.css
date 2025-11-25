@@ -495,3 +495,19 @@ body:not(.dark) .theme-simon h3 {
     2px 4px 0 #FF69B4,
     4px 4px 0 #FF69B4;
 }
+
+/* Ally Theme - Navigation hover styles */
+.theme-ally [data-slot="navigation-menu-link"]:hover {
+  background-color: var(--hover-bg) !important;
+  color: var(--hover-text) !important;
+}
+
+.theme-ally .ally-visitor-label {
+  color: var(--primary) !important;
+}
+
+.theme-ally .ally-visitor-counter {
+  color: var(--primary) !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
