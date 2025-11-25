@@ -601,10 +601,20 @@ export function RetroTerminal() {
       html?.classList.remove(t.class);
     });
     
+    // Remove simon-light class if it exists
+    body?.classList.remove("simon-light");
+    html?.classList.remove("simon-light");
+    
     // Add current theme class if not default
     if (currentTheme !== "default" && theme) {
       body?.classList.add(theme.class);
       html?.classList.add(theme.class);
+      
+      // Add simon-light class when Simon theme is in light mode
+      if (currentTheme === "simon" && simonThemeMode === "light") {
+        body?.classList.add("simon-light");
+        html?.classList.add("simon-light");
+      }
     }
   }, [currentTheme, simonThemeMode, resolvedTheme]);
 

@@ -185,10 +185,10 @@ export function RetroBackground({
       
       return {
         id: `flower-${index}`,
-        left,
-        bottom,
-        top,
-        right,
+        ...(left !== undefined && { left }),
+        ...(bottom !== undefined && { bottom }),
+        ...(top !== undefined && { top }),
+        ...(right !== undefined && { right }),
         scale: 0.6 + randomFromSeed(baseSeed * 4) * 0.6,
         type: Math.floor(randomFromSeed(baseSeed * 5) * 3), // 0, 1, 2
         swayDuration: seconds(2 + randomFromSeed(baseSeed * 6) * 2),
@@ -239,56 +239,16 @@ export function RetroBackground({
             </div>
           ))}
 
-          {/* Grass section with pixel details */}
+          {/* Grass section with image */}
           <div className="absolute bottom-0 left-0 right-0" style={{ height: "30%" }}>
-            {/* Darker grass base with multiple layers for texture */}
-            <div className="absolute inset-0">
-              {/* Layer 1: Dark grass blades */}
-              {Array.from({ length: 80 }, (_, i) => (
-                <div
-                  key={`grass-dark-${i}`}
-                  className="absolute"
-                  style={{
-                    bottom: `${randomFromSeed(i * 7) * 25}%`,
-                    left: `${(i * 1.25) % 100}%`,
-                    width: "6px",
-                    height: `${12 + randomFromSeed(i * 11) * 20}px`,
-                    backgroundColor: "#3A7D1E",
-                    opacity: 0.6 + randomFromSeed(i * 13) * 0.3,
-                  }}
-                />
-              ))}
-              {/* Layer 2: Medium grass blades */}
-              {Array.from({ length: 60 }, (_, i) => (
-                <div
-                  key={`grass-med-${i}`}
-                  className="absolute"
-                  style={{
-                    bottom: `${randomFromSeed(i * 17) * 20}%`,
-                    left: `${(i * 1.67) % 100}%`,
-                    width: "4px",
-                    height: `${10 + randomFromSeed(i * 19) * 18}px`,
-                    backgroundColor: "#4A9D2E",
-                    opacity: 0.5 + randomFromSeed(i * 23) * 0.4,
-                  }}
-                />
-              ))}
-              {/* Layer 3: Light grass highlights */}
-              {Array.from({ length: 40 }, (_, i) => (
-                <div
-                  key={`grass-light-${i}`}
-                  className="absolute"
-                  style={{
-                    bottom: `${randomFromSeed(i * 29) * 15}%`,
-                    left: `${(i * 2.5) % 100}%`,
-                    width: "3px",
-                    height: `${8 + randomFromSeed(i * 31) * 14}px`,
-                    backgroundColor: "#5EBD3E",
-                    opacity: 0.4 + randomFromSeed(i * 37) * 0.3,
-                  }}
-                />
-              ))}
-            </div>
+            <img
+              src="/assets/grass.png"
+              alt=""
+              className="absolute bottom-0 left-0 w-full h-full object-cover object-bottom"
+              style={{
+                imageRendering: "pixelated",
+              }}
+            />
           </div>
 
           <style jsx>{`

@@ -482,6 +482,29 @@ body:not(.dark) .theme-simon h3 {
     4px 4px 0 #CC6600;
 }
 
+/* Simon Theme - Project titles in accordions with gold pixel shadow (light mode only) */
+html.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg,
+html.simon-light.theme-simon [data-slot="accordion-trigger"] .retro.text-lg,
+html.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg.uppercase,
+html.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro,
+body.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg,
+body.simon-light.theme-simon [data-slot="accordion-trigger"] .retro.text-lg,
+body.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg.uppercase,
+body.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro,
+.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg,
+.simon-light.theme-simon [data-slot="accordion-trigger"] .retro.text-lg,
+.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg.uppercase,
+.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro {
+  color: #FFD700 !important;
+  text-shadow: 
+    2px 0 0 #CC6600,
+    0 2px 0 #CC6600,
+    2px 2px 0 #CC6600,
+    4px 2px 0 #CC6600,
+    2px 4px 0 #CC6600,
+    4px 4px 0 #CC6600 !important;
+}
+
 /* Ally Theme - White titles with pink pixel shadow */
 .theme-ally h1,
 .theme-ally h2,
