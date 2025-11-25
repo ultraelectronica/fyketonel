@@ -789,7 +789,12 @@ const RetroVisitorCounter = () => {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="rounded-none border-4 border-border bg-gradient-to-b from-yellow-200 via-yellow-300 to-yellow-400 p-3 shadow-[4px_4px_0_var(--border)] dark:border-ring dark:from-yellow-700 dark:via-yellow-800 dark:to-yellow-900">
+      <div className={cn(
+        "rounded-none border-4 border-border p-3 shadow-[4px_4px_0_var(--border)]",
+        "bg-gradient-to-b from-yellow-200 via-yellow-300 to-yellow-400 dark:border-ring dark:from-yellow-700 dark:via-yellow-800 dark:to-yellow-900",
+        // Override for Ally theme
+        "theme-ally:bg-gradient-to-b theme-ally:from-white theme-ally:via-white theme-ally:to-gray-100"
+      )}>
         <div className="space-y-2">
           <div className="flex items-center justify-center gap-2">
             <motion.span
@@ -799,7 +804,12 @@ const RetroVisitorCounter = () => {
             >
               🎉
             </motion.span>
-            <p className="retro text-center text-[0.5rem] uppercase tracking-[0.25em] text-yellow-900 dark:text-yellow-200">
+            <p className={cn(
+              "retro text-center text-[0.5rem] uppercase tracking-[0.25em]",
+              "text-yellow-900 dark:text-yellow-200",
+              // Override for Ally theme
+              "theme-ally:text-pink-500"
+            )}>
               {getLabel()}
             </p>
             <motion.span
@@ -811,11 +821,19 @@ const RetroVisitorCounter = () => {
             </motion.span>
           </div>
           
-          <div className="rounded-sm border-2 border-yellow-800 bg-black px-4 py-2 dark:border-yellow-400">
+          <div className={cn(
+            "rounded-sm border-2 border-yellow-800 bg-black px-4 py-2 dark:border-yellow-400",
+            // Override for Ally theme
+            "theme-ally:border-pink-300 theme-ally:bg-white"
+          )}>
             <div className="max-w-full overflow-x-auto">
               <motion.div
                 key={visitorCount}
-                className="retro mx-auto text-center font-mono text-xl tabular-nums sm:text-2xl md:text-3xl"
+                className={cn(
+                  "retro mx-auto text-center font-mono text-xl tabular-nums sm:text-2xl md:text-3xl",
+                  // Override for Ally theme
+                  "theme-ally:text-pink-500 theme-ally:drop-shadow-[0_0_10px_rgba(236,72,153,0.8)]"
+                )}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
@@ -827,6 +845,7 @@ const RetroVisitorCounter = () => {
                   wordBreak: "break-all",
                   whiteSpace: "nowrap",
                 }}
+
               >
                 {visitorCount}
               </motion.div>

@@ -481,3 +481,17 @@ body:not(.dark) .theme-simon h3 {
     2px 4px 0 #CC6600,
     4px 4px 0 #CC6600;
 }
+
+/* Ally Theme - White titles with pink pixel shadow */
+.theme-ally h1,
+.theme-ally h2,
+.theme-ally h3 {
+  color: #FFFFFF !important;
+  text-shadow: 
+    2px 0 0 #FF69B4,
+    0 2px 0 #FF69B4,
+    2px 2px 0 #FF69B4,
+    4px 2px 0 #FF69B4,
+    2px 4px 0 #FF69B4,
+    4px 4px 0 #FF69B4;
+}
