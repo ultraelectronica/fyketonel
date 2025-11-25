@@ -118,7 +118,7 @@ export function RetroBackground({
           aria-hidden="true"
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(to bottom, #87CEEB 0%, #B0E0E6 70%, #2D5016 70%, #1A3D0A 100%)",
+            background: "linear-gradient(to bottom, #87CEEB 0%, #B0E0E6 70%, #4A9D2E 70%, #3A7D1E 100%)",
           }}
         >
           {/* Clouds */}
@@ -161,7 +161,7 @@ export function RetroBackground({
                     left: `${(i * 1.25) % 100}%`,
                     width: "6px",
                     height: `${12 + randomFromSeed(i * 11) * 20}px`,
-                    backgroundColor: "#307e0cff",
+                    backgroundColor: "#3A7D1E",
                     opacity: 0.6 + randomFromSeed(i * 13) * 0.3,
                   }}
                 />
@@ -176,7 +176,7 @@ export function RetroBackground({
                     left: `${(i * 1.67) % 100}%`,
                     width: "4px",
                     height: `${10 + randomFromSeed(i * 19) * 18}px`,
-                    backgroundColor: "#2D5016",
+                    backgroundColor: "#4A9D2E",
                     opacity: 0.5 + randomFromSeed(i * 23) * 0.4,
                   }}
                 />
@@ -191,7 +191,7 @@ export function RetroBackground({
                     left: `${(i * 2.5) % 100}%`,
                     width: "3px",
                     height: `${8 + randomFromSeed(i * 31) * 14}px`,
-                    backgroundColor: "#4A7C2C",
+                    backgroundColor: "#5EBD3E",
                     opacity: 0.4 + randomFromSeed(i * 37) * 0.3,
                   }}
                 />
