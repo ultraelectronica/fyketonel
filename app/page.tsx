@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/8bit/button";
 import InteractiveCalendar from "@/components/interactive-calendar";
 import {
@@ -59,6 +60,7 @@ async function getJokeOfTheDay() {
 
 export default function Home() {
   const [joke, setJoke] = useState("Loading joke...");
+  const [isAllyMode, setIsAllyMode] = useState(false);
   const today = new Date();
 
   // Detect screen sizes
@@ -83,6 +85,23 @@ export default function Home() {
 
     return () => {
       isMounted = false;
+    };
+  }, []);
+
+  // Detect Ally theme
+  useEffect(() => {
+    const checkTheme = () => {
+      if (typeof window !== "undefined") {
+        const theme = localStorage.getItem("terminal-theme");
+        setIsAllyMode(theme === "ally");
+      }
+    };
+    checkTheme();
+    window.addEventListener("themeChanged", checkTheme);
+    const interval = setInterval(checkTheme, 100);
+    return () => {
+      window.removeEventListener("themeChanged", checkTheme);
+      clearInterval(interval);
     };
   }, []);
 
@@ -135,8 +154,25 @@ export default function Home() {
 
       <section
         id="lab-container"
-        className={`${shellClass} border-dashed border-foreground/50 dark:border-ring/50`}
+        className={`${shellClass} border-dashed border-foreground/50 dark:border-ring/50 relative`}
       >
+        {/* Tulips on borders for Ally theme */}
+        <div className="pointer-events-none absolute -left-2 top-0 bottom-0 theme-ally:block hidden">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute top-4 opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute bottom-4 opacity-60" />
+        </div>
+        <div className="pointer-events-none absolute -right-2 top-0 bottom-0 theme-ally:block hidden">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute top-4 opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute bottom-4 opacity-60" />
+        </div>
+        <div className="pointer-events-none absolute left-0 right-0 -top-2 theme-ally:flex hidden justify-between px-4">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+        </div>
+        <div className="pointer-events-none absolute left-0 right-0 -bottom-2 theme-ally:flex hidden justify-between px-4">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+        </div>
         <p className="retro mb-4 text-center text-[0.5rem] uppercase tracking-[0.25em] text-muted-foreground sm:mb-5 sm:text-[0.6rem] sm:tracking-[0.3em] md:mb-6 md:text-xs md:tracking-[0.35em]">
           Lab Control Center
         </p>
@@ -222,11 +258,22 @@ export default function Home() {
               </div>
             </div>
 
-            <div className={`${panelClass} flex flex-col h-full`}>
-              <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
+            <div className={`${panelClass} flex flex-col h-full relative`}>
+              {/* Lotus background for Ally theme */}
+              {isAllyMode && (
+                <div className="pointer-events-none absolute inset-0 opacity-40">
+                  <Image
+                    src="/assets/tulips.png"
+                    alt=""
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <p className="retro relative z-10 text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
                 A random joke for your mood.
               </p>
-              <div className="mt-4 flex flex-1 items-center justify-center sm:mt-5 md:mt-6">
+              <div className="mt-4 flex flex-1 items-center justify-center sm:mt-5 md:mt-6 relative z-10">
                 <p className="retro text-xs leading-relaxed text-center text-muted-foreground sm:text-sm md:text-base lg:text-lg">
                   {joke}
                 </p>

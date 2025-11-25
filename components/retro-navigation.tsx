@@ -101,8 +101,7 @@ export function RetroNavigation() {
                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
                             isActive
                               ? "border-primary bg-primary/20 text-primary shadow-[3px_3px_0_var(--primary)] hover:shadow-[4px_4px_0_var(--primary)] hover:translate-y-[-2px]"
-                              : "border-border bg-card shadow-[3px_3px_0_var(--border)] hover:border-primary hover:bg-accent hover:text-primary hover:shadow-[4px_4px_0_var(--primary)] hover:translate-y-[-2px]",
-                            "theme-ally:hover:bg-pink-500 theme-ally:hover:text-white"
+                              : "border-border bg-card shadow-[3px_3px_0_var(--border)] hover:border-primary hover:bg-[color:var(--hover-bg)] hover:text-[color:var(--hover-text)] hover:shadow-[4px_4px_0_var(--primary)] hover:translate-y-[-2px]"
                           )}
                         >
                           {/* Active indicator pixel dots */}
@@ -130,9 +129,8 @@ export function RetroNavigation() {
               rel="noopener noreferrer"
               className={cn(
                 "retro inline-flex items-center gap-2 rounded-none border-2 border-border bg-card px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] transition-all duration-200",
-                "shadow-[3px_3px_0_var(--border)] hover:border-primary hover:bg-accent hover:text-primary",
-                "hover:shadow-[4px_4px_0_var(--primary)] hover:translate-y-[-2px]",
-                "theme-ally:hover:bg-pink-500 theme-ally:hover:text-white"
+                "shadow-[3px_3px_0_var(--border)] hover:border-primary hover:bg-[color:var(--hover-bg)] hover:text-[color:var(--hover-text)]",
+                "hover:shadow-[4px_4px_0_var(--primary)] hover:translate-y-[-2px]"
               )}
               aria-label="View the project on GitHub"
             >
@@ -190,9 +188,7 @@ export function RetroNavigation() {
                       "retro group relative overflow-hidden rounded-none border-3 p-4 text-center text-xs font-bold uppercase tracking-[0.15em] transition-all duration-200",
                       isActive
                         ? "border-primary bg-primary/20 text-primary shadow-[4px_4px_0_var(--primary)]"
-                        : "border-border bg-card shadow-[4px_4px_0_var(--border)] hover:border-primary hover:bg-accent hover:text-primary hover:shadow-[5px_5px_0_var(--primary)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_var(--primary)]"
-                    ,
-                    "theme-ally:hover:bg-pink-500 theme-ally:hover:text-white"
+                        : "border-border bg-card shadow-[4px_4px_0_var(--border)] hover:border-primary hover:bg-[color:var(--hover-bg)] hover:text-[color:var(--hover-text)] hover:shadow-[5px_5px_0_var(--primary)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_var(--primary)]"
                     )}
                   >
                     {/* Pixel corner decorations for active state */}
@@ -223,9 +219,8 @@ export function RetroNavigation() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     "retro group relative flex items-center justify-center gap-2 overflow-hidden rounded-none border-3 border-border bg-card p-4 text-center text-xs font-bold uppercase tracking-[0.15em] transition-all duration-200",
-                    "shadow-[4px_4px_0_var(--border)] hover:border-primary hover:bg-accent hover:text-primary hover:shadow-[5px_5px_0_var(--primary)]",
-                    "active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_var(--primary)]",
-                    "theme-ally:hover:bg-pink-500 theme-ally:hover:text-white"
+                    "shadow-[4px_4px_0_var(--border)] hover:border-primary hover:bg-[color:var(--hover-bg)] hover:text-[color:var(--hover-text)] hover:shadow-[5px_5px_0_var(--primary)]",
+                    "active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_var(--primary)]"
                   )}
                 >
                   {/* Hover gradient */}

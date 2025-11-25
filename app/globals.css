@@ -482,6 +482,29 @@ body:not(.dark) .theme-simon h3 {
     4px 4px 0 #CC6600;
 }
 
+/* Simon Theme - Project titles in accordions with gold pixel shadow (light mode only) */
+html.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg,
+html.simon-light.theme-simon [data-slot="accordion-trigger"] .retro.text-lg,
+html.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg.uppercase,
+html.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro,
+body.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg,
+body.simon-light.theme-simon [data-slot="accordion-trigger"] .retro.text-lg,
+body.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg.uppercase,
+body.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro,
+.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg,
+.simon-light.theme-simon [data-slot="accordion-trigger"] .retro.text-lg,
+.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro.text-lg.uppercase,
+.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro {
+  color: #FFD700 !important;
+  text-shadow: 
+    2px 0 0 #CC6600,
+    0 2px 0 #CC6600,
+    2px 2px 0 #CC6600,
+    4px 2px 0 #CC6600,
+    2px 4px 0 #CC6600,
+    4px 4px 0 #CC6600 !important;
+}
+
 /* Ally Theme - White titles with pink pixel shadow */
 .theme-ally h1,
 .theme-ally h2,
@@ -494,4 +517,74 @@ body:not(.dark) .theme-simon h3 {
     4px 2px 0 #FF69B4,
     2px 4px 0 #FF69B4,
     4px 4px 0 #FF69B4;
+}
+
+/* Ally Theme - Project titles in accordions with pink pixel shadow */
+.theme-ally [data-slot="accordion-trigger"] p.retro.text-lg,
+.theme-ally [data-slot="accordion-trigger"] .retro.text-lg,
+.theme-ally [data-slot="accordion-trigger"] p.retro.text-lg.uppercase {
+  text-shadow: 
+    2px 0 0 #FF69B4,
+    0 2px 0 #FF69B4,
+    2px 2px 0 #FF69B4,
+    4px 2px 0 #FF69B4,
+    2px 4px 0 #FF69B4,
+    4px 4px 0 #FF69B4 !important;
+}
+
+/* Ally Theme - Navigation hover styles */
+.theme-ally [data-slot="navigation-menu-link"]:hover {
+  background-color: var(--hover-bg) !important;
+  color: var(--hover-text) !important;
+}
+
+/* Ally Theme - Navigation active/selected styles */
+.theme-ally [data-slot="navigation-menu-link"] a.border-primary.bg-primary\/20,
+.theme-ally a.border-primary.bg-primary\/20.text-primary {
+  border-color: oklch(0.65 0.25 350) !important;
+  background-color: oklch(0.65 0.25 350 / 0.2) !important;
+  color: oklch(0.65 0.25 350) !important;
+}
+
+/* Target any link with active state classes in Ally theme */
+.theme-ally header a.border-primary,
+.theme-ally header a.bg-primary\/20,
+.theme-ally header a.text-primary {
+  border-color: oklch(0.65 0.25 350) !important;
+  background-color: oklch(0.65 0.25 350 / 0.2) !important;
+  color: oklch(0.65 0.25 350) !important;
+}
+
+.theme-ally .ally-visitor-label {
+  color: var(--primary) !important;
+}
+
+.theme-ally .ally-visitor-counter {
+  color: var(--primary) !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* Ally Theme - Change yellow/amber gradients to pink */
+.theme-ally .bg-gradient-to-r.from-yellow-600,
+.theme-ally .bg-gradient-to-r.via-orange-600,
+.theme-ally .bg-gradient-to-r.to-red-700,
+.theme-ally .bg-gradient-to-b.from-yellow-500,
+.theme-ally .bg-gradient-to-b.to-orange-600 {
+  background-image: linear-gradient(to right, oklch(0.65 0.25 350), oklch(0.7 0.25 350), oklch(0.65 0.25 350)) !important;
+}
+
+.theme-ally .bg-gradient-to-b.from-amber-200.via-amber-300.to-amber-500,
+.theme-ally .bg-gradient-to-b.from-amber-200,
+.theme-ally .bg-gradient-to-b.via-amber-300,
+.theme-ally .bg-gradient-to-b.to-amber-500 {
+  background-image: linear-gradient(to bottom, oklch(0.85 0.2 350), oklch(0.75 0.25 350), oklch(0.65 0.25 350)) !important;
+}
+
+.theme-ally .border-amber-500 {
+  border-color: oklch(0.65 0.25 350) !important;
+}
+
+.theme-ally .text-amber-900 {
+  color: oklch(0.2 0.05 350) !important;
 }

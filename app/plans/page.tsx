@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMediaQuery } from "react-responsive";
 import QuestLog from "@/components/quest-log";
 import LaboratoryExperimentsLog from "@/components/laboratory-experiments-log";
@@ -40,8 +41,25 @@ export default function PlansPage() {
 
       {/* Quest Log Container */}
       <section
-        className={`${shellClass} border-dashed border-foreground/50 dark:border-ring/50`}
+        className={`${shellClass} border-dashed border-foreground/50 dark:border-ring/50 relative`}
       >
+        {/* Tulips on borders for Ally theme */}
+        <div className="pointer-events-none absolute -left-2 top-0 bottom-0 theme-ally:block hidden">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute top-4 opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute bottom-4 opacity-60" />
+        </div>
+        <div className="pointer-events-none absolute -right-2 top-0 bottom-0 theme-ally:block hidden">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute top-4 opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute bottom-4 opacity-60" />
+        </div>
+        <div className="pointer-events-none absolute left-0 right-0 -top-2 theme-ally:flex hidden justify-between px-4">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+        </div>
+        <div className="pointer-events-none absolute left-0 right-0 -bottom-2 theme-ally:flex hidden justify-between px-4">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+        </div>
         <p className="retro mb-4 text-center text-[0.5rem] uppercase tracking-[0.25em] text-muted-foreground sm:mb-5 sm:text-[0.6rem] sm:tracking-[0.3em] md:mb-6 md:text-xs md:tracking-[0.35em]">
           Active Quest Log
         </p>

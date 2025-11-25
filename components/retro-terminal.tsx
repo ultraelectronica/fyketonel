@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Terminal, Minimize2, Maximize2, X } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -376,8 +377,8 @@ const themes = {
       "--chart-5": "oklch(0.85 0.22 90)",
       "--visitor-counter": "oklch(0.7 0.25 350)",
       "--shadow-color": "oklch(0.65 0.25 350 / 0.3)",
-      "--hover-bg": "oklch(0.65 0.25 350 / 0.2)",
-      "--hover-text": "oklch(0.65 0.25 350)",
+      "--hover-bg": "oklch(0.65 0.25 350)",
+      "--hover-text": "oklch(1 0 0)",
     },
     dark: {
       // Ally Dark is now just Ally Light (but maybe slightly softer/warmer to differentiate?)
@@ -408,8 +409,8 @@ const themes = {
       "--chart-5": "oklch(0.85 0.22 90)",
       "--visitor-counter": "oklch(0.7 0.25 350)",
       "--shadow-color": "oklch(0.65 0.25 350 / 0.3)",
-      "--hover-bg": "oklch(0.65 0.25 350 / 0.2)",
-      "--hover-text": "oklch(0.65 0.25 350)",
+      "--hover-bg": "oklch(0.65 0.25 350)",
+      "--hover-text": "oklch(1 0 0)",
     }
   },
   simon: {
@@ -600,10 +601,20 @@ export function RetroTerminal() {
       html?.classList.remove(t.class);
     });
     
+    // Remove simon-light class if it exists
+    body?.classList.remove("simon-light");
+    html?.classList.remove("simon-light");
+    
     // Add current theme class if not default
     if (currentTheme !== "default" && theme) {
       body?.classList.add(theme.class);
       html?.classList.add(theme.class);
+      
+      // Add simon-light class when Simon theme is in light mode
+      if (currentTheme === "simon" && simonThemeMode === "light") {
+        body?.classList.add("simon-light");
+        html?.classList.add("simon-light");
+      }
     }
   }, [currentTheme, simonThemeMode, resolvedTheme]);
 
@@ -1273,6 +1284,24 @@ export function RetroTerminal() {
     }
   };
 
+  const [isAllyMode, setIsAllyMode] = useState(false);
+  
+  useEffect(() => {
+    const checkTheme = () => {
+      if (typeof window !== "undefined") {
+        const theme = localStorage.getItem("terminal-theme");
+        setIsAllyMode(theme === "ally");
+      }
+    };
+    checkTheme();
+    window.addEventListener("themeChanged", checkTheme);
+    const interval = setInterval(checkTheme, 100);
+    return () => {
+      window.removeEventListener("themeChanged", checkTheme);
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -1285,6 +1314,17 @@ export function RetroTerminal() {
           : "border-4 border-border bg-card shadow-[6px_6px_0_var(--border)] dark:border-ring"
       )}
     >
+      {/* Cat background for Ally theme */}
+      {isAllyMode && (
+        <div className="pointer-events-none absolute inset-0 opacity-20">
+          <Image
+            src="/assets/cat.png"
+            alt=""
+            fill
+            className="object-cover"
+          />
+        </div>
+      )}
       {/* Scanline effect */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.03)_50%)] bg-[length:100%_4px] opacity-30" />
 

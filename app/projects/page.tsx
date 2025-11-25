@@ -595,12 +595,41 @@ const QuestionMarkBlock = ({
 }: {
   title: string;
   caption?: string;
-}) => (
-  <div className="relative flex h-full min-h-[260px] w-full flex-col items-center justify-center overflow-hidden rounded-sm border-4 border-amber-500 bg-gradient-to-b from-amber-200 via-amber-300 to-amber-500 text-center text-amber-900 shadow-[0_0_0_4px_rgba(0,0,0,0.25),inset_0_-12px_0_rgba(0,0,0,0.15)]">
-    <span className="retro text-7xl drop-shadow-[0_6px_0_rgba(0,0,0,0.35)]">?</span>
-    <p className="retro mt-4 max-w-xs text-[0.6rem] uppercase tracking-[0.2em]">
-      {title}
-    </p>
+}) => {
+  const [isAllyMode, setIsAllyMode] = useState(false);
+  
+  useEffect(() => {
+    const checkTheme = () => {
+      if (typeof window !== "undefined") {
+        const theme = localStorage.getItem("terminal-theme");
+        setIsAllyMode(theme === "ally");
+      }
+    };
+    checkTheme();
+    window.addEventListener("themeChanged", checkTheme);
+    const interval = setInterval(checkTheme, 100);
+    return () => {
+      window.removeEventListener("themeChanged", checkTheme);
+      clearInterval(interval);
+    };
+  }, []);
+  
+  return (
+    <div className="relative flex h-full min-h-[260px] w-full flex-col items-center justify-center overflow-hidden rounded-sm border-4 border-amber-500 bg-gradient-to-b from-amber-200 via-amber-300 to-amber-500 text-center text-amber-900 shadow-[0_0_0_4px_rgba(0,0,0,0.25),inset_0_-12px_0_rgba(0,0,0,0.15)]">
+      {isAllyMode ? (
+        <Image
+          src="/assets/butterfly.png"
+          alt="Butterfly"
+          width={80}
+          height={80}
+          className="drop-shadow-[0_6px_0_rgba(0,0,0,0.35)]"
+        />
+      ) : (
+        <span className="retro text-7xl drop-shadow-[0_6px_0_rgba(0,0,0,0.35)]">?</span>
+      )}
+      <p className="retro mt-4 max-w-xs text-[0.6rem] uppercase tracking-[0.2em]">
+        {title}
+      </p>
     {caption ? (
       <p className="retro mt-2 px-4 text-[0.55rem] text-amber-800">
         {caption}
@@ -623,7 +652,8 @@ const QuestionMarkBlock = ({
       className="absolute right-3 bottom-3 size-3 rounded-sm bg-amber-400 shadow-[0_2px_0_rgba(0,0,0,0.3)]"
     />
   </div>
-);
+  );
+};
 
 type TierFilter = Tier | "ALL";
 
@@ -791,9 +821,8 @@ const RetroVisitorCounter = () => {
     >
       <div className={cn(
         "rounded-none border-4 border-border p-3 shadow-[4px_4px_0_var(--border)]",
-        "bg-gradient-to-b from-yellow-200 via-yellow-300 to-yellow-400 dark:border-ring dark:from-yellow-700 dark:via-yellow-800 dark:to-yellow-900",
-        // Override for Ally theme
-        "theme-ally:bg-gradient-to-b theme-ally:from-white theme-ally:via-white theme-ally:to-gray-100"
+        "bg-gradient-to-b from-[color:var(--card)] via-[color:var(--secondary)] to-[color:var(--primary)]",
+        "dark:from-[color:var(--card)] dark:via-[color:var(--secondary)] dark:to-[color:var(--primary)]"
       )}>
         <div className="space-y-2">
           <div className="flex items-center justify-center gap-2">
@@ -804,12 +833,12 @@ const RetroVisitorCounter = () => {
             >
               🎉
             </motion.span>
-            <p className={cn(
-              "retro text-center text-[0.5rem] uppercase tracking-[0.25em]",
-              "text-yellow-900 dark:text-yellow-200",
-              // Override for Ally theme
-              "theme-ally:text-pink-500"
-            )}>
+            <p
+              className={cn(
+                "retro ally-visitor-label text-center text-[0.5rem] uppercase tracking-[0.25em]",
+                "text-[color:var(--foreground)]"
+              )}
+            >
               {getLabel()}
             </p>
             <motion.span
@@ -821,25 +850,25 @@ const RetroVisitorCounter = () => {
             </motion.span>
           </div>
           
-          <div className={cn(
-            "rounded-sm border-2 border-yellow-800 bg-black px-4 py-2 dark:border-yellow-400",
-            // Override for Ally theme
-            "theme-ally:border-pink-300 theme-ally:bg-white"
-          )}>
+          <div
+            className={cn(
+              "rounded-sm border-2 px-4 py-2",
+              "border-[color:var(--border)] bg-[color:var(--card)]"
+            )}
+          >
             <div className="max-w-full overflow-x-auto">
               <motion.div
                 key={visitorCount}
                 className={cn(
-                  "retro mx-auto text-center font-mono text-xl tabular-nums sm:text-2xl md:text-3xl",
-                  // Override for Ally theme
-                  "theme-ally:text-pink-500 theme-ally:drop-shadow-[0_0_10px_rgba(236,72,153,0.8)]"
+                  "retro ally-visitor-counter mx-auto text-center font-mono text-xl tabular-nums sm:text-2xl md:text-3xl",
+                  "text-[color:var(--primary)] drop-shadow-[0_0_3px_var(--primary)]"
                 )}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
                 style={{
                   color: "var(--visitor-counter, oklch(0.6 0.25 140))",
-                  textShadow: "0 0 10px var(--visitor-counter, oklch(0.6 0.25 140) / 0.8), 0 0 20px var(--visitor-counter, oklch(0.6 0.25 140) / 0.4)",
+                  textShadow: "0 0 3px var(--visitor-counter, oklch(0.6 0.25 140) / 0.8), 0 0 20px var(--visitor-counter, oklch(0.6 0.25 140) / 0.4)",
                   letterSpacing: displayMode === "binary" ? "0.08em" : "0.18em",
                   fontSize: displayMode === "binary" ? "0.7rem" : undefined,
                   wordBreak: "break-all",
@@ -1525,6 +1554,8 @@ const TechStackConstellation = ({
 }) => {
   const [hoveredTech, setHoveredTech] = useState<string | null>(null);
   const [selectedTech, setSelectedTech] = useState<string | null>(null);
+  const [isAllyMode, setIsAllyMode] = useState(false);
+  const [isSimonMode, setIsSimonMode] = useState(false);
 
   // Generate stable random positions for stars (only on client to avoid hydration mismatch)
   const [starPositions, setStarPositions] = useState<Array<{
@@ -1551,6 +1582,24 @@ const TechStackConstellation = ({
         );
       });
     }
+  }, []);
+
+  // Detect Ally and Simon themes
+  useEffect(() => {
+    const checkTheme = () => {
+      if (typeof window !== "undefined") {
+        const theme = localStorage.getItem("terminal-theme");
+        setIsAllyMode(theme === "ally");
+        setIsSimonMode(theme === "simon");
+      }
+    };
+    checkTheme();
+    window.addEventListener("themeChanged", checkTheme);
+    const interval = setInterval(checkTheme, 100);
+    return () => {
+      window.removeEventListener("themeChanged", checkTheme);
+      clearInterval(interval);
+    };
   }, []);
 
   // Build tech stack data
@@ -1634,6 +1683,97 @@ const TechStackConstellation = ({
 
   const formatPercent = (value: number) => value.toFixed(3);
 
+  // Horizontal diamond formation function for Simon theme
+  const getDiamondPosition = (index: number, total: number) => {
+    const centerX = 50;
+    const centerY = 50;
+    const diamondWidth = 70; // Horizontal span of diamond
+    const diamondHeight = 50; // Vertical span of diamond
+    
+    // Divide nodes into 4 sides of the diamond
+    const nodesPerSide = Math.ceil(total / 4);
+    const side = Math.floor(index / nodesPerSide);
+    const positionOnSide = (index % nodesPerSide) / Math.max(1, nodesPerSide - 1);
+    
+    let x: number, y: number;
+    
+    if (side === 0) {
+      // Top-left to top edge (left to center-top)
+      x = centerX - diamondWidth / 2 + positionOnSide * (diamondWidth / 2);
+      y = centerY - (diamondHeight / 2) * positionOnSide;
+    } else if (side === 1) {
+      // Top-right edge (center-top to right)
+      x = centerX + positionOnSide * (diamondWidth / 2);
+      y = centerY - (diamondHeight / 2) * (1 - positionOnSide);
+    } else if (side === 2) {
+      // Bottom-right edge (right to center-bottom)
+      x = centerX + (diamondWidth / 2) * (1 - positionOnSide);
+      y = centerY + (diamondHeight / 2) * positionOnSide;
+    } else {
+      // Bottom-left edge (center-bottom to left)
+      x = centerX - positionOnSide * (diamondWidth / 2);
+      y = centerY + (diamondHeight / 2) * (1 - positionOnSide);
+    }
+    
+    return { x, y };
+  };
+
+  // Butterfly formation function for Ally theme
+  const getButterflyPosition = (index: number, total: number) => {
+    const centerX = 50;
+    const centerY = 50;
+    
+    // Divide nodes into body and wings
+    const bodyCount = Math.max(1, Math.floor(total * 0.1)); // 10% for body
+    const wingCount = Math.floor((total - bodyCount) / 4); // Divide remaining into 4 wing sections
+    
+    if (index < bodyCount) {
+      // Body nodes (vertical line in center)
+      const bodyY = 30 + (index / bodyCount) * 40; // Spread vertically from 30% to 70%
+      return { x: centerX, y: bodyY };
+    } else {
+      const wingIndex = index - bodyCount;
+      const wingSection = Math.floor(wingIndex / wingCount);
+      const positionInWing = (wingIndex % wingCount) / wingCount;
+      
+      // Butterfly wing shape parameters
+      const wingBaseX = centerX;
+      const wingBaseY = centerY;
+      const wingSpan = 45; // How far wings extend (increased from 35)
+      const wingHeight = 30; // Vertical spread of wings
+      
+      let x, y;
+      
+      if (wingSection === 0) {
+        // Top left wing
+        const angle = Math.PI * 0.75 + positionInWing * Math.PI * 0.5; // 135° to 225°
+        const distance = wingSpan * (0.2 + positionInWing * 0.8); // Start closer, extend further
+        x = wingBaseX + distance * Math.cos(angle);
+        y = wingBaseY - wingHeight * (0.5 + positionInWing * 0.5);
+      } else if (wingSection === 1) {
+        // Top right wing
+        const angle = Math.PI * 0.25 - positionInWing * Math.PI * 0.5; // 45° to -45°
+        const distance = wingSpan * (0.2 + positionInWing * 0.8); // Start closer, extend further
+        x = wingBaseX + distance * Math.cos(angle);
+        y = wingBaseY - wingHeight * (0.5 + positionInWing * 0.5);
+      } else if (wingSection === 2) {
+        // Bottom left wing
+        const angle = Math.PI * 0.75 + positionInWing * Math.PI * 0.5; // 135° to 225°
+        const distance = wingSpan * (0.2 + positionInWing * 0.8); // Start closer, extend further
+        x = wingBaseX + distance * Math.cos(angle);
+        y = wingBaseY + wingHeight * (0.5 + positionInWing * 0.5);
+      } else {
+        // Bottom right wing
+        const angle = Math.PI * 0.25 - positionInWing * Math.PI * 0.5; // 45° to -45°
+        const distance = wingSpan * (0.2 + positionInWing * 0.8); // Start closer, extend further
+        x = wingBaseX + distance * Math.cos(angle);
+        y = wingBaseY + wingHeight * (0.5 + positionInWing * 0.5);
+      }
+      
+      return { x, y };
+    }
+  };
+
   return (
     <div className={cn(panelClass, "overflow-hidden")}>
       <div className="space-y-4">
@@ -1702,6 +1842,15 @@ const TechStackConstellation = ({
 
         {/* Constellation Container */}
         <div className="relative min-h-[300px] overflow-hidden rounded-sm border-2 border-dashed border-border/40 bg-gradient-to-b from-background via-background/50 to-background p-3 sm:min-h-[400px] sm:p-4 dark:border-ring/40">
+          {/* Lotus background for Ally theme */}
+          <div className="pointer-events-none absolute inset-0 theme-ally:opacity-40">
+            <Image
+              src="/assets/lotus.png"
+              alt=""
+              fill
+              className="object-cover opacity-0 theme-ally:opacity-100"
+            />
+          </div>
           {/* Background stars effect */}
           <div className="pointer-events-none absolute inset-0">
             {starPositions.map((star, i) => (
@@ -1740,26 +1889,50 @@ const TechStackConstellation = ({
                 activeTech &&
                 (connectedTechs.has(conn.from) && connectedTechs.has(conn.to));
 
-              // Simple positioning in a circular/scattered layout
-              const angle1 = (fromIndex / techData.length) * 2 * Math.PI;
-              const angle2 = (toIndex / techData.length) * 2 * Math.PI;
+              // Position based on theme
+              let x1: number, y1: number, x2: number, y2: number;
               
-              const radius = 40; // percentage
-              const centerX = 50;
-              const centerY = 50;
+              if (isAllyMode) {
+                // Butterfly formation
+                const pos1 = getButterflyPosition(fromIndex, techData.length);
+                const pos2 = getButterflyPosition(toIndex, techData.length);
+                x1 = pos1.x;
+                y1 = pos1.y;
+                x2 = pos2.x;
+                y2 = pos2.y;
+              } else if (isSimonMode) {
+                // Horizontal diamond formation
+                const pos1 = getDiamondPosition(fromIndex, techData.length);
+                const pos2 = getDiamondPosition(toIndex, techData.length);
+                x1 = pos1.x;
+                y1 = pos1.y;
+                x2 = pos2.x;
+                y2 = pos2.y;
+              } else {
+                // Circular layout
+                const angle1 = (fromIndex / techData.length) * 2 * Math.PI;
+                const angle2 = (toIndex / techData.length) * 2 * Math.PI;
+                const radius = 40;
+                const centerX = 50;
+                const centerY = 50;
+                x1 = centerX + radius * Math.cos(angle1);
+                y1 = centerY + radius * Math.sin(angle1);
+                x2 = centerX + radius * Math.cos(angle2);
+                y2 = centerY + radius * Math.sin(angle2);
+              }
               
-              const x1 = formatPercent(centerX + radius * Math.cos(angle1));
-              const y1 = formatPercent(centerY + radius * Math.sin(angle1));
-              const x2 = formatPercent(centerX + radius * Math.cos(angle2));
-              const y2 = formatPercent(centerY + radius * Math.sin(angle2));
+              const x1Formatted = formatPercent(x1);
+              const y1Formatted = formatPercent(y1);
+              const x2Formatted = formatPercent(x2);
+              const y2Formatted = formatPercent(y2);
 
               return (
                 <motion.line
                   key={`${conn.from}-${conn.to}-${i}`}
-                  x1={`${x1}%`}
-                  y1={`${y1}%`}
-                  x2={`${x2}%`}
-                  y2={`${y2}%`}
+                  x1={`${x1Formatted}%`}
+                  y1={`${y1Formatted}%`}
+                  x2={`${x2Formatted}%`}
+                  y2={`${y2Formatted}%`}
                   stroke="currentColor"
                   strokeWidth={isActive ? 2 : 1}
                   className={cn(
@@ -1781,12 +1954,31 @@ const TechStackConstellation = ({
           {/* Tech Stack Nodes */}
           <div className="pointer-events-none absolute inset-0">
             {techData.map((tech, index) => {
-              const angle = (index / techData.length) * 2 * Math.PI;
-              const radius = 40;
-              const centerX = 50;
-              const centerY = 50;
-              const x = formatPercent(centerX + radius * Math.cos(angle));
-              const y = formatPercent(centerY + radius * Math.sin(angle));
+              // Position based on theme
+              let x: number, y: number;
+              
+              if (isAllyMode) {
+                // Butterfly formation
+                const pos = getButterflyPosition(index, techData.length);
+                x = pos.x;
+                y = pos.y;
+              } else if (isSimonMode) {
+                // Horizontal diamond formation
+                const pos = getDiamondPosition(index, techData.length);
+                x = pos.x;
+                y = pos.y;
+              } else {
+                // Circular layout
+                const angle = (index / techData.length) * 2 * Math.PI;
+                const radius = 40;
+                const centerX = 50;
+                const centerY = 50;
+                x = centerX + radius * Math.cos(angle);
+                y = centerY + radius * Math.sin(angle);
+              }
+              
+              const xFormatted = formatPercent(x);
+              const yFormatted = formatPercent(y);
               const isActive = activeTech === tech.name;
               const isConnected = connectedTechs.has(tech.name);
 
@@ -1802,8 +1994,8 @@ const TechStackConstellation = ({
                       : "border-muted-foreground/50 bg-muted-foreground/20"
                   )}
                   style={{
-                    left: `calc(${x}% - 6px)`,
-                    top: `calc(${y}% - 6px)`,
+                    left: `calc(${xFormatted}% - 6px)`,
+                    top: `calc(${yFormatted}% - 6px)`,
                   }}
                 />
               );
@@ -2426,9 +2618,26 @@ export default function ProjectsPage() {
         id="archive-container"
         className={cn(
           shellClass,
-          "border-dashed border-foreground/50 dark:border-ring/50 space-y-6 sm:space-y-8"
+          "border-dashed border-foreground/50 dark:border-ring/50 space-y-6 sm:space-y-8 relative"
         )}
       >
+        {/* Tulips on borders for Ally theme */}
+        <div className="pointer-events-none absolute -left-2 top-0 bottom-0 theme-ally:block hidden">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute top-4 opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute bottom-4 opacity-60" />
+        </div>
+        <div className="pointer-events-none absolute -right-2 top-0 bottom-0 theme-ally:block hidden">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute top-4 opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute bottom-4 opacity-60" />
+        </div>
+        <div className="pointer-events-none absolute left-0 right-0 -top-2 theme-ally:flex hidden justify-between px-4">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+        </div>
+        <div className="pointer-events-none absolute left-0 right-0 -bottom-2 theme-ally:flex hidden justify-between px-4">
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
+        </div>
         <p className="retro text-center text-[0.5rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.3em] md:text-xs md:tracking-[0.35em]">
           Lab Archive Citadel
         </p>
@@ -2577,7 +2786,7 @@ export default function ProjectsPage() {
                       Tier {project.classification.tier} ·{" "}
                       {project.classification.codename}
                     </p>
-                    <p className="retro text-lg uppercase tracking-[0.2em]">
+                    <p className="retro text-lg uppercase tracking-[0.2em] theme-ally:drop-shadow-[2px_2px_0_oklch(0.65_0.25_350)]">
                       {project.title}
                     </p>
                     <p className="retro text-xs text-primary/80">
