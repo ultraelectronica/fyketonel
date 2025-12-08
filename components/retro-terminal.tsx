@@ -789,7 +789,7 @@ export function RetroTerminal() {
         { type: "output", content: "║          CONTACT CHANNELS                      ║" },
         { type: "output", content: "╚════════════════════════════════════════════════╝" },
         { type: "output", content: "" },
-        { type: "output", content: "  GitHub:   github.com/heimin22" },
+        { type: "output", content: "  GitHub:   github.com/ultraelectronica" },
         { type: "output", content: "  Email:    Available on contact form" },
         { type: "output", content: "  Location: Metro Manila, Philippines" },
         { type: "output", content: "" },

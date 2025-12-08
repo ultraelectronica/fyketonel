@@ -24,7 +24,7 @@ export default function GitHubContributions() {
     async function fetchContributions() {
       try {
         const response = await fetch(
-          "https://github-contributions-api.deno.dev/heimin22.json"
+          "https://github-contributions-api.deno.dev/ultraelectronica.json"
         );
 
         if (!response.ok) {
