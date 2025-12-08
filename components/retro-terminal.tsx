@@ -527,7 +527,9 @@ export function RetroTerminal() {
   const [currentTheme, setCurrentTheme] = useState<string>("default");
   const [simonThemeMode, setSimonThemeMode] = useState<"dark" | "light">("dark");
   const [isMounted, setIsMounted] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [multiLineBuffer, setMultiLineBuffer] = useState<string[]>([]);
+  const [isMultiLine, setIsMultiLine] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const outputRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
 
@@ -652,12 +654,19 @@ export function RetroTerminal() {
         { type: "output", content: "  theme [name]      - Change color theme" },
         { type: "output", content: "                      default/atari/nintendo/vhs/" },
         { type: "output", content: "                      gameboy/softpop/ally" },
-        { type: "output", content: "  shout [text]      - Shout back the text with data type and arithmetic support" },
+        { type: "output", content: "  shout [expr]      - Evaluate expressions with full support:" },
+        { type: "output", content: "                      Math: +, -, *, /, %, ** (power)" },
+        { type: "output", content: "                      Comparison: ==, !=, <, >, <=, >=" },
+        { type: "output", content: "                      Logical: &&, ||, !" },
+        { type: "output", content: "                      Assignment: =, +=, -=, *=, /=, %=" },
+        { type: "output", content: "                      Types: int, float, bool, string" },
         { type: "output", content: "  date              - Display current date/time" },
         { type: "output", content: "  fastfetch         - Display system information" },
         { type: "output", content: "" },
         { type: "success", content: "Use ↑/↓ arrows to navigate command history" },
         { type: "success", content: "Press Tab for autocomplete" },
+        { type: "success", content: "Shift+Enter or \\ at end for multi-line input" },
+        { type: "success", content: "Press Esc to cancel multi-line input" },
       ],
     },
     ls: {
@@ -877,7 +886,7 @@ export function RetroTerminal() {
     },
     shout: {
       name: "shout",
-      description: "Shout back the text with data type and arithmetic support",
+      description: "Shout back the text with data type, arithmetic, logical, and assignment support",
       execute: (args) => {
         if (args.length === 0) {
           return [
@@ -891,71 +900,373 @@ export function RetroTerminal() {
         const input = args.join(" ");
         const output: TerminalLine[] = [];
 
-        // Try to evaluate arithmetic expressions first
-        // Match patterns like: number operator number (with optional spaces)
-        const arithmeticPattern = /^(-?\d+\.?\d*)\s*([+\-*/%])\s*(-?\d+\.?\d*)$/;
-        const arithmeticMatch = input.match(arithmeticPattern);
-        
-        if (arithmeticMatch) {
-          const left = parseFloat(arithmeticMatch[1]);
-          const operator = arithmeticMatch[2];
-          const right = parseFloat(arithmeticMatch[3]);
-          let result: number;
-          let resultType: string;
-
-          try {
-            switch (operator) {
-              case "+":
-                result = left + right;
-                break;
-              case "-":
-                result = left - right;
-                break;
-              case "*":
-                result = left * right;
-                break;
-              case "/":
-                if (right === 0) {
-                  output.push({
-                    type: "error",
-                    content: "Division by zero is not allowed",
-                  });
-                  return output;
-                }
-                result = left / right;
-                break;
-              case "%":
-                if (right === 0) {
-                  output.push({
-                    type: "error",
-                    content: "Modulo by zero is not allowed",
-                  });
-                  return output;
-                }
-                result = left % right;
-                break;
-              default:
-                result = left;
+        // Variable storage for assignments (scoped to this execution context)
+        // Using a ref-like pattern to persist between evaluations
+        const getVariables = (): Record<string, number | boolean | string> => {
+          if (typeof window !== "undefined") {
+            if (!(window as unknown as Record<string, unknown>).__shoutVars) {
+              (window as unknown as Record<string, Record<string, number | boolean | string>>).__shoutVars = {};
             }
+            return (window as unknown as Record<string, Record<string, number | boolean | string>>).__shoutVars;
+          }
+          return {};
+        };
 
-            // Determine result type
-            resultType = Number.isInteger(result) ? "int" : "float";
+        // Tokenizer for expression parsing
+        const tokenize = (expr: string): string[] => {
+          const tokens: string[] = [];
+          let i = 0;
+          while (i < expr.length) {
+            // Skip whitespace
+            if (/\s/.test(expr[i])) {
+              i++;
+              continue;
+            }
             
-            output.push({
-              type: "output",
-              content: `${input} = ${result} (${resultType})`,
-            });
+            // Multi-character operators
+            if (i + 1 < expr.length) {
+              const twoChar = expr.slice(i, i + 2);
+              if (["==", "!=", "<=", ">=", "&&", "||", "+=", "-=", "*=", "/=", "%=", "**"].includes(twoChar)) {
+                tokens.push(twoChar);
+                i += 2;
+                continue;
+              }
+            }
+            
+            // Single character operators and parentheses
+            if (["+", "-", "*", "/", "%", "(", ")", "<", ">", "=", "!"].includes(expr[i])) {
+              tokens.push(expr[i]);
+              i++;
+              continue;
+            }
+            
+            // Numbers (including decimals and negatives handled by unary)
+            if (/\d/.test(expr[i]) || (expr[i] === "." && i + 1 < expr.length && /\d/.test(expr[i + 1]))) {
+              let num = "";
+              while (i < expr.length && (/\d/.test(expr[i]) || expr[i] === ".")) {
+                num += expr[i];
+                i++;
+              }
+              tokens.push(num);
+              continue;
+            }
+            
+            // Identifiers (variables, true, false)
+            if (/[a-zA-Z_]/.test(expr[i])) {
+              let ident = "";
+              while (i < expr.length && /[a-zA-Z0-9_]/.test(expr[i])) {
+                ident += expr[i];
+                i++;
+              }
+              tokens.push(ident);
+              continue;
+            }
+            
+            // Unknown character, skip
+            i++;
+          }
+          return tokens;
+        };
+
+        // Expression parser with operator precedence (function-based to avoid inline class)
+        // Precedence (lowest to highest):
+        // 1. Assignment: =, +=, -=, *=, /=, %=
+        // 2. Logical OR: ||
+        // 3. Logical AND: &&
+        // 4. Equality: ==, !=
+        // 5. Comparison: <, >, <=, >=
+        // 6. Addition/Subtraction: +, -
+        // 7. Multiplication/Division/Modulo: *, /, %
+        // 8. Power: **
+        // 9. Unary: !, - (negative)
+        // 10. Parentheses: ()
+
+        const parseExpression = (
+          tokens: string[],
+          variables: Record<string, number | boolean | string>
+        ): number | boolean | string => {
+          let pos = 0;
+
+          const peek = (): string | null => pos < tokens.length ? tokens[pos] : null;
+          const consume = (): string | null => pos < tokens.length ? tokens[pos++] : null;
+
+          const parsePrimary = (): number | boolean | string => {
+            const token = peek();
+            
+            if (token === null) {
+              throw new Error("Unexpected end of expression");
+            }
+            
+            // Parentheses
+            if (token === "(") {
+              consume();
+              const result = parseAssignment();
+              if (peek() !== ")") {
+                throw new Error("Missing closing parenthesis");
+              }
+              consume();
+              return result;
+            }
+            
+            // Number
+            if (/^-?\d+\.?\d*$/.test(token) || /^\.\d+$/.test(token)) {
+              consume();
+              return parseFloat(token);
+            }
+            
+            // Boolean literals
+            if (token.toLowerCase() === "true") {
+              consume();
+              return true;
+            }
+            if (token.toLowerCase() === "false") {
+              consume();
+              return false;
+            }
+            
+            // Variable
+            if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(token)) {
+              consume();
+              if (token in variables) {
+                return variables[token];
+              }
+              // Return 0 for undefined variables (common in shells)
+              return 0;
+            }
+            
+            throw new Error(`Unexpected token: ${token}`);
+          };
+
+          const parseUnary = (): number | boolean | string => {
+            if (peek() === "!") {
+              consume();
+              const operand = parseUnary();
+              return !Boolean(operand);
+            }
+            
+            if (peek() === "-") {
+              consume();
+              const operand = parseUnary();
+              const numOperand = typeof operand === "number" ? operand : parseFloat(String(operand)) || 0;
+              return -numOperand;
+            }
+            
+            return parsePrimary();
+          };
+
+          const parsePower = (): number | boolean | string => {
+            let left = parseUnary();
+            
+            while (peek() === "**") {
+              consume();
+              const right = parseUnary(); // right-associative
+              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
+              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
+              left = Math.pow(numLeft, numRight);
+            }
+            
+            return left;
+          };
+
+          const parseMultiplicative = (): number | boolean | string => {
+            let left = parsePower();
+            
+            while (peek() === "*" || peek() === "/" || peek() === "%") {
+              const op = consume();
+              const right = parsePower();
+              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
+              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
+              
+              if (op === "*") {
+                left = numLeft * numRight;
+              } else if (op === "/") {
+                if (numRight === 0) throw new Error("Division by zero");
+                left = numLeft / numRight;
+              } else {
+                if (numRight === 0) throw new Error("Modulo by zero");
+                left = numLeft % numRight;
+              }
+            }
+            
+            return left;
+          };
+
+          const parseAdditive = (): number | boolean | string => {
+            let left = parseMultiplicative();
+            
+            while (peek() === "+" || peek() === "-") {
+              const op = consume();
+              const right = parseMultiplicative();
+              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
+              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
+              
+              if (op === "+") {
+                left = numLeft + numRight;
+              } else {
+                left = numLeft - numRight;
+              }
+            }
+            
+            return left;
+          };
+
+          const parseComparison = (): number | boolean | string => {
+            let left = parseAdditive();
+            
+            while (["<", ">", "<=", ">="].includes(peek() || "")) {
+              const op = consume();
+              const right = parseAdditive();
+              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
+              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
+              
+              switch (op) {
+                case "<": left = numLeft < numRight; break;
+                case ">": left = numLeft > numRight; break;
+                case "<=": left = numLeft <= numRight; break;
+                case ">=": left = numLeft >= numRight; break;
+              }
+            }
+            
+            return left;
+          };
+
+          const parseEquality = (): number | boolean | string => {
+            let left = parseComparison();
+            
+            while (peek() === "==" || peek() === "!=") {
+              const op = consume();
+              const right = parseComparison();
+              if (op === "==") {
+                left = left === right;
+              } else {
+                left = left !== right;
+              }
+            }
+            
+            return left;
+          };
+
+          const parseLogicalAnd = (): number | boolean | string => {
+            let left = parseEquality();
+            
+            while (peek() === "&&") {
+              consume();
+              const right = parseEquality();
+              left = Boolean(left) && Boolean(right);
+            }
+            
+            return left;
+          };
+
+          const parseLogicalOr = (): number | boolean | string => {
+            let left = parseLogicalAnd();
+            
+            while (peek() === "||") {
+              consume();
+              const right = parseLogicalAnd();
+              left = Boolean(left) || Boolean(right);
+            }
+            
+            return left;
+          };
+
+          const parseAssignment = (): number | boolean | string => {
+            // Check if this is an assignment
+            if (pos + 1 < tokens.length) {
+              const varName = tokens[pos];
+              const op = tokens[pos + 1];
+              
+              if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName) && ["=", "+=", "-=", "*=", "/=", "%="].includes(op)) {
+                pos += 2; // consume variable name and operator
+                const value = parseAssignment(); // right-associative
+                
+                let finalValue: number | boolean | string;
+                if (op === "=") {
+                  finalValue = value;
+                } else {
+                  const currentValue = variables[varName];
+                  const numCurrent = typeof currentValue === "number" ? currentValue : 0;
+                  const numValue = typeof value === "number" ? value : parseFloat(String(value)) || 0;
+                  
+                  switch (op) {
+                    case "+=": finalValue = numCurrent + numValue; break;
+                    case "-=": finalValue = numCurrent - numValue; break;
+                    case "*=": finalValue = numCurrent * numValue; break;
+                    case "/=": 
+                      if (numValue === 0) throw new Error("Division by zero");
+                      finalValue = numCurrent / numValue; 
+                      break;
+                    case "%=": 
+                      if (numValue === 0) throw new Error("Modulo by zero");
+                      finalValue = numCurrent % numValue; 
+                      break;
+                    default: finalValue = value;
+                  }
+                }
+                
+                variables[varName] = finalValue;
+                return finalValue;
+              }
+            }
+            
+            return parseLogicalOr();
+          };
+
+          return parseAssignment();
+        };
+
+        // Try to evaluate as an expression
+        const tokens = tokenize(input);
+        
+        if (tokens.length > 0) {
+          try {
+            const variables = getVariables();
+            const result = parseExpression(tokens, variables);
+            
+            // Determine result type
+            let resultType: string;
+            if (typeof result === "boolean") {
+              resultType = "bool";
+            } else if (typeof result === "number") {
+              resultType = Number.isInteger(result) ? "int" : "float";
+            } else {
+              resultType = "string";
+            }
+            
+            // Check if it was an assignment
+            const assignmentMatch = input.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*([+\-*/%]?=)\s*/);
+            if (assignmentMatch) {
+              const varName = assignmentMatch[1];
+              const op = assignmentMatch[2];
+              output.push({
+                type: "success",
+                content: `${varName} ${op} ${result} (${resultType})`,
+              });
+            } else {
+              output.push({
+                type: "output",
+                content: `${input} = ${result} (${resultType})`,
+              });
+            }
+            
             return output;
           } catch (error) {
-            output.push({
-              type: "error",
-              content: `Arithmetic error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            });
-            return output;
+            // If expression parsing fails, fall through to type detection
+            if (error instanceof Error && (
+              error.message.includes("Division by zero") || 
+              error.message.includes("Modulo by zero")
+            )) {
+              output.push({
+                type: "error",
+                content: error.message,
+              });
+              return output;
+            }
+            // Continue to type detection for non-expression inputs
           }
         }
 
-        // Try to detect and format data types
+        // Try to detect and format data types (fallback for non-expressions)
         // Check for boolean
         if (input.toLowerCase() === "true" || input.toLowerCase() === "false") {
           const boolValue = input.toLowerCase() === "true";
@@ -1152,6 +1463,14 @@ export function RetroTerminal() {
     // Add input line
     addLines([{ type: "input", content: `$ ${trimmed}`, timestamp: new Date() }]);
 
+    // Special-case: allow full logical/assignment expressions inside shout without splitting on && or ||
+    const firstToken = trimmed.split(/\s+/)[0]?.toLowerCase();
+    if (firstToken === "shout") {
+      executeSingleCommand(trimmed);
+      setInput("");
+      return;
+    }
+
     // Parse command string for logical operators: &&, ||, ;
     // Smart parsing: combine flags from the same command
     const parts: Array<{ command: string; operator?: "&&" | "||" | ";" }> = [];
@@ -1245,39 +1564,180 @@ export function RetroTerminal() {
     setInput("");
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  // Execute command without displaying input line (for multi-line mode where input is already shown)
+  const executeCommandDirect = (commandString: string) => {
+    const trimmed = commandString.trim();
+    if (!trimmed) return;
+
+    // Add command to history
+    setHistory((prev) => [...prev, trimmed]);
+    setHistoryIndex(-1);
+
+    // Special-case: allow full logical/assignment expressions inside shout without splitting on && or ||
+    const firstToken = trimmed.split(/\s+/)[0]?.toLowerCase();
+    if (firstToken === "shout") {
+      executeSingleCommand(trimmed);
+      return;
+    }
+
+    // Parse command string for logical operators: &&, ||, ;
+    const parts: Array<{ command: string; operator?: "&&" | "||" | ";" }> = [];
+    const operatorPattern = /(\s+&&\s+|\s+\|\|\s+|\s+;\s+|^&&\s+|\s+&&$|^\|\|\s+|\s+\|\|$|^;\s+|\s+;$)/;
+    const tokens = trimmed.split(operatorPattern).filter(token => token.trim());
+    
+    let currentOperator: "&&" | "||" | ";" | undefined = undefined;
+    let previousCommandName = "";
+    let previousCommandBase = "";
+    
+    for (const token of tokens) {
+      const trimmedToken = token.trim();
+      
+      if (trimmedToken === "&&") {
+        currentOperator = "&&";
+      } else if (trimmedToken === "||") {
+        currentOperator = "||";
+      } else if (trimmedToken === ";") {
+        currentOperator = ";";
+      } else if (trimmedToken) {
+        if (trimmedToken.startsWith("--") && previousCommandName && currentOperator === "&&") {
+          const previousIndex = parts.length - 1;
+          if (previousIndex >= 0) {
+            const newFlags = trimmedToken.split(/\s+/);
+            const combinedCommand = `${previousCommandBase} ${newFlags.join(" ")}`.trim();
+            parts[previousIndex].command = combinedCommand;
+            previousCommandBase = combinedCommand;
+            currentOperator = undefined;
+            continue;
+          }
+        }
+        
+        const commandParts = trimmedToken.split(/\s+/);
+        previousCommandName = commandParts[0].toLowerCase();
+        previousCommandBase = trimmedToken;
+        
+        if (parts.length > 0 && currentOperator) {
+          parts[parts.length - 1].operator = currentOperator;
+        }
+        parts.push({ command: trimmedToken });
+        currentOperator = undefined;
+      }
+    }
+
+    let lastSuccess = true;
+
+    for (let j = 0; j < parts.length; j++) {
+      const part = parts[j];
+      let shouldExecute = true;
+
+      if (j > 0 && parts[j - 1].operator) {
+        const operator = parts[j - 1].operator;
+        if (operator === "&&") {
+          shouldExecute = lastSuccess;
+        } else if (operator === "||") {
+          shouldExecute = !lastSuccess;
+        } else if (operator === ";") {
+          shouldExecute = true;
+        }
+      }
+
+      if (shouldExecute && part.command) {
+        lastSuccess = executeSingleCommand(part.command);
+      } else if (part.command) {
+        lastSuccess = false;
+      }
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
+      // Shift+Enter adds a new line without executing
+      if (e.shiftKey) {
+        e.preventDefault();
+        setInput(prev => prev + "\n");
+        setIsMultiLine(true);
+        return;
+      }
+      
+      e.preventDefault();
+      const currentInput = input.trim();
+      
+      // Check if line ends with backslash (line continuation)
+      if (currentInput.endsWith("\\")) {
+        // Remove the backslash and add to buffer
+        const lineWithoutBackslash = currentInput.slice(0, -1);
+        setMultiLineBuffer(prev => [...prev, lineWithoutBackslash]);
+        setIsMultiLine(true);
+        
+        // Show continuation line in output
+        addLines([{ type: "input", content: `${isMultiLine ? ">" : "$"} ${currentInput}`, timestamp: new Date() }]);
+        setInput("");
+        return;
+      }
+      
+      // If we're in multi-line mode, combine all lines
+      if (isMultiLine || multiLineBuffer.length > 0) {
+        const fullCommand = [...multiLineBuffer, currentInput].join(" ");
+        
+        // Show the final line
+        addLines([{ type: "input", content: `> ${currentInput}`, timestamp: new Date() }]);
+        
+        // Reset multi-line state
+        setMultiLineBuffer([]);
+        setIsMultiLine(false);
+        
+        // Execute the combined command (skip the input line display since we already added it)
+        executeCommandDirect(fullCommand);
+        setInput("");
+        return;
+      }
+      
+      // Normal single-line execution
       executeCommand(input);
     } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      if (history.length > 0) {
-        const newIndex =
-          historyIndex === -1 ? history.length - 1 : Math.max(0, historyIndex - 1);
-        setHistoryIndex(newIndex);
-        setInput(history[newIndex]);
-      }
-    } else if (e.key === "ArrowDown") {
-      e.preventDefault();
-      if (historyIndex !== -1) {
-        const newIndex = historyIndex + 1;
-        if (newIndex >= history.length) {
-          setHistoryIndex(-1);
-          setInput("");
-        } else {
+      // Only navigate history if not in multi-line mode and cursor is at start
+      if (!isMultiLine && !input.includes("\n")) {
+        e.preventDefault();
+        if (history.length > 0) {
+          const newIndex =
+            historyIndex === -1 ? history.length - 1 : Math.max(0, historyIndex - 1);
           setHistoryIndex(newIndex);
           setInput(history[newIndex]);
         }
       }
+    } else if (e.key === "ArrowDown") {
+      // Only navigate history if not in multi-line mode
+      if (!isMultiLine && !input.includes("\n")) {
+        e.preventDefault();
+        if (historyIndex !== -1) {
+          const newIndex = historyIndex + 1;
+          if (newIndex >= history.length) {
+            setHistoryIndex(-1);
+            setInput("");
+          } else {
+            setHistoryIndex(newIndex);
+            setInput(history[newIndex]);
+          }
+        }
+      }
     } else if (e.key === "Tab") {
       e.preventDefault();
-      // Simple autocomplete
-      if (input.trim()) {
+      // Simple autocomplete (only on first line)
+      const firstLine = input.split("\n")[0];
+      if (firstLine.trim() && !isMultiLine) {
         const matches = Object.keys(commands).filter((cmd) =>
-          cmd.startsWith(input.toLowerCase())
+          cmd.startsWith(firstLine.toLowerCase())
         );
         if (matches.length === 1) {
           setInput(matches[0]);
         }
+      }
+    } else if (e.key === "Escape") {
+      // Cancel multi-line mode
+      if (isMultiLine || multiLineBuffer.length > 0) {
+        setMultiLineBuffer([]);
+        setIsMultiLine(false);
+        setInput("");
+        addLines([{ type: "output", content: "^C (multi-line input cancelled)" }]);
       }
     }
   };
@@ -1430,17 +1890,24 @@ export function RetroTerminal() {
               </AnimatePresence>
 
               {/* Input Line */}
-              <div className="mt-2 flex items-center gap-2">
-                <span className="retro text-xs text-primary">$</span>
-                <input
+              <div className="mt-2 flex items-start gap-2">
+                <span className="retro text-xs text-primary">{isMultiLine || multiLineBuffer.length > 0 ? ">" : "$"}</span>
+                <textarea
                   ref={inputRef}
-                  type="text"
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    // Auto-detect multi-line from pasted content
+                    if (e.target.value.includes("\n")) {
+                      setIsMultiLine(true);
+                    }
+                  }}
                   onKeyDown={handleKeyDown}
-                  className="retro flex-1 bg-transparent text-xs text-foreground outline-none caret-primary"
-                  placeholder="Type a command..."
+                  rows={Math.max(1, input.split("\n").length)}
+                  className="retro flex-1 resize-none bg-transparent text-xs text-foreground outline-none caret-primary"
+                  placeholder={isMultiLine ? "...continue (Enter to execute, Esc to cancel)" : "Type a command... (Shift+Enter for multi-line)"}
                   autoFocus
+                  style={{ minHeight: "1.5em" }}
                 />
               </div>
             </div>
@@ -1448,7 +1915,7 @@ export function RetroTerminal() {
             {/* Status Bar */}
             <div className="relative border-t-4 border-border bg-primary/10 px-4 py-2 dark:border-ring">
               <div className="flex items-center justify-between text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
-                <span className="retro">Ready</span>
+                <span className="retro">{isMultiLine || multiLineBuffer.length > 0 ? "Multi-line" : "Ready"}</span>
                 <span className="retro">Theme: {isMounted ? themes[currentTheme as keyof typeof themes].name : "Default"}</span>
                 <span className="retro">Lines: {lines.length}</span>
               </div>
