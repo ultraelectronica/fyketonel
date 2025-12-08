@@ -59,6 +59,7 @@ const themes = {
       "--shadow-color": "oklch(0.5 0.2 60 / 0.3)",
       "--hover-bg": "oklch(0.5 0.2 60 / 0.2)",
       "--hover-text": "oklch(0.5 0.2 60)",
+      "--title-shadow": "oklch(0.2 0.05 60)",
     },
     dark: {
       "--primary": "oklch(0.4 0.2 60)",
@@ -89,6 +90,7 @@ const themes = {
       "--shadow-color": "oklch(0.4 0.2 60 / 0.4)",
       "--hover-bg": "oklch(0.4 0.2 60 / 0.2)",
       "--hover-text": "oklch(0.4 0.2 60)",
+      "--title-shadow": "oklch(0.25 0.04 60)",
     }
   },
   nintendo: {
@@ -123,6 +125,7 @@ const themes = {
       "--shadow-color": "oklch(0.5 0.2 280 / 0.3)",
       "--hover-bg": "oklch(0.5 0.2 280 / 0.2)",
       "--hover-text": "oklch(0.5 0.2 280)",
+      "--title-shadow": "oklch(0.2 0 0)",
     },
     dark: {
       "--primary": "oklch(0.5 0.2 280)",
@@ -153,6 +156,7 @@ const themes = {
       "--shadow-color": "oklch(0.5 0.2 280 / 0.4)",
       "--hover-bg": "oklch(0.5 0.2 280 / 0.2)",
       "--hover-text": "oklch(0.5 0.2 280)",
+      "--title-shadow": "oklch(0.6 0 0)",
     }
   },
   vhs: {
@@ -187,6 +191,7 @@ const themes = {
       "--shadow-color": "oklch(0.5915 0.2569 322.8961 / 0.3)",
       "--hover-bg": "oklch(0.5915 0.2569 322.8961 / 0.2)",
       "--hover-text": "oklch(0.5915 0.2569 322.8961)",
+      "--title-shadow": "oklch(0.15 0.07 302.7167)",
     },
     dark: {
       "--primary": "oklch(0.6668 0.2591 322.1499)",
@@ -217,6 +222,7 @@ const themes = {
       "--shadow-color": "oklch(0.6668 0.2591 322.1499 / 0.4)",
       "--hover-bg": "oklch(0.6668 0.2591 322.1499 / 0.2)",
       "--hover-text": "oklch(0.6668 0.2591 322.1499)",
+      "--title-shadow": "oklch(0.4 0.08 302.7167)",
     }
   },
   gameboy: {
@@ -251,6 +257,7 @@ const themes = {
       "--shadow-color": "oklch(0.7 0.2 120 / 0.3)",
       "--hover-bg": "oklch(0.7 0.2 120 / 0.2)",
       "--hover-text": "oklch(0.7 0.2 120)",
+      "--title-shadow": "oklch(0.1 0.08 140)",
     },
     dark: {
       "--primary": "oklch(0.7 0.2 120)",
@@ -281,6 +288,7 @@ const themes = {
       "--shadow-color": "oklch(0.7 0.2 120 / 0.4)",
       "--hover-bg": "oklch(0.7 0.2 120 / 0.2)",
       "--hover-text": "oklch(0.7 0.2 120)",
+      "--title-shadow": "oklch(0.5 0.1 120)",
     }
   },
   softpop: {
@@ -315,6 +323,7 @@ const themes = {
       "--shadow-color": "oklch(0.5106 0.2301 276.9656 / 0.3)",
       "--hover-bg": "oklch(0.5106 0.2301 276.9656 / 0.2)",
       "--hover-text": "oklch(0.5106 0.2301 276.9656)",
+      "--title-shadow": "oklch(0.2 0 0)",
     },
     dark: {
       "--primary": "oklch(0.6801 0.1583 276.9349)",
@@ -345,6 +354,7 @@ const themes = {
       "--shadow-color": "oklch(0.6801 0.1583 276.9349 / 0.4)",
       "--hover-bg": "oklch(0.6801 0.1583 276.9349 / 0.2)",
       "--hover-text": "oklch(0.6801 0.1583 276.9349)",
+      "--title-shadow": "oklch(0.6 0 0)",
     }
   },
   ally: {
@@ -573,7 +583,8 @@ export function RetroTerminal() {
       "--accent", "--accent-foreground", "--destructive", "--destructive-foreground",
       "--border", "--input", "--ring",
       "--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-5",
-      "--visitor-counter", "--shadow-color", "--hover-bg", "--hover-text"
+      "--visitor-counter", "--shadow-color", "--hover-bg", "--hover-text",
+      "--title-shadow"
     ];
     
     // Apply CSS variables directly
