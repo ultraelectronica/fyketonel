@@ -285,7 +285,7 @@ export default function Home() {
             className={`${panelClass} flex flex-col gap-2 text-center min-[375px]:gap-2.5 sm:gap-3.5 md:gap-4`}
           >
             <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
-              heimin22 GitHub Contributions
+              ultraelectronica GitHub Contributions
             </p>
             <div className={githubContainerClass}>
               <GitHubContributions />
@@ -296,7 +296,7 @@ export default function Home() {
               className="retro h-8 text-[0.5rem] uppercase tracking-[0.2em] sm:h-9 sm:text-[0.6rem] sm:tracking-[0.25em] md:h-10 md:text-xs md:tracking-[0.3em]"
             >
               <a
-                href="https://github.com/heimin22"
+                href="https://github.com/ultraelectronica"
                 target="_blank"
                 rel="noopener noreferrer"
               >

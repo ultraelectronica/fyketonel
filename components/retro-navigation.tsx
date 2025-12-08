@@ -31,7 +31,7 @@ export function RetroNavigation() {
 
     async function fetchStars() {
       try {
-        const response = await fetch("https://api.github.com/repos/heimin22/fyketonel");
+        const response = await fetch("https://api.github.com/repos/ultraelectronica/fyketonel");
         if (!response.ok) return;
         const data = await response.json();
         if (!cancelled) {
@@ -124,7 +124,7 @@ export function RetroNavigation() {
           {/* Desktop GitHub Link */}
           <div className="hidden min-w-[180px] flex-1 justify-end md:flex">
             <a
-              href="https://github.com/heimin22/fyketonel"
+              href="https://github.com/ultraelectronica/fyketonel"
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
@@ -213,7 +213,7 @@ export function RetroNavigation() {
               
               <div className="mt-2 border-t-2 border-dashed border-border pt-4">
                 <a
-                  href="https://github.com/heimin22/fyketonel"
+                  href="https://github.com/ultraelectronica/fyketonel"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMobileMenuOpen(false)}

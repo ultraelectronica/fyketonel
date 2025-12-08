@@ -821,8 +821,7 @@ const RetroVisitorCounter = () => {
     >
       <div className={cn(
         "rounded-none border-4 border-border p-3 shadow-[4px_4px_0_var(--border)]",
-        "bg-gradient-to-b from-[color:var(--card)] via-[color:var(--secondary)] to-[color:var(--primary)]",
-        "dark:from-[color:var(--card)] dark:via-[color:var(--secondary)] dark:to-[color:var(--primary)]"
+        "bg-[color:var(--card)]"
       )}>
         <div className="space-y-2">
           <div className="flex items-center justify-center gap-2">
@@ -861,14 +860,13 @@ const RetroVisitorCounter = () => {
                 key={visitorCount}
                 className={cn(
                   "retro ally-visitor-counter mx-auto text-center font-mono text-xl tabular-nums sm:text-2xl md:text-3xl",
-                  "text-[color:var(--primary)] drop-shadow-[0_0_3px_var(--primary)]"
+                  "text-[color:var(--primary)]"
                 )}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
                 style={{
                   color: "var(--visitor-counter, oklch(0.6 0.25 140))",
-                  textShadow: "0 0 3px var(--visitor-counter, oklch(0.6 0.25 140) / 0.8), 0 0 20px var(--visitor-counter, oklch(0.6 0.25 140) / 0.4)",
                   letterSpacing: displayMode === "binary" ? "0.08em" : "0.18em",
                   fontSize: displayMode === "binary" ? "0.7rem" : undefined,
                   wordBreak: "break-all",
@@ -887,7 +885,7 @@ const RetroVisitorCounter = () => {
               animate={{ opacity: [1, 0.3, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             />
-            <p className="retro text-center text-[0.4rem] italic text-yellow-900 dark:text-yellow-300">
+            <p className="retro text-center text-[0.4rem] italic text-foreground">
               {displayMode === "binary" 
                 ? "Counting in machine language..." 
                 : displayMode === "hex"
@@ -904,7 +902,7 @@ const RetroVisitorCounter = () => {
 
         {/* Fake "since 1996" badge */}
         <div className="mt-2 border-t-2 border-dashed border-yellow-800 pt-2 dark:border-yellow-400">
-          <div className="flex items-center justify-center gap-2 text-[0.4rem] text-yellow-900 dark:text-yellow-300">
+          <div className="flex items-center justify-center gap-2 text-[0.4rem] text-foreground">
             <span className="retro">EST. 1996</span>
             <span>•</span>
             <span className="retro">GEOCITIES CERTIFIED</span>
