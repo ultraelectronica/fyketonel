@@ -243,7 +243,7 @@ const projects: ProjectEntry[] = [
       "The official marketing and information site for Pasada, combining brand storytelling with live booking context.",
     detail:
       "Showcases the cooperative, highlights booking tracking, and keeps contact paths obvious.",
-    link: "https://pasadapp.com",
+    link: "https://pasadaapp.com",
     tech: [
       "React",
       "TypeScript",
