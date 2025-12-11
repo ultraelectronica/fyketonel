@@ -107,7 +107,7 @@ export default function PlansPage() {
                   Current Status
                 </p>
                 <p className="retro text-sm font-bold tracking-[0.15em] text-primary sm:text-base sm:tracking-[0.2em] md:text-lg md:tracking-[0.25em]">
-                  Level 54 Developer
+                  Level 57 Developer
                 </p>
               </div>
             </div>

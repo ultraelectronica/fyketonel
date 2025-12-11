@@ -490,6 +490,51 @@ const projects: ProjectEntry[] = [
       },
     ],
   },
+  {
+    id: "revo",
+    title: "Revo",
+    tagline: "All-in-one productivity hub with end-to-end encryption",
+    description:
+      "The revamped version of Live Calendar—a modern, feature-rich web-based calendar and productivity platform built around 'Plan • Track • Achieve'.",
+    detail:
+      "Combines calendar management, event tracking, note-taking, and productivity tools with end-to-end encryption, cloud sync via Supabase, Spotify integration, weather widget, and a stunning aurora glassmorphism UI.",
+    link: "https://revocalendar.vercel.app/",
+    tech: [
+      "React",
+      "TypeScript",
+      "Next.js",
+      "Supabase",
+      "Vercel",
+    ],
+    classification: {
+      tier: "A",
+      codename: "Command Deck",
+      status: "Full-stack productivity platform",
+      priority: getTierPriority("A"),
+    },
+    highlights: [
+      "End-to-end encryption for sensitive event data with lock/unlock functionality.",
+      "Real-time cloud sync across devices with offline localStorage fallback.",
+      "Focus timer, quick stats dashboard, and smart search with keyboard shortcuts.",
+      "Spotify widget and weather integration for immersive planning sessions.",
+      "Aurora gradient backgrounds with glassmorphism UI and smooth animations.",
+      "Recurring events, priority levels, and smart categorization.",
+    ],
+    images: [
+      {
+        src: "/ProjectPictures/Revo/revo_screenshot_1.png",
+        alt: "Revo calendar dashboard with aurora background",
+      },
+      {
+        src: "/ProjectPictures/Revo/revo_screenshot_2.png",
+        alt: "Revo event management and productivity tools",
+      },
+      {
+        src: "/ProjectPictures/Revo/revo_screenshot_3.png",
+        alt: "Revo notes and focus timer features",
+      },
+    ],
+  },
 ];
 
 const classificationLegend: {
