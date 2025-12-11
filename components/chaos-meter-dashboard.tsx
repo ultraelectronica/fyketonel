@@ -34,11 +34,11 @@ const planCategories: ChaosPlanCategory[] = [
     title: "Probably Doing",
     limit: "5-10 quests",
     plans: [
+      "Revo offline mode polish",
+      "Revo mobile PWA optimization",
       "Retro UI v2 effects",
       "Add lofi radio to site",
       "Docs refresh",
-      "Minor bug backlog",
-      "UI accessibility audit",
       "Pasada dispatcher tools",
     ],
   },
@@ -81,6 +81,12 @@ const planCategories: ChaosPlanCategory[] = [
 ];
 
 const chaosEvents: ChaosEvent[] = [
+  {
+    id: "event-0",
+    title: "Shipped Revo Calendar v1",
+    impact: "mild",
+    description: "LiveCalendar reborn with encryption, Spotify, and aurora vibes. +3 levels.",
+  },
   {
     id: "event-1",
     title: "Client scope doubled overnight",

@@ -196,7 +196,7 @@ export default function Home() {
                   playerName="Fyke"
                   avatarSrc="/assets/minippix.png"
                   avatarFallback="FY"
-                  level={54}
+                  level={57}
                   playerClass="Guardian of Chaotic Plans"
                   stats={{
                     health: { current: 86, max: 100 },
