@@ -942,6 +942,29 @@ export function RetroTerminal() {
               continue;
             }
             
+            // String literals (single or double quotes)
+            if (expr[i] === '"' || expr[i] === "'") {
+              const quote = expr[i];
+              let str = quote;
+              i++;
+              while (i < expr.length && expr[i] !== quote) {
+                // Handle escape sequences
+                if (expr[i] === '\\' && i + 1 < expr.length) {
+                  str += expr[i] + expr[i + 1];
+                  i += 2;
+                } else {
+                  str += expr[i];
+                  i++;
+                }
+              }
+              if (i < expr.length) {
+                str += expr[i]; // Include closing quote
+                i++;
+              }
+              tokens.push(str);
+              continue;
+            }
+            
             // Numbers (including decimals and negatives handled by unary)
             if (/\d/.test(expr[i]) || (expr[i] === "." && i + 1 < expr.length && /\d/.test(expr[i + 1]))) {
               let num = "";
@@ -1024,6 +1047,20 @@ export function RetroTerminal() {
             if (token.toLowerCase() === "false") {
               consume();
               return false;
+            }
+            
+            // String literals (single or double quotes)
+            if ((token.startsWith('"') && token.endsWith('"')) || 
+                (token.startsWith("'") && token.endsWith("'"))) {
+              consume();
+              // Remove quotes and handle escape sequences
+              let str = token.slice(1, -1);
+              str = str.replace(/\\n/g, '\n');
+              str = str.replace(/\\t/g, '\t');
+              str = str.replace(/\\"/g, '"');
+              str = str.replace(/\\'/g, "'");
+              str = str.replace(/\\\\/g, '\\');
+              return str;
             }
             
             // Variable
@@ -1220,7 +1257,16 @@ export function RetroTerminal() {
         // Try to evaluate as an expression
         const tokens = tokenize(input);
         
-        if (tokens.length > 0) {
+        // Check if input looks like an expression (has operators, numbers, quoted strings, or assignments)
+        // Otherwise treat as plain text string
+        const hasOperators = /[+\-*/%<>=!&|]/.test(input);
+        const isNumber = /^-?\d+\.?\d*$/.test(input.trim());
+        const isQuotedString = /^["'].*["']$/.test(input.trim());
+        const isBooleanLiteral = /^(true|false)$/i.test(input.trim());
+        const isAssignment = /^[a-zA-Z_][a-zA-Z0-9_]*\s*[+\-*/%]?=/.test(input);
+        const looksLikeExpression = hasOperators || isNumber || isQuotedString || isBooleanLiteral || isAssignment;
+        
+        if (tokens.length > 0 && looksLikeExpression) {
           try {
             const variables = getVariables();
             const result = parseExpression(tokens, variables);
@@ -1244,6 +1290,12 @@ export function RetroTerminal() {
                 type: "success",
                 content: `${varName} ${op} ${result} (${resultType})`,
               });
+            } else if (resultType === "string") {
+              // For strings, just show the value without the "= result" format
+              output.push({
+                type: "output",
+                content: `${result} (${resultType})`,
+              });
             } else {
               output.push({
                 type: "output",
@@ -1266,6 +1318,15 @@ export function RetroTerminal() {
             }
             // Continue to type detection for non-expression inputs
           }
+        }
+        
+        // Plain text without operators/expressions - treat as string
+        if (!looksLikeExpression && tokens.length > 0) {
+          output.push({
+            type: "output",
+            content: `${input} (string)`,
+          });
+          return output;
         }
 
         // Try to detect and format data types (fallback for non-expressions)
