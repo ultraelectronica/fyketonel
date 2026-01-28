@@ -396,6 +396,51 @@ const projects: ProjectEntry[] = [
     ],
   },
   {
+    id: "flick",
+    title: "Flick",
+    tagline: "Flutter music player with Rust-powered native-grade audio",
+    description:
+      "A Flutter-based music player that pairs a high-performance Rust backend with a custom USB Audio Class 2.0 (UAC 2.0) driver for low-latency, native-grade playback.",
+    detail:
+      "Boot sequence initializes the Rust bridge, opens the local database, sets up a gapless just_audio engine, requests notification permissions, restores the last session, then launches a tabbed UI shell (Menu • Songs • Settings) with an ambient background tied to the current track and a unified mini-player + navigation bar.",
+    tech: [
+      "Flutter",
+      "Dart",
+      "Rust",
+      "FFI",
+      "just_audio",
+      "UAC 2.0",
+      "SQLite",
+      "Android",
+    ],
+    classification: {
+      tier: "A",
+      codename: "Signal Furnace",
+      status: "High-performance audio lab build",
+      priority: getTierPriority("A"),
+    },
+    highlights: [
+      "Custom Rust UAC 2.0 driver for native audio output and low-latency playback.",
+      "Gapless playback with queueing, shuffle/loop modes, crossfade, and playback speed control (Rust engine when available).",
+      "Library folder management with scan/diff progress UI, favorites + recent-play tracking, sleep timer, and Android notification controls.",
+      "Dual-mode equalizer: 10-band graphic + 5-band parametric with presets and live visualization.",
+    ],
+    images: [
+      {
+        src: "/ProjectPictures/Flick/flick1.png",
+        alt: "Flick player main screen",
+      },
+      {
+        src: "/ProjectPictures/Flick/flick2.png",
+        alt: "Flick library and folder management",
+      },
+      {
+        src: "/ProjectPictures/Flick/flick3.png",
+        alt: "Flick equalizer controls",
+      },
+    ],
+  },
+  {
     id: "simple-calculator",
     title: "A Simple Calculator",
     tagline: "Calculator with history",
