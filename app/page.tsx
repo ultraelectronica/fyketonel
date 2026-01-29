@@ -196,17 +196,17 @@ export default function Home() {
                   playerName="Fyke"
                   avatarSrc="/assets/minippix.png"
                   avatarFallback="FY"
-                  level={57}
+                  level={60}
                   playerClass="Guardian of Chaotic Plans"
                   stats={{
-                    health: { current: 86, max: 100 },
-                    mana: { current: 64, max: 100 },
-                    experience: { current: 7850, max: 10000 },
+                    health: { current: 92, max: 100 },
+                    mana: { current: 78, max: 100 },
+                    experience: { current: 9450, max: 12000 },
                   }}
                   customStats={[
                     {
                       label: "Stamina",
-                      value: 92,
+                      value: 95,
                       max: 100,
                       color: "bg-green-700",
                     },

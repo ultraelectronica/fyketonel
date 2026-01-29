@@ -95,10 +95,10 @@ export default function PlansPage() {
               Quest Philosophy
             </h2>
             <p className="retro text-[0.5rem] leading-relaxed text-muted-foreground sm:text-xs md:text-sm">
-              Every great adventure begins with a plan—however chaotic it may be. These quests represent my current objectives in the ever-evolving landscape of software development. Some are grand campaigns requiring months of dedication, while others are daily rituals that keep my skills sharp and my progress steady.
+              Every great adventure begins with a plan—however chaotic it may be. As a full-stack developer and technical lead, these quests map the real work of designing systems, shipping features, and keeping teams unblocked. Some are grand campaigns that span quarters; others are tight feedback loops that keep the craft sharp day after day.
             </p>
             <p className="retro text-[0.5rem] leading-relaxed text-muted-foreground sm:text-xs md:text-sm">
-              As the Guardian of Chaotic Plans, I embrace the unpredictable nature of development. Quests may shift, new challenges may emerge, and unexpected opportunities may alter the path forward. But that&apos;s all part of the adventure.
+              As the Guardian of Chaotic Plans, I balance hands-on building with technical direction, mentorship, and architecture. Roadmaps shift, stakeholder needs evolve, and surprise fires appear at 3 AM—but guiding the team through that uncertainty, and still shipping meaningful work, is the core of the adventure.
             </p>
             <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-none border-2 border-border bg-background/80 px-4 py-2 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring sm:mt-5 sm:gap-2.5 sm:border-3 sm:px-5 sm:py-2.5 sm:shadow-[3px_3px_0_var(--border)] md:mt-6 md:gap-3 md:border-4 md:px-6 md:py-3 md:shadow-[4px_4px_0_var(--border)]">
               <span className="text-xl sm:text-2xl md:text-3xl">⚔️</span>
@@ -107,7 +107,7 @@ export default function PlansPage() {
                   Current Status
                 </p>
                 <p className="retro text-sm font-bold tracking-[0.15em] text-primary sm:text-base sm:tracking-[0.2em] md:text-lg md:tracking-[0.25em]">
-                  Level 57 Developer
+                  Level 60 Full-Stack Dev & Tech Lead
                 </p>
               </div>
             </div>

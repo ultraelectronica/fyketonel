@@ -65,7 +65,7 @@ const experiments: Experiment[] = [
   {
     id: "locker-vault",
     title: "LockerApp Vault Hardening Ritual",
-    progress: 64,
+    progress: 100,
     hypothesis:
       "Encrypting artifacts per tenant + implementing proactive auditing will discourage treasure thieves.",
     variables: [
@@ -73,15 +73,15 @@ const experiments: Experiment[] = [
       "Activity trail depth",
       "Encryption rotation cadence",
     ],
-    status: "ongoing",
+    status: "success",
     statusNote:
-      "Audit trail UI still feels like a cursed spreadsheet—needs polish.",
+      "Vault shipped to production with a clean review—ongoing tweaks now focus on UX polish.",
     labNotes:
       "Discovered that rotating keys too often confuses the familiars (aka background jobs). Need better ceremony.",
     equipment: ["Node.js", "PostgreSQL", "Prisma", "Clerk", "ShadCN"],
     expectedResult: "Pass security review with zero critical findings.",
     actualResult:
-      "Two medium findings flagged (audit UX + alerting) but structure looks solid.",
+      "Passed review with no critical issues; audit trail and alerts hardened post-launch.",
   },
   {
     id: "folio-retro",
