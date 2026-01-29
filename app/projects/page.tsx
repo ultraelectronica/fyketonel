@@ -372,7 +372,7 @@ const projects: ProjectEntry[] = [
     classification: {
       tier: "C",
       codename: "Vault Specimen",
-      status: "Steady guardian build",
+      status: "Shipped v1 • Steady guardian build",
       priority: getTierPriority("C"),
     },
     highlights: [
@@ -416,7 +416,7 @@ const projects: ProjectEntry[] = [
     classification: {
       tier: "A",
       codename: "Signal Furnace",
-      status: "High-performance audio lab build",
+      status: "Active high-performance audio lab in development",
       priority: getTierPriority("A"),
     },
     highlights: [
@@ -554,7 +554,7 @@ const projects: ProjectEntry[] = [
     classification: {
       tier: "A",
       codename: "Command Deck",
-      status: "Full-stack productivity platform",
+      status: "Full-stack productivity platform evolving to battle Notion",
       priority: getTierPriority("A"),
     },
     highlights: [

@@ -231,16 +231,16 @@ export const quests: Quest[] = [
   {
     id: "complete-locker",
     title: "Seal the Locker Vault Project",
-    description: "Complete the legendary LockerApp—a secure digital vault for safeguarding treasures and artifacts. Final enchantments and polish required before the grand unveiling.",
+    description: "Complete the legendary LockerApp—a secure digital vault for safeguarding treasures and artifacts. The vault has been shipped; ongoing tweaks focus on making the guardian experience smoother for everyday users.",
     type: "main",
-    status: "in-progress",
+    status: "completed",
     difficulty: 3,
     rewards: {
       exp: 3500,
       skills: ["Project Completion", "Polish & Refinement"],
       achievement: "Vault Master",
     },
-    timeEstimate: "1 season",
+    timeEstimate: "Completed arc",
     pixelArt: <ShieldPixel />,
   },
   {

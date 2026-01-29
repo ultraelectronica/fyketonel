@@ -28,12 +28,13 @@ const planCategories: ChaosPlanCategory[] = [
   {
     title: "Definitely Doing",
     limit: "Max 2 quests",
-    plans: ["Ship LockerApp v1", "Pasada stabilization sprint"],
+    plans: ["Flick core audio & UX lab", "Revo command deck vs Notion push"],
   },
   {
     title: "Probably Doing",
     limit: "5-10 quests",
     plans: [
+      "Flick library & playlist ergonomics",
       "Revo offline mode polish",
       "Revo mobile PWA optimization",
       "Retro UI v2 effects",
@@ -105,6 +106,12 @@ const chaosEvents: ChaosEvent[] = [
     impact: "mild",
     description: "Started a new feature. Forgot why in the morning.",
   },
+  {
+    id: "event-4",
+    title: "LockerApp v1 Ship Ceremony",
+    impact: "major",
+    description: "Vault guardian finally released to the wild. Chaos redirected into Flick and Revo.",
+  },
 ];
 
 const restorationAttempts: RestorationAttempt[] = [
@@ -128,7 +135,7 @@ const restorationAttempts: RestorationAttempt[] = [
 const randomPlans = [
   "Build a pixelated control room page",
   "Finish documenting Pasada design system",
-  "Ship LockerApp onboarding flow",
+  "Refine LockerApp onboarding flow",
   "Redesign the blog to look like a logbook",
   "Train a model to roast my old code",
   "Add keyboard-only gameplay to the site",

@@ -62,7 +62,6 @@ async function getJokeOfTheDay() {
 export default function Home() {
   const [joke, setJoke] = useState("Loading joke...");
   const [isAllyMode, setIsAllyMode] = useState(false);
-  const today = new Date();
 
   // Detect screen sizes
   const isVerySmall = useMediaQuery({ maxWidth: 374 });
@@ -197,17 +196,17 @@ export default function Home() {
                   playerName="Fyke"
                   avatarSrc="/assets/minippix.png"
                   avatarFallback="FY"
-                  level={57}
+                  level={60}
                   playerClass="Guardian of Chaotic Plans"
                   stats={{
-                    health: { current: 86, max: 100 },
-                    mana: { current: 64, max: 100 },
-                    experience: { current: 7850, max: 10000 },
+                    health: { current: 92, max: 100 },
+                    mana: { current: 78, max: 100 },
+                    experience: { current: 9450, max: 12000 },
                   }}
                   customStats={[
                     {
                       label: "Stamina",
-                      value: 92,
+                      value: 95,
                       max: 100,
                       color: "bg-green-700",
                     },
@@ -337,7 +336,7 @@ export default function Home() {
                     Fyke Simon V. Tonel
                   </h3>
                   <p className="retro mt-2 text-xs uppercase tracking-[0.18em] text-primary sm:mt-2.5 sm:text-sm sm:tracking-[0.22em] md:mt-3 md:text-base md:tracking-[0.25em]">
-                    Full-stack Developer
+                    Full-Stack Developer & Technical Lead
                   </p>
                 </div>
                 
