@@ -33,10 +33,10 @@ const wishlistItems = [
     description: "I still haven't completed the volumes yet.",
   },
   {
-    id: "chrollo-figure",
-    title: "Banpresto Hunting Archives Chrollo Lucilfer",
-    price: "₱1000",
-    description: "He looks cool.",
+    id: "gundam-one",
+    title: "Gundam Astray Gold Frame Amatsu Mina",
+    price: "₱2,299",
+    description: "It looks cool as hell.",
   },
   {
     id: "genshin-figures",

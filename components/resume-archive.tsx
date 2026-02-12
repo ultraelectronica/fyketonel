@@ -332,8 +332,8 @@ export function ResumeArchive({ className }: { className?: string }) {
 
     // Trigger actual download
     const link = document.createElement("a");
-    link.href = "/Resume/RESUME_FYKE_TONEL.pdf";
-    link.download = "FYKE_TONEL_RESUME.pdf";
+    link.href = "/Resume/CV_FYKE_TONEL.pdf";
+    link.download = "FYKE_TONEL_CV.pdf";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -341,7 +341,7 @@ export function ResumeArchive({ className }: { className?: string }) {
 
   // Handle full view
   const handleFullView = () => {
-    window.open("/Resume/RESUME_FYKE_TONEL.pdf", "_blank");
+    window.open("/Resume/CV_FYKE_TONEL.pdf", "_blank");
     if (!viewedFullScreen) {
       setViewedFullScreen(true);
       unlockAchievement("power-reader");
@@ -528,7 +528,7 @@ export function ResumeArchive({ className }: { className?: string }) {
                       />
                       {/* PDF Preview iframe */}
                       <iframe
-                        src="/Resume/RESUME_FYKE_TONEL.pdf"
+                        src="/Resume/CV_FYKE_TONEL.pdf"
                         className="h-full w-full"
                         title="Resume Preview"
                       />
