@@ -101,7 +101,7 @@ export default function Home() {
   const headerClass = "retro text-xs uppercase tracking-[0.2em] text-primary mb-2 border-b-2 border-dashed border-border/50 pb-1";
 
   return (
-    <main className="min-h-screen w-full bg-background p-4 sm:p-6 md:p-8">
+    <main className="min-h-screen w-full bg-transparent p-4 sm:p-6 md:p-8">
       {/* Game World Container - Increased padding for breathability */}
       <div className="mx-auto max-w-[1700px] border-4 border-border bg-background p-3 shadow-[8px_8px_0_var(--border)] sm:p-4">
         
