@@ -333,7 +333,7 @@ export default function PlayerProfileCard({
                   </span>
                 )}
               </div>
-              <div className="flex flex-wrap gap-1 text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground retro">
+              <div className="flex flex-wrap gap-1 text-xs sm:text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground retro">
                 {playerClass && (
                   <span className="text-xs text-muted-foreground flex items-center gap-1">
                     <span className="text-base">⚔️</span>
@@ -350,7 +350,7 @@ export default function PlayerProfileCard({
         <CardContent className="space-y-4 relative z-10 px-6 pb-6">
           {/* Status ticker */}
           <div className="rounded-none border-2 border-dashed border-border/60 bg-background/70 px-3 py-2 shadow-[2px_2px_0_var(--border)]">
-            <div className="flex items-center justify-between text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground retro">
+            <div className="flex items-center justify-between text-[0.7rem] sm:text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground retro">
               <span>Status Feed</span>
               {xpToNextLevel !== null && (
                 <span>+{xpToNextLevel} XP → Lv.{level + 1}</span>
@@ -364,7 +364,7 @@ export default function PlayerProfileCard({
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  className="retro text-[0.65rem] tracking-[0.15em] text-primary"
+                  className="retro text-xs sm:text-[0.65rem] tracking-[0.15em] text-primary"
                 >
                   {activeEffect}
                 </motion.p>
@@ -377,7 +377,7 @@ export default function PlayerProfileCard({
           <div className="space-y-1">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Health</span>
-              <span className="text-[9px] sm:text-xs text-muted-foreground retro">
+              <span className="text-xs sm:text-[9px] text-muted-foreground retro">
                 {stats.health.current}/{stats.health.max}
               </span>
             </div>
@@ -394,7 +394,7 @@ export default function PlayerProfileCard({
           <div className="space-y-1">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Mana</span>
-              <span className="text-[9px] sm:text-xs text-muted-foreground retro">
+              <span className="text-xs sm:text-[9px] text-muted-foreground retro">
                 {stats.mana.current}/{stats.mana.max}
               </span>
             </div>
@@ -407,7 +407,7 @@ export default function PlayerProfileCard({
           <div className="space-y-1">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Experience</span>
-              <span className="text-[9px] sm:text-xs text-muted-foreground retro">
+              <span className="text-xs sm:text-[9px] text-muted-foreground retro">
                 {stats.experience.current}/{stats.experience.max} XP
               </span>
             </div>
@@ -456,7 +456,7 @@ export default function PlayerProfileCard({
               key={metric.label}
               className="rounded-none border border-border bg-card/70 px-3 py-2 text-center shadow-[2px_2px_0_var(--border)]"
             >
-              <p className="retro text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground">
+              <p className="retro text-[0.6rem] sm:text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground">
                 {metric.label}
               </p>
               <p className={cn("retro text-base tracking-[0.1em]", metric.tone)}>

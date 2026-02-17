@@ -289,11 +289,11 @@ const branchColors = {
   },
 };
 
-// COMPACTED DIMENSIONS
-const NODE_SPACING_X = 100;
-const NODE_SPACING_Y = 80;
-const NODE_WIDTH = 90;
-const NODE_HEIGHT = 65;
+// COMPACT BUT BREATHABLE DIMENSIONS
+const NODE_SPACING_X = 130;
+const NODE_SPACING_Y = 100;
+const NODE_WIDTH = 110;
+const NODE_HEIGHT = 80;
 
 const maxX = Math.max(...skillsData.map((s) => s.position.x));
 const maxY = Math.max(...skillsData.map((s) => s.position.y));
@@ -327,7 +327,7 @@ export function SkillTree({ className }: { className?: string }) {
         {/* Header Bar */}
         <div className="flex items-center justify-between border-b-2 border-border bg-muted/30 px-3 py-2">
             <h2 className="retro text-xs uppercase tracking-[0.2em] text-primary">Skill Tree</h2>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3 flex-wrap justify-end">
                 <div className="flex items-center gap-1.5">
                     <span className="retro text-[0.5rem] text-muted-foreground uppercase">Points</span>
                     <span className="retro text-[0.5rem] font-bold text-foreground">
@@ -335,8 +335,8 @@ export function SkillTree({ className }: { className?: string }) {
                     </span>
                 </div>
                  <div className="flex items-center gap-1.5">
-                    <span className="retro text-[0.5rem] text-muted-foreground uppercase">Unlocked</span>
-                    <span className="retro text-[0.5rem] font-bold text-green-600">
+                    <span className="retro text-[0.6rem] sm:text-[0.5rem] text-muted-foreground uppercase">Unlocked</span>
+                    <span className="retro text-[0.65rem] sm:text-[0.5rem] font-bold text-green-600">
                         {unlockedCount} / {skillsData.length}
                     </span>
                  </div>
@@ -484,7 +484,7 @@ function SkillNode({
         {/* Content */}
         <div className="flex h-full flex-col items-center justify-center gap-0.5 p-1">
           <p className={cn(
-            "retro text-center text-[0.4rem] uppercase leading-tight tracking-[0.05em]",
+            "retro text-center text-[0.55rem] sm:text-[0.5rem] uppercase leading-tight tracking-[0.05em]",
             skill.unlocked ? "text-foreground" : "text-muted-foreground/60"
           )}>
             {skill.name}
@@ -500,13 +500,13 @@ function SkillNode({
                     />
                  </div>
               </div>
-              <p className={cn("retro text-[0.3rem] font-bold mt-0.5", colors.text)}>
+              <p className={cn("retro text-[0.45rem] font-bold mt-0.5", colors.text)}>
                 Lv.{skill.level}
               </p>
             </>
           )}
           {!skill.unlocked && (
-               <span className="retro text-[0.3rem] uppercase text-muted-foreground">Locked</span>
+               <span className="retro text-[0.45rem] uppercase text-muted-foreground">Locked</span>
           )}
         </div>
       </button>
@@ -531,7 +531,7 @@ function SkillDetails({ skill, onClose }: { skill: SkillNode; onClose: () => voi
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-2 top-2 text-[0.6rem] text-muted-foreground hover:text-foreground p-1"
+          className="absolute right-2 top-2 text-[0.7rem] sm:text-[0.6rem] text-muted-foreground hover:text-foreground p-1"
         >
           ✕ CLOSE
         </button>
@@ -551,7 +551,7 @@ function SkillDetails({ skill, onClose }: { skill: SkillNode; onClose: () => voi
                     </span>
                 </div>
                 
-                <p className="retro text-[0.5rem] text-muted-foreground leading-relaxed max-w-[90%]">
+                <p className="retro text-xs sm:text-[0.5rem] text-muted-foreground leading-relaxed max-w-[90%]">
                     {skill.description}
                 </p>
 

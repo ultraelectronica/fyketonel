@@ -101,23 +101,23 @@ export default function Home() {
   const headerClass = "retro text-xs uppercase tracking-[0.2em] text-primary mb-2 border-b-2 border-dashed border-border/50 pb-1";
 
   return (
-    <main className="min-h-screen w-full bg-background p-2 sm:p-4 md:p-6">
-      {/* Game World Container - Reduced padding */}
-      <div className="mx-auto max-w-[1700px] border-4 border-border bg-background p-1 shadow-[8px_8px_0_var(--border)] sm:p-2">
+    <main className="min-h-screen w-full bg-background p-4 sm:p-6 md:p-8">
+      {/* Game World Container - Increased padding for breathability */}
+      <div className="mx-auto max-w-[1700px] border-4 border-border bg-background p-3 shadow-[8px_8px_0_var(--border)] sm:p-4">
         
         {/* Header / Intro Box - Reduced margin/padding */}
         <section className="mb-4 border-b-4 border-border bg-card p-4 text-center sm:text-left shadow-sm">
           <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
             <div>
-                <div className="mb-1 inline-block bg-primary px-2 py-0.5">
-                    <p className="retro text-[0.6rem] font-bold uppercase tracking-widest text-primary-foreground">
+                <div className="mb-2 inline-block bg-primary px-3 py-1 shadow-[2px_2px_0_rgba(0,0,0,0.2)]">
+                    <p className="retro text-[0.7rem] font-bold uppercase tracking-widest text-primary-foreground sm:text-xs">
                     CURRENT LOCATION: LABORATORY
                     </p>
                 </div>
                 <h1 className="retro text-2xl uppercase leading-tight tracking-widest sm:text-3xl md:text-4xl">
                 Fyke&#39;s Workspace
                 </h1>
-                <p className="retro mt-1 text-xs text-muted-foreground sm:text-sm">
+                <p className="retro mt-2 text-xs text-muted-foreground sm:text-sm leading-relaxed">
                 Level 60 Full-Stack Developer • Class: Guardian of Chaotic Plans
                 </p>
             </div>
@@ -130,15 +130,15 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Dashboard Grid - Tighter gaps (gap-4 instead of gap-6) */}
-        <div id="lab-container" className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-4">
+        {/* Dashboard Grid - Increased gaps for mobile breathability */}
+        <div id="lab-container" className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-6">
           
           {/* Left Column: Player Status & Menu (4 cols) */}
           <div className="flex flex-col gap-4 lg:col-span-4">
              {/* Player Card - Compact */}
             <div className={panelBaseClass}>
-              <h2 className={headerClass}>PLAYER_STATUS</h2>
-              <div className="flex items-center justify-center py-1">
+              <h2 className={`${headerClass} text-sm`}>PLAYER_STATUS</h2>
+              <div className="flex items-center justify-center py-2">
                 <PlayerProfileCard
                   playerName="Fyke"
                   avatarSrc="/assets/minippix.png"
@@ -177,14 +177,14 @@ export default function Home() {
 
              {/* Github Contributions */}
              <div className={panelBaseClass}>
-              <h2 className={headerClass}>CONTRIBUTION_LOG</h2>
+              <h2 className={`${headerClass} text-sm`}>CONTRIBUTION_LOG</h2>
               <div className="min-h-[160px] overflow-hidden rounded border border-dashed border-border bg-background/50 p-2">
                  <GitHubContributions />
               </div>
                <Button
                 asChild
                 variant="outline"
-                className="retro mt-4 w-full h-8 text-[0.6rem] uppercase tracking-widest"
+                className="retro mt-4 w-full h-10 text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform"
               >
                 <a
                   href="https://github.com/ultraelectronica"
@@ -210,15 +210,15 @@ export default function Home() {
                         <div key={item.id}>
                         <Item 
                             variant="outline" 
-                            className="group flex cursor-pointer flex-col border border-dashed border-border bg-transparent transition-all hover:border-primary hover:bg-primary/5 active:translate-y-0.5"
+                            className="group flex cursor-pointer flex-col border border-dashed border-border bg-transparent transition-none hover:border-primary hover:bg-primary/5 active:translate-y-0.5"
                         >
-                            <ItemContent className="flex-1 p-1.5">
-                            <ItemTitle className="retro text-[0.55rem] uppercase tracking-wider group-hover:text-primary">
+                            <ItemContent className="flex-1 p-2 sm:p-1.5">
+                            <ItemTitle className="retro text-xs sm:text-[0.55rem] uppercase tracking-wider group-hover:text-primary">
                                 {item.title}
                             </ItemTitle>
                             <div className="mt-0.5 flex items-center justify-between">
-                                 <span className="retro text-[0.5rem] text-muted-foreground truncate max-w-[70%]">{item.description}</span>
-                                 <span className="retro text-[0.55rem] font-bold text-primary">{item.price}</span>
+                                 <span className="retro text-[0.65rem] sm:text-[0.5rem] text-muted-foreground truncate max-w-[70%]">{item.description}</span>
+                                 <span className="retro text-[0.7rem] sm:text-[0.55rem] font-bold text-primary">{item.price}</span>
                             </div>
                             </ItemContent>
                         </Item>

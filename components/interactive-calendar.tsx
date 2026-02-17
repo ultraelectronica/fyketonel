@@ -156,15 +156,15 @@ export function InteractiveCalendar({ className }: { className?: string }) {
       <div className="rounded-none border-2 border-dashed border-border bg-background/60 p-2 backdrop-blur-sm dark:border-ring sm:border-3 sm:p-2.5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex-1">
-            <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
+            <p className="retro text-[0.6rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-xs">
               Today&apos;s Status
             </p>
-            <p className={cn("retro text-[0.5rem] font-bold uppercase tracking-[0.15em] sm:text-[0.55rem] md:text-[0.6rem]", dailyStatus.color)}>
+            <p className={cn("retro text-[0.65rem] font-bold uppercase tracking-[0.15em] sm:text-xs md:text-sm", dailyStatus.color)}>
               {dailyStatus.name}
             </p>
           </div>
           <div className="text-right">
-            <p className={cn("retro text-[0.45rem] font-bold tracking-[0.12em] sm:text-[0.5rem] md:text-[0.55rem]", dailyStatus.color)}>
+            <p className={cn("retro text-[0.6rem] font-bold tracking-[0.12em] sm:text-xs", dailyStatus.color)}>
               {dailyStatus.effect}
             </p>
           </div>
@@ -196,17 +196,17 @@ export function InteractiveCalendar({ className }: { className?: string }) {
           </div>
           <div className="flex items-center gap-1">
             <div className="h-1.5 w-1.5 bg-purple-600 animate-pulse" />
-            <span className="retro text-[0.35rem] text-muted-foreground sm:text-[0.4rem]">Achievement</span>
+            <span className="retro text-[0.55rem] text-muted-foreground sm:text-[0.6rem]">Achievement</span>
           </div>
         </div>
       </div>
 
       {/* Daily Quest */}
       <div className="rounded-none border-2 border-border bg-card/80 p-2 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring sm:border-3 sm:p-2.5 sm:shadow-[2px_2px_0_var(--border)]">
-        <p className="retro mb-1 text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
+        <p className="retro mb-1 text-[0.6rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-xs">
           📋 Daily Quest
         </p>
-        <p className="retro text-[0.45rem] leading-relaxed tracking-[0.12em] text-foreground sm:text-[0.5rem] md:text-[0.55rem]">
+        <p className="retro text-[0.65rem] leading-relaxed tracking-[0.12em] text-foreground sm:text-xs">
           {dailyQuest}
         </p>
       </div>
