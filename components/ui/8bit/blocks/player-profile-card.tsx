@@ -14,6 +14,7 @@ import ManaBar from "@/components/ui/8bit/mana-bar";
 import { Progress } from "@/components/ui/8bit/progress";
 import "@/components/ui/8bit/styles/retro.css";
 import { motion, AnimatePresence } from "framer-motion";
+import { pixelHover, pixelFade, steps } from "@/components/ui/8bit/motion-utils";
 
 export interface PlayerStats {
   health?: {
@@ -139,9 +140,10 @@ export default function PlayerProfileCard({
   return (
     <motion.div
       className="w-full"
-      initial={{ rotateX: 0, rotateY: 0, scale: 1 }}
-      whileHover={{ rotateX: -2, rotateY: 2, scale: 1.01 }}
-      transition={{ type: "spring", stiffness: 200, damping: 18 }}
+      variants={pixelHover}
+      initial="initial"
+      whileHover="hover"
+      whileTap="tap"
     >
       <Card
         className={cn(
@@ -161,13 +163,13 @@ export default function PlayerProfileCard({
             {/* Outer corner pixels */}
             <motion.div 
               className="absolute left-0 top-0 h-2 w-6 bg-primary"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1, repeat: Infinity, ease: steps(2) }}
             />
             <motion.div 
               className="absolute left-0 top-0 h-6 w-2 bg-primary"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.5, ease: steps(2) }}
             />
             {/* Inner detail */}
             <div className="absolute left-2 top-2 h-1 w-1 animate-pulse bg-accent" />
@@ -179,13 +181,13 @@ export default function PlayerProfileCard({
           <div className="relative h-8 w-8">
             <motion.div 
               className="absolute right-0 top-0 h-2 w-6 bg-primary"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.25 }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.25, ease: steps(2) }}
             />
             <motion.div 
               className="absolute right-0 top-0 h-6 w-2 bg-primary"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.75 }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.75, ease: steps(2) }}
             />
             <div className="absolute right-2 top-2 h-1 w-1 animate-pulse bg-accent" />
           </div>
@@ -196,13 +198,13 @@ export default function PlayerProfileCard({
           <div className="relative h-8 w-8">
             <motion.div 
               className="absolute bottom-0 left-0 h-2 w-6 bg-secondary"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.5, ease: steps(2) }}
             />
             <motion.div 
               className="absolute bottom-0 left-0 h-6 w-2 bg-secondary"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1, repeat: Infinity, ease: steps(2) }}
             />
             <div className="absolute bottom-2 left-2 h-1 w-1 animate-pulse bg-accent" />
           </div>
@@ -213,13 +215,13 @@ export default function PlayerProfileCard({
           <div className="relative h-8 w-8">
             <motion.div 
               className="absolute bottom-0 right-0 h-2 w-6 bg-secondary"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.75 }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.75, ease: steps(2) }}
             />
             <motion.div 
               className="absolute bottom-0 right-0 h-6 w-2 bg-secondary"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.25 }}
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.25, ease: steps(2) }}
             />
             <div className="absolute bottom-2 right-2 h-1 w-1 animate-pulse bg-accent" />
           </div>
@@ -231,7 +233,7 @@ export default function PlayerProfileCard({
           <motion.div
             className="flex flex-col gap-1 px-0.5"
             animate={{ x: [-2, 0, -2] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 1, repeat: Infinity, ease: steps(3) }}
           >
             <div className="h-1.5 w-1.5 bg-primary shadow-[0_0_4px_var(--primary)]" />
             <div className="h-2 w-2 bg-accent shadow-[0_0_6px_var(--accent)]" />
@@ -244,7 +246,7 @@ export default function PlayerProfileCard({
           <motion.div
             className="flex flex-col gap-1 px-0.5"
             animate={{ x: [2, 0, 2] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+            transition={{ duration: 1, repeat: Infinity, ease: steps(3), delay: 0.5 }}
           >
             <div className="h-1.5 w-1.5 bg-secondary shadow-[0_0_4px_var(--secondary)]" />
             <div className="h-2 w-2 bg-accent shadow-[0_0_6px_var(--accent)]" />
@@ -257,10 +259,10 @@ export default function PlayerProfileCard({
           <motion.div
             className="flex gap-1 py-0.5"
             animate={{ 
-              opacity: [0.6, 1, 0.6],
-              y: [-1, 0, -1]
+              opacity: [0, 1, 0],
+              y: [-2, 0, -2]
             }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: steps(3) }}
           >
             <div className="h-1.5 w-1.5 bg-primary" />
             <div className="h-1.5 w-2 bg-accent" />
@@ -273,10 +275,10 @@ export default function PlayerProfileCard({
           <motion.div
             className="flex gap-1 py-0.5"
             animate={{ 
-              opacity: [0.6, 1, 0.6],
-              y: [1, 0, 1]
+              opacity: [0, 1, 0],
+              y: [2, 0, 2]
             }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 1.25 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: steps(3), delay: 0.75 }}
           >
             <div className="h-1.5 w-1.5 bg-secondary" />
             <div className="h-1.5 w-2 bg-accent" />
@@ -294,12 +296,12 @@ export default function PlayerProfileCard({
               'rgba(var(--primary-rgb, 234, 179, 8), 0.3)',
             ],
             boxShadow: [
-              '0 0 5px rgba(234, 179, 8, 0.2)',
-              '0 0 15px rgba(251, 191, 36, 0.4)',
-              '0 0 5px rgba(234, 179, 8, 0.2)',
+              '0 0 0px rgba(234, 179, 8, 0)',
+              '0 0 0px rgba(251, 191, 36, 0)',
+              '0 0 0px rgba(234, 179, 8, 0)',
             ]
           }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 2, repeat: Infinity, ease: steps(4) }}
         />
 
 
@@ -307,8 +309,8 @@ export default function PlayerProfileCard({
         <div className="flex items-center gap-4">
           <motion.div
             className="relative"
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, -2, 0] }}
+            transition={{ duration: 1, repeat: Infinity, ease: steps(2) }}
           >
             <div className="absolute -inset-1 rounded-full bg-primary/30 blur-md" />
             <Avatar className="size-16 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.35)]" variant="pixel" font="retro">
@@ -358,10 +360,10 @@ export default function PlayerProfileCard({
               <AnimatePresence mode="wait">
                 <motion.p
                   key={activeEffect}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.3 }}
+                  variants={pixelFade}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
                   className="retro text-[0.65rem] tracking-[0.15em] text-primary"
                 >
                   {activeEffect}

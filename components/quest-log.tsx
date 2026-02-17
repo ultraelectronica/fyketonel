@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { pixelHover, steps } from "@/components/ui/8bit/motion-utils";
 
 interface PixelArtProps {
   pattern: string[];
@@ -403,17 +404,24 @@ function QuestCard({
   return (
     <motion.div
       layout
+      variants={pixelHover}
+      initial="initial"
+      whileHover="hover"
+      whileTap="tap"
       className={cn(
-        "group relative cursor-pointer rounded-none border-2 backdrop-blur-sm transition-all duration-200 sm:border-3 md:border-4",
+        "group relative cursor-pointer rounded-none border-2 backdrop-blur-sm transition-none sm:border-3 md:border-4",
         typeColors[quest.type],
         quest.status === "completed"
           ? "bg-gradient-to-br from-card/80 to-green-500/10 opacity-80"
           : quest.status === "failed"
           ? "bg-gradient-to-br from-card/80 to-red-500/10 opacity-70"
           : "bg-gradient-to-br from-card/80 to-card/60",
-        "shadow-[2px_2px_0_var(--border)] hover:bg-accent/30 hover:border-primary hover:-translate-y-1 sm:shadow-[3px_3px_0_var(--border)] sm:hover:shadow-[4px_4px_0_var(--primary)] md:shadow-[4px_4px_0_var(--border)]"
+        "shadow-[2px_2px_0_var(--border)] sm:shadow-[3px_3px_0_var(--border)] md:shadow-[4px_4px_0_var(--border)]"
       )}
       onClick={onSelect}
+      transition={{
+        layout: { duration: 0.2, ease: steps(4) }
+      }}
     >
       <div className="flex gap-3 p-3 sm:gap-4 sm:p-4 md:gap-5 md:p-5">
         {/* Quest Icon */}
@@ -473,7 +481,7 @@ function QuestCard({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, ease: steps(4) }}
                 className="overflow-hidden"
               >
                 <div className="space-y-2 border-t-2 border-dashed border-border pt-2 dark:border-ring sm:space-y-2.5 sm:pt-2.5 md:space-y-3 md:pt-3">

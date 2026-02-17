@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { steps } from "@/components/ui/8bit/motion-utils";
 
 interface SkillNode {
   id: string;
@@ -479,15 +480,15 @@ function SkillNode({
         width: `${NODE_WIDTH}px`,
         height: `${NODE_HEIGHT}px`,
       }}
-      whileHover={{ scale: 1.05, y: -4 }}
-      transition={{ duration: 0.2 }}
+      whileHover={{ scale: 1.05, y: -4, transition: { duration: 0.1, ease: steps(2) } }}
+      transition={{ duration: 0.2, ease: steps(2) }}
       onMouseEnter={onHover}
       onMouseLeave={onHoverEnd}
     >
       <button
         onClick={onSelect}
         className={cn(
-          "relative h-full w-full cursor-pointer rounded-none border-2 backdrop-blur-sm transition-all duration-200 sm:border-3",
+          "relative h-full w-full cursor-pointer rounded-none border-2 backdrop-blur-sm transition-none sm:border-3",
           skill.unlocked ? colors.border : "border-border/40 dark:border-ring/40",
           skill.unlocked ? colors.bg : "bg-background/60",
           skill.unlocked
@@ -550,7 +551,7 @@ function SkillNode({
           <motion.div
             className={cn("absolute inset-0 rounded-none", colors.border)}
             animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ repeat: Infinity, duration: 2 }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: steps(3) }}
           />
         )}
       </button>
@@ -566,7 +567,7 @@ function SkillDetails({ skill, onClose }: { skill: SkillNode; onClose: () => voi
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.3, ease: steps(4) }}
       className={cn(
         "rounded-none border-2 backdrop-blur-sm sm:border-3 md:border-4",
         colors.border,
