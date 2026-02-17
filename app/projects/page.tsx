@@ -924,7 +924,7 @@ const RetroVisitorCounter = () => {
             </motion.span>
             <p
               className={cn(
-                "retro ally-visitor-label text-center text-[0.5rem] uppercase tracking-[0.25em]",
+                "retro ally-visitor-label text-center text-[0.6rem] uppercase tracking-[0.25em] sm:text-xs",
                 "text-[color:var(--foreground)]"
               )}
             >
@@ -1549,7 +1549,7 @@ const ProjectDependenciesGraph = ({
                     <p className="retro text-xs font-bold text-primary sm:text-sm">
                       {projects.find((p) => p.id === activeProject)?.title}
                     </p>
-                    <p className="retro mt-1 text-[0.45rem] text-muted-foreground sm:text-[0.5rem]">
+                    <p className="retro mt-1 text-[0.55rem] text-muted-foreground sm:text-xs">
                       Connected to {connectedProjects.size - 1} project(s)
                     </p>
                     <div className="mt-2 space-y-1">
@@ -1576,7 +1576,7 @@ const ProjectDependenciesGraph = ({
                                     : "bg-purple-500"
                                 )}
                               />
-                              <span className="retro text-[0.4rem] text-foreground sm:text-[0.45rem]">
+                              <span className="retro text-[0.5rem] text-foreground sm:text-[0.55rem]">
                                 {other?.title}: {rel.description}
                               </span>
                             </div>
@@ -1590,7 +1590,7 @@ const ProjectDependenciesGraph = ({
                       setSelectedProject(null);
                       setHoveredProject(null);
                     }}
-                    className="retro flex size-5 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-[0.6rem] touch-manipulation active:bg-primary/20 sm:size-6 sm:text-xs sm:hover:bg-primary/20 dark:border-ring"
+                    className="retro flex size-6 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-xs touch-manipulation active:bg-primary/20 sm:size-7 sm:text-sm sm:hover:bg-primary/20 dark:border-ring"
                   >
                     ✕
                   </button>
@@ -1603,25 +1603,25 @@ const ProjectDependenciesGraph = ({
         {/* Legend - Below Graph */}
         <div className="mt-3 flex justify-center">
           <div className="inline-flex items-center gap-3 rounded-sm border border-border/60 bg-background/80 px-3 py-2 backdrop-blur-sm dark:border-ring/60 sm:gap-4 sm:px-4">
-            <p className="retro text-[0.4rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.45rem]">
+            <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.55rem]">
               Connection Types:
             </p>
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="flex items-center gap-1">
                 <div className="h-px w-3 bg-yellow-500" />
-                <span className="retro text-[0.35rem] text-foreground sm:text-[0.4rem]">
+                <span className="retro text-[0.45rem] text-foreground sm:text-[0.5rem]">
                   Parent
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="h-px w-3 bg-cyan-500" />
-                <span className="retro text-[0.35rem] text-foreground sm:text-[0.4rem]">
+                <span className="retro text-[0.45rem] text-foreground sm:text-[0.5rem]">
                   Sibling
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="h-px w-3 border-t border-dashed border-purple-500" />
-                <span className="retro text-[0.35rem] text-foreground sm:text-[0.4rem]">
+                <span className="retro text-[0.45rem] text-foreground sm:text-[0.5rem]">
                   Related
                 </span>
               </div>
@@ -1866,10 +1866,10 @@ const TechStackConstellation = ({
     <div className={cn(panelClass, "overflow-hidden")}>
       <div className="space-y-4">
         <div className="flex flex-col gap-1 text-left">
-          <p className="retro text-[0.55rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem]">
+          <p className="retro text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
             Tech Stack Constellation
           </p>
-          <p className="retro text-[0.55rem] leading-relaxed text-muted-foreground">
+          <p className="retro text-[0.65rem] leading-relaxed text-muted-foreground sm:text-[0.7rem] md:text-sm">
             <span className="hidden sm:inline">Hover or tap</span>
             <span className="sm:hidden">Tap</span> to see connections between technologies across projects.
           </p>
@@ -1917,10 +1917,10 @@ const TechStackConstellation = ({
                 }}
                 transition={{ duration: 0.3, delay: index * 0.02 }}
               >
-                <span className="text-[0.55rem] sm:text-[0.6rem] md:text-[0.7rem]">
+                <span className="text-[0.65rem] sm:text-xs md:text-sm">
                   {tech.name}
                 </span>
-                <span className="ml-1 text-[0.45rem] opacity-70 sm:ml-1.5 sm:text-[0.5rem]">
+                <span className="ml-1 text-[0.55rem] opacity-70 sm:ml-1.5 sm:text-[0.6rem]">
                   ×{tech.count}
                 </span>
               </motion.button>
@@ -2401,7 +2401,7 @@ const LabStatusMonitor = ({
                 animate={{ opacity: [1, 0.3, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               />
-              <span className="retro text-[0.6rem] uppercase tracking-[0.2em] text-foreground">
+              <span className="retro text-[0.65rem] uppercase tracking-[0.2em] text-foreground">
                 Lab Status Monitor
               </span>
             </div>
@@ -2427,11 +2427,11 @@ const LabStatusMonitor = ({
             <div className="flex gap-3 pb-2" style={{ minWidth: "max-content" }}>
               {/* Lab Time */}
               <div className="w-40 shrink-0 space-y-1">
-                <p className="retro text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground">
+                <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
                   Lab Time
                 </p>
                 <div className="rounded-sm border border-dashed border-border/60 bg-background/70 px-2 py-1.5 dark:border-ring/60">
-                  <p className="retro text-center text-xs tabular-nums text-primary">
+                  <p className="retro text-center text-sm tabular-nums text-primary">
                     {labTime ? labTime.toLocaleTimeString('en-US', { 
                       hour12: false,
                       hour: '2-digit',
@@ -2439,7 +2439,7 @@ const LabStatusMonitor = ({
                       second: '2-digit'
                     }) : '--:--:--'}
                   </p>
-                  <p className="retro text-center text-[0.4rem] text-muted-foreground">
+                  <p className="retro text-center text-[0.45rem] text-muted-foreground">
                     {labTime ? labTime.toLocaleDateString('en-US', { 
                       weekday: 'short',
                       month: 'short',
@@ -2451,23 +2451,23 @@ const LabStatusMonitor = ({
 
               {/* Experiments Status */}
               <div className="w-36 shrink-0 space-y-1">
-                <p className="retro text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground">
+                <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
                   Specimens
                 </p>
                 <div className="space-y-1">
                   <div className="flex items-center justify-between rounded-sm border border-border/60 bg-green-600/10 px-2 py-0.5 dark:border-ring/60">
-                    <span className="retro text-[0.45rem] uppercase tracking-[0.15em] text-foreground">
+                    <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-foreground">
                       Active
                     </span>
-                    <span className="retro text-xs font-bold text-green-600">
+                    <span className="retro text-sm font-bold text-green-600">
                       {activeCount}
                     </span>
                   </div>
                   <div className="flex items-center justify-between rounded-sm border border-border/60 bg-slate-600/10 px-2 py-0.5 dark:border-ring/60">
-                    <span className="retro text-[0.45rem] uppercase tracking-[0.15em] text-foreground">
+                    <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-foreground">
                       Archived
                     </span>
-                    <span className="retro text-xs font-bold text-slate-600">
+                    <span className="retro text-sm font-bold text-slate-600">
                       {archivedCount}
                     </span>
                   </div>
@@ -2477,10 +2477,10 @@ const LabStatusMonitor = ({
               {/* Caffeine Level */}
               <div className="w-44 shrink-0 space-y-1">
                 <div className="flex items-center justify-between">
-                  <p className="retro text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground">
+                  <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
                     Caffeine
                   </p>
-                  <span className="retro text-[0.45rem] text-foreground">
+                  <span className="retro text-[0.5rem] text-foreground">
                     {caffeineLevel}%
                   </span>
                 </div>
@@ -2491,7 +2491,7 @@ const LabStatusMonitor = ({
                     transition={{ duration: 0.5 }}
                   />
                 </div>
-                <p className="retro text-[0.4rem] italic text-muted-foreground">
+                <p className="retro text-[0.45rem] italic text-muted-foreground">
                   {caffeineLevel >= 70
                     ? "Optimal"
                     : caffeineLevel >= 40
@@ -2503,10 +2503,10 @@ const LabStatusMonitor = ({
               {/* Inspiration Meter */}
               <div className="w-44 shrink-0 space-y-1">
                 <div className="flex items-center justify-between">
-                  <p className="retro text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground">
+                  <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
                     Inspiration
                   </p>
-                  <span className="retro text-[0.45rem] text-foreground">
+                  <span className="retro text-[0.5rem] text-foreground">
                     {inspiration.level}%
                   </span>
                 </div>
@@ -2523,7 +2523,7 @@ const LabStatusMonitor = ({
               <div className="w-64 shrink-0 rounded-sm border border-dashed border-primary/40 bg-primary/5 px-2 py-2">
                 <motion.p
                   key={currentQuote}
-                  className="retro text-center text-[0.45rem] leading-relaxed text-foreground"
+                  className="retro text-center text-[0.5rem] leading-relaxed text-foreground"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
@@ -2656,23 +2656,23 @@ export default function ProjectsPage() {
         activeCount={activeProjectsCount} 
         archivedCount={archivedProjectsCount} 
       />
-      <main className="mx-auto flex min-h-screen w-full max-w-[1700px] flex-col gap-4 p-2 text-foreground sm:gap-6 sm:p-4">
-        <section className="flex flex-col items-center gap-3 text-center sm:gap-4">
+      <main className="mx-auto flex min-h-screen w-full max-w-[1700px] flex-col gap-6 p-4 text-foreground sm:gap-8 sm:p-6 md:p-8">
+        <section className="flex flex-col items-center gap-4 text-center sm:gap-6">
         <div className="space-y-2">
-          <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem]">
+          <p className="retro text-[0.6rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
             Project Intel
           </p>
           <h1 className="retro text-xl uppercase leading-tight tracking-[0.2em] sm:text-2xl md:text-3xl">
             Lab Archive Citadel
           </h1>
-          <p className="retro text-xs leading-relaxed text-muted-foreground sm:text-sm">
+          <p className="retro text-sm leading-relaxed text-muted-foreground sm:text-base">
             A catalog of experiments, relics, and mission-critical deployments.
           </p>
         </div>
         <Button
           asChild
           font="retro"
-          className="retro h-10 px-6 text-[0.6rem] uppercase tracking-[0.2em] sm:h-11 sm:px-8 sm:text-sm"
+          className="retro h-12 px-8 text-xs uppercase tracking-[0.2em] sm:h-14 sm:px-10 sm:text-sm hover:scale-105 transition-transform active:scale-95 duration-75"
         >
           <Link href="#archive-container">Skip to Citadel</Link>
         </Button>
@@ -2686,7 +2686,7 @@ export default function ProjectsPage() {
         id="archive-container"
         className={cn(
           shellClass,
-          "border-dashed border-foreground/50 dark:border-ring/50 space-y-4 relative"
+          "border-dashed border-foreground/50 dark:border-ring/50 space-y-6 relative p-4 sm:p-6"
         )}
       >
         {/* Tulips on borders for Ally theme */}
@@ -2706,14 +2706,13 @@ export default function ProjectsPage() {
           <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
           <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
         </div>
-        <p className="retro text-center text-[0.5rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.3em] md:text-xs md:tracking-[0.35em]">
+        <p className="retro text-center text-[0.6rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs sm:tracking-[0.3em] md:text-sm md:tracking-[0.35em]">
           Lab Archive Citadel
         </p>
-
-        <div className="grid gap-4 md:grid-cols-12">
-          <div className={cn(panelBaseClass, "md:col-span-7 space-y-4 text-left")}>
+        <div className="grid gap-6 md:grid-cols-12">
+          <div className={cn(panelBaseClass, "md:col-span-7 space-y-6 text-left")}>
             <div className="flex items-center justify-between">
-              <p className="retro text-[0.55rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem]">
+              <p className="retro text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
                 Project Manifest
               </p>
               <span className="retro text-[0.5rem] text-muted-foreground">
@@ -2731,7 +2730,7 @@ export default function ProjectsPage() {
                   return (
                     <li
                       key={project.id}
-                      className="relative rounded-sm border border-dashed border-border/70 px-3 py-2 shadow-[2px_2px_0_var(--border)] transition-all duration-200 hover:-translate-y-1 hover:border-primary hover:shadow-[3px_3px_0_var(--primary)] dark:border-ring/70"
+                      className="relative rounded-sm border border-dashed border-border/70 px-4 py-3 shadow-[2px_2px_0_var(--border)] transition-none hover:-translate-y-1 hover:border-primary hover:shadow-[4px_4px_0_var(--primary)] dark:border-ring/70 cursor-pointer active:translate-y-0.5 active:shadow-none"
                       onMouseEnter={() => setHoveredProjectId(project.id)}
                       onMouseLeave={() => setHoveredProjectId(null)}
                     >
@@ -2741,7 +2740,7 @@ export default function ProjectsPage() {
                         )}
                       </AnimatePresence>
                       
-                      <div className="flex items-center justify-between text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
+                      <div className="flex items-center justify-between text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.65rem]">
                         <span className="retro">
                           Case {String(index + 1).padStart(2, "0")}
                         </span>
@@ -2749,10 +2748,10 @@ export default function ProjectsPage() {
                           Tier {project.classification.tier}
                         </span>
                       </div>
-                      <p className="retro mt-1 text-sm uppercase tracking-[0.1em]">
+                      <p className="retro mt-1.5 text-base uppercase tracking-[0.1em] sm:text-lg">
                         {project.title}
                       </p>
-                      <p className="retro text-[0.55rem] text-primary/80">
+                      <p className="retro text-[0.6rem] text-primary/80 sm:text-[0.65rem]">
                         {project.tagline}
                       </p>
                     </li>
@@ -2770,7 +2769,7 @@ export default function ProjectsPage() {
 
           <div className={cn(panelBaseClass, "md:col-span-5 space-y-4")}>
             <div className="flex flex-col gap-1 text-left">
-              <p className="retro text-[0.55rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem]">
+              <p className="retro text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
                 Containment Sortation Matrix
               </p>
               <p className="retro text-[0.55rem] leading-relaxed text-muted-foreground">
@@ -2783,36 +2782,36 @@ export default function ProjectsPage() {
                   type="button"
                   key={tier.tier}
                   className={cn(
-                    "rounded-sm border border-dashed border-border/60 p-3 text-left shadow-[2px_2px_0_var(--border)] transition-all duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/60 dark:border-ring/70",
+                    "rounded-sm border border-dashed border-border/60 p-4 text-left shadow-[2px_2px_0_var(--border)] transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/60 dark:border-ring/70 active:translate-y-0.5 active:shadow-none",
                     "bg-gradient-to-br text-white",
                     tier.gradient,
                     activeTier === tier.tier
-                      ? "ring-4 ring-primary shadow-[0_0_0_4px_var(--primary)]"
-                      : "hover:-translate-y-1 hover:shadow-[3px_3px_0_var(--border)]"
+                      ? "ring-4 ring-primary shadow-[0_0_0_4px_var(--primary)] scale-[1.02]"
+                      : "hover:-translate-y-1 hover:shadow-[4px_4px_0_var(--border)]"
                   )}
                   onClick={() => handleTierToggle(tier.tier)}
                   aria-pressed={activeTier === tier.tier}
                   aria-label={`Toggle Tier ${tier.tier} filter`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="retro text-[0.6rem] uppercase tracking-[0.2em]">
+                    <span className="retro text-[0.7rem] uppercase tracking-[0.2em] sm:text-xs">
                       Tier {tier.tier}
                     </span>
-                    <span className="retro text-[0.6rem]">
+                    <span className="retro text-[0.7rem] sm:text-xs">
                       {tierCounts[tier.tier]}x
                     </span>
                   </div>
-                  <p className="retro mt-1 text-sm uppercase tracking-[0.15em]">
+                  <p className="retro mt-1.5 text-base uppercase tracking-[0.15em] sm:text-lg">
                     {tier.label}
                   </p>
-                  <p className="retro text-[0.55rem] leading-relaxed text-white/90">
+                  <p className="retro text-[0.6rem] leading-relaxed text-white/90 sm:text-[0.65rem]">
                     {tier.description}
                   </p>
                 </button>
               ))}
             </div>
             <div className="flex items-center justify-between">
-              <p className="retro text-[0.5rem] uppercase tracking-[0.25em] text-muted-foreground">
+              <p className="retro text-[0.6rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.65rem]">
                 {activeTier === "ALL"
                   ? "Viewing all tiers"
                   : `Filtering by Tier ${activeTier}`}
@@ -2822,7 +2821,7 @@ export default function ProjectsPage() {
                   type="button"
                   variant="outline"
                   font="retro"
-                  className="retro h-8 px-3 text-[0.55rem] uppercase tracking-[0.18em]"
+                  className="retro h-9 px-4 text-[0.6rem] uppercase tracking-[0.18em] sm:text-[0.65rem] hover:bg-primary/10"
                   onClick={() => setActiveTier("ALL")}
                 >
                   Clear Filter
@@ -2838,7 +2837,7 @@ export default function ProjectsPage() {
         {/* Tech Stack Constellation - Between Matrix and Accordions */}
         <TechStackConstellation projects={sortedProjects} panelClass={panelBaseClass} />
 
-        <div className={cn(panelBaseClass, "p-0 sm:p-0 md:p-0 lg:p-0")}>
+        <div className={cn(panelBaseClass, "p-0 sm:p-0 md:p-0 lg:p-0 mt-6 sm:mt-8")}>
           {filteredProjects.length > 0 ? (
             <Accordion
               key={activeTier}
@@ -2848,30 +2847,30 @@ export default function ProjectsPage() {
             >
               {filteredProjects.map((project) => (
               <AccordionItem key={project.id} value={project.id}>
-                <AccordionTrigger className="flex flex-col gap-2 px-3 py-4 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                <AccordionTrigger className="flex flex-col gap-3 px-4 py-5 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
                   <div className="space-y-1">
-                    <p className="retro text-[0.6rem] uppercase tracking-[0.25em] text-muted-foreground">
+                    <p className="retro text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
                       Tier {project.classification.tier} ·{" "}
                       {project.classification.codename}
                     </p>
-                    <p className="retro text-lg uppercase tracking-[0.2em] theme-ally:drop-shadow-[2px_2px_0_oklch(0.65_0.25_350)]">
+                    <p className="retro text-xl uppercase tracking-[0.2em] theme-ally:drop-shadow-[2px_2px_0_oklch(0.65_0.25_350)] sm:text-2xl pt-1">
                       {project.title}
                     </p>
-                    <p className="retro text-xs text-primary/80">
+                    <p className="retro text-sm text-primary/80 sm:text-base">
                       {project.tagline}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="retro text-[0.55rem] uppercase tracking-[0.2em] text-muted-foreground">
+                    <p className="retro text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.65rem]">
                       {project.classification.status}
                     </p>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="bg-background/70 relative overflow-hidden">
                   <LabSpecimenScanner />
-                  <div className="flex flex-col gap-6 p-3 sm:p-4">
+                  <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
                     <motion.div
-                      className="flex items-center gap-2 rounded-sm border border-dashed border-primary/40 bg-primary/5 px-3 py-2"
+                      className="flex items-center gap-3 rounded-sm border border-dashed border-primary/40 bg-primary/5 px-4 py-3"
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: [0, 1, 1, 0] }}
                       transition={{ duration: 1.5, times: [0, 0.2, 0.8, 1] }}
@@ -2881,29 +2880,29 @@ export default function ProjectsPage() {
                         animate={{ opacity: [1, 0.3, 1] }}
                         transition={{ duration: 1, repeat: 2, ease: "easeInOut" }}
                       />
-                      <span className="retro text-[0.5rem] uppercase tracking-[0.25em] text-primary">
+                      <span className="retro text-[0.6rem] uppercase tracking-[0.25em] text-primary sm:text-xs">
                         Specimen Analysis in Progress...
                       </span>
                     </motion.div>
                     <div className="space-y-4">
                       <div>
-                        <p className="retro text-sm text-foreground">
+                        <p className="retro text-base leading-relaxed text-foreground sm:text-lg">
                           {project.description}
                         </p>
-                        <p className="retro mt-1 text-xs uppercase tracking-[0.2em] text-primary">
+                        <p className="retro mt-2 text-sm uppercase tracking-[0.2em] text-primary sm:text-base">
                           {project.detail}
                         </p>
                       </div>
 
-                      <div className="space-y-2">
-                        <p className="retro text-[0.6rem] uppercase tracking-[0.25em] text-muted-foreground">
+                      <div className="space-y-3">
+                        <p className="retro text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
                           Lab Notes
                         </p>
-                        <ul className="space-y-2">
+                        <ul className="space-y-3">
                           {project.highlights.map((highlight) => (
                             <li
                               key={highlight}
-                              className="retro text-xs leading-relaxed text-foreground"
+                              className="retro text-sm leading-relaxed text-foreground sm:text-base"
                             >
                               • {highlight}
                             </li>
@@ -2911,17 +2910,17 @@ export default function ProjectsPage() {
                         </ul>
                       </div>
 
-                      <div className="space-y-2">
-                        <p className="retro text-[0.6rem] uppercase tracking-[0.25em] text-muted-foreground">
+                      <div className="space-y-3">
+                        <p className="retro text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
                           Tech Stack
                         </p>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-3">
                           {project.tech.map((tech) => (
                             <Badge
                               key={tech}
                               font="retro"
                               variant="secondary"
-                              className="border border-border bg-background px-3 py-1 text-[0.55rem] uppercase tracking-[0.2em] text-foreground"
+                              className="border border-border bg-background px-4 py-1.5 text-[0.65rem] uppercase tracking-[0.2em] text-foreground sm:text-xs"
                             >
                               {tech}
                             </Badge>
@@ -2933,7 +2932,7 @@ export default function ProjectsPage() {
                         <Button
                           asChild
                           font="retro"
-                          className="retro h-9 w-fit px-5 text-[0.6rem] uppercase tracking-[0.2em]"
+                          className="retro h-11 w-fit px-8 text-xs uppercase tracking-[0.2em] sm:h-12 sm:px-10 sm:text-sm active:translate-y-1 transition-none"
                         >
                           <Link
                             href={project.link}

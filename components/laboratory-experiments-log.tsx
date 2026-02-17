@@ -127,13 +127,13 @@ export function LaboratoryExperimentsLog({ className }: { className?: string }) 
   return (
     <section className={cn("space-y-4 sm:space-y-5 md:space-y-6", className)}>
       <div className="space-y-2 text-center sm:space-y-2.5 md:space-y-3">
-        <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
+        <p className="retro text-[0.6rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.35em] md:text-sm md:tracking-[0.4em]">
           Lab Status Board
         </p>
-        <h2 className="retro text-lg uppercase tracking-[0.2em] sm:text-xl sm:tracking-[0.25em] md:text-2xl md:tracking-[0.3em]">
+        <h2 className="retro text-xl uppercase tracking-[0.2em] sm:text-2xl sm:tracking-[0.25em] md:text-3xl md:tracking-[0.3em]">
           Laboratory Experiments Log
         </h2>
-        <p className="retro text-[0.55rem] text-muted-foreground sm:text-[0.65rem] md:text-sm">
+        <p className="retro text-xs text-muted-foreground sm:text-sm md:text-base">
           Current experiments running inside Fyke&apos;s Laboratory—complete with
           hypotheses, variables, and questionable coffee-fueled conclusions.
         </p>
@@ -151,12 +151,12 @@ export function LaboratoryExperimentsLog({ className }: { className?: string }) 
               {/* Header */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="retro text-sm uppercase leading-tight tracking-[0.18em] text-foreground sm:text-base md:text-lg">
+                  <h3 className="retro text-base uppercase leading-tight tracking-[0.18em] text-foreground sm:text-lg md:text-xl">
                     {experiment.title}
                   </h3>
                   <div
                     className={cn(
-                      "rounded-none border px-2 py-0.5 text-[0.4rem] uppercase tracking-[0.15em] sm:text-[0.45rem]",
+                      "rounded-none border px-2 py-0.5 text-[0.5rem] uppercase tracking-[0.15em] sm:text-[0.55rem]",
                       status.bg,
                       status.color
                     )}
@@ -164,7 +164,7 @@ export function LaboratoryExperimentsLog({ className }: { className?: string }) 
                     {status.icon} {status.label}
                   </div>
                 </div>
-                <p className="retro text-[0.45rem] leading-relaxed tracking-[0.1em] text-muted-foreground sm:text-[0.5rem] md:text-[0.55rem]">
+                <p className="retro text-xs leading-relaxed tracking-[0.1em] text-muted-foreground sm:text-sm md:text-base">
                   Hypothesis: {experiment.hypothesis}
                 </p>
               </div>
@@ -172,10 +172,10 @@ export function LaboratoryExperimentsLog({ className }: { className?: string }) 
               {/* Progress */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem]">
+                  <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem]">
                     Active Experiment
                   </span>
-                  <span className="retro text-[0.45rem] font-bold tracking-[0.15em] text-primary sm:text-[0.5rem]">
+                  <span className="retro text-[0.5rem] font-bold tracking-[0.15em] text-primary sm:text-[0.55rem]">
                     {experiment.progress}%
                   </span>
                 </div>
@@ -185,7 +185,7 @@ export function LaboratoryExperimentsLog({ className }: { className?: string }) 
                     style={{ width: `${experiment.progress}%` }}
                   />
                 </div>
-                <p className="retro text-[0.4rem] tracking-[0.12em] text-muted-foreground">
+                <p className="retro text-[0.5rem] tracking-[0.12em] text-muted-foreground">
                   {experiment.statusNote}
                 </p>
               </div>
@@ -193,14 +193,14 @@ export function LaboratoryExperimentsLog({ className }: { className?: string }) 
               {/* Variables & Equipment */}
               <div className="grid gap-2 sm:grid-cols-2">
                 <div className="rounded-none border border-dashed border-border/70 p-2 dark:border-ring/70">
-                  <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+                  <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
                     Variables Under Test
                   </p>
                   <ul className="mt-1 space-y-0.5">
                     {experiment.variables.map((variable) => (
                       <li
                         key={variable}
-                        className="retro text-[0.4rem] tracking-[0.1em] text-foreground sm:text-[0.45rem]"
+                        className="retro text-[0.5rem] tracking-[0.1em] text-foreground sm:text-[0.55rem]"
                       >
                         • {variable}
                       </li>
@@ -208,14 +208,14 @@ export function LaboratoryExperimentsLog({ className }: { className?: string }) 
                   </ul>
                 </div>
                 <div className="rounded-none border border-dashed border-border/70 p-2 dark:border-ring/70">
-                  <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+                  <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
                     Equipment Needed
                   </p>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {experiment.equipment.map((tool) => (
                       <span
                         key={tool}
-                        className="retro rounded-none border border-border px-1.5 py-0.5 text-[0.35rem] uppercase tracking-[0.1em] text-muted-foreground dark:border-ring sm:text-[0.4rem]"
+                        className="retro rounded-none border border-border px-1.5 py-0.5 text-[0.45rem] uppercase tracking-[0.1em] text-muted-foreground dark:border-ring sm:text-[0.5rem]"
                       >
                         {tool}
                       </span>
@@ -228,18 +228,18 @@ export function LaboratoryExperimentsLog({ className }: { className?: string }) 
               <div className="rounded-none border border-border/80 bg-background/80 p-2 dark:border-ring/80">
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div>
-                    <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-green-600 dark:text-green-400">
+                    <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-green-600 dark:text-green-400">
                       Expected Result
                     </p>
-                    <p className="retro text-[0.45rem] leading-relaxed tracking-[0.1em] text-foreground">
+                    <p className="retro text-xs leading-relaxed tracking-[0.1em] text-foreground">
                       {experiment.expectedResult}
                     </p>
                   </div>
                   <div>
-                    <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-amber-600 dark:text-amber-400">
+                    <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-amber-600 dark:text-amber-400">
                       Actual Result
                     </p>
-                    <p className="retro text-[0.45rem] leading-relaxed tracking-[0.1em] text-foreground">
+                    <p className="retro text-xs leading-relaxed tracking-[0.1em] text-foreground">
                       {experiment.actualResult}
                     </p>
                   </div>
@@ -248,16 +248,16 @@ export function LaboratoryExperimentsLog({ className }: { className?: string }) 
 
               {/* Lab Notes */}
               <div className="rounded-none border border-border bg-background/70 p-2 dark:border-ring">
-                <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+                <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
                   Lab Notes
                 </p>
-                <p className="retro text-[0.45rem] leading-relaxed tracking-[0.1em] text-foreground">
+                <p className="retro text-xs leading-relaxed tracking-[0.1em] text-foreground">
                   {experiment.labNotes}
                 </p>
               </div>
 
               {/* Decorative corner */}
-              <div className="pointer-events-none absolute inset-x-2 top-2 flex justify-between text-[0.35rem] uppercase tracking-[0.15em] text-muted-foreground/60">
+              <div className="pointer-events-none absolute inset-x-2 top-2 flex justify-between text-[0.45rem] uppercase tracking-[0.15em] text-muted-foreground/60">
                 <span>Experiment #{experiment.id}</span>
                 <span>{experiment.status === "success" ? "✅" : "🧪"}</span>
               </div>
