@@ -6,6 +6,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Terminal, Minimize2, Maximize2, X } from "lucide-react";
 import { useTheme } from "next-themes";
+import { crtOpenVariant } from "@/components/ui/8bit/motion-utils";
 
 interface TerminalLine {
   type: "input" | "output" | "error" | "success";
@@ -1836,11 +1837,14 @@ export function RetroTerminal() {
     };
   }, []);
 
+
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      variants={crtOpenVariant}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
       className={cn(
         "relative overflow-hidden rounded-none",
         isMaximized
@@ -1938,16 +1942,16 @@ export function RetroTerminal() {
                 {lines.map((line, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2, delay: index * 0.02 }}
+                    transition={{ duration: 0 }}
                     className={cn(
                       "retro mb-1 whitespace-pre-wrap text-xs leading-relaxed",
                       getLineColor(line.type)
                     )}
                   >
-                    {line.content}
+                   {line.content}
                   </motion.div>
                 ))}
               </AnimatePresence>
