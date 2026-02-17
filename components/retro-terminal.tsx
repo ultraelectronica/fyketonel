@@ -1981,7 +1981,7 @@ export function RetroTerminal() {
 
             {/* Status Bar */}
             <div className="relative border-t-4 border-border bg-primary/10 px-4 py-2 dark:border-ring">
-              <div className="flex items-center justify-between text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
+              <div className="flex items-center justify-between text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-xs">
                 <span className="retro">{isMultiLine || multiLineBuffer.length > 0 ? "Multi-line" : "Ready"}</span>
                 <span className="retro">Theme: {isMounted ? themes[currentTheme as keyof typeof themes].name : "Default"}</span>
                 <span className="retro">Lines: {lines.length}</span>

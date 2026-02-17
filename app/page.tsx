@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/8bit/button";
 import InteractiveCalendar from "@/components/interactive-calendar";
 import {
   Item,
-  ItemActions,
   ItemContent,
-  ItemDescription,
   ItemGroup,
   ItemSeparator,
   ItemTitle,
@@ -22,8 +20,8 @@ import AchievementWall from "@/components/achievement-wall";
 import InventorySystem from "@/components/inventory-system";
 import SkillTree from "@/components/skill-tree";
 import ResumeArchive from "@/components/resume-archive";
-import { useMediaQuery } from "react-responsive";
 import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 const wishlistItems = [
   {
@@ -63,13 +61,6 @@ export default function Home() {
   const [joke, setJoke] = useState("Loading joke...");
   const [isAllyMode, setIsAllyMode] = useState(false);
 
-  // Detect screen sizes
-  const isVerySmall = useMediaQuery({ maxWidth: 374 });
-  const isSmall = useMediaQuery({ minWidth: 375, maxWidth: 639 });
-
-  // Simple client-side check
-  const isClient = typeof window !== 'undefined' && (isVerySmall !== undefined || isSmall !== undefined);
-
   // Fetch joke on mount
   useEffect(() => {
     let isMounted = true;
@@ -105,93 +96,49 @@ export default function Home() {
     };
   }, []);
 
-  // Dynamic classes based on screen size
-  const shellClass = isClient && isVerySmall
-    ? "rounded-none border border-border bg-card/80 p-2 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : isClient && isSmall
-    ? "rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : "rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring min-[375px]:border-3 min-[375px]:p-4 min-[375px]:shadow-[3px_3px_0_var(--border)] sm:border-4 sm:p-6 sm:shadow-[6px_6px_0_var(--border)] md:p-8 md:shadow-[8px_8px_0_var(--border)]";
-
-  const panelClass = isClient && isVerySmall
-    ? "rounded-none border border-border bg-card/80 p-2 text-center shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : isClient && isSmall
-    ? "rounded-none border-2 border-border bg-card/80 p-3 text-center shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : "rounded-none border-2 border-border bg-card/80 p-3 text-center shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring min-[375px]:border-3 min-[375px]:p-4 min-[375px]:shadow-[3px_3px_0_var(--border)] sm:border-4 sm:p-5 sm:shadow-[4px_4px_0_var(--border)] md:p-6 md:shadow-[6px_6px_0_var(--border)]";
-
-  const gridGap = isClient && isVerySmall
-    ? "gap-12"
-    : isClient && isSmall
-    ? "gap-12"
-    : "gap-8 min-[375px]:gap-10 sm:gap-10 md:gap-10";
-
-  const githubContainerClass = isClient && isVerySmall
-    ? "rounded-none border border-dashed border-border bg-background/80 p-2 shadow-[1px_1px_0_var(--border)] overflow-hidden min-h-[180px] flex items-center justify-center"
-    : isClient && isSmall
-    ? "rounded-none border-2 border-dashed border-border bg-background/80 p-2.5 shadow-[2px_2px_0_var(--border)] overflow-hidden min-h-[220px] flex items-center justify-center"
-    : "rounded-none border-2 border-dashed border-border bg-background/80 p-2 shadow-[2px_2px_0_var(--border)] overflow-hidden min-h-[200px] flex items-center justify-center min-[375px]:border-3 min-[375px]:p-2.5 min-[375px]:shadow-[2.5px_2.5px_0_var(--border)] min-[375px]:min-h-[250px] sm:border-4 sm:min-h-[300px] sm:p-3.5 sm:shadow-[3.5px_3.5px_0_var(--border)] md:min-h-[400px] md:p-4 md:shadow-[4px_4px_0_var(--border)]";
+  // Updated Panel styles - Denser, less padding
+  const panelBaseClass = "relative bg-card text-card-foreground border-2 border-border shadow-[4px_4px_0_var(--border)] p-3 overflow-hidden";
+  const headerClass = "retro text-xs uppercase tracking-[0.2em] text-primary mb-2 border-b-2 border-dashed border-border/50 pb-1";
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-[95vw] flex-col gap-6 px-3 py-6 text-foreground min-[375px]:gap-7 min-[375px]:px-4 min-[375px]:py-8 sm:gap-10 sm:px-6 sm:py-12 md:gap-12 md:py-16">
-      <section className="flex flex-col items-center gap-3 text-center min-[375px]:gap-4 sm:gap-5 md:gap-6">
-        <div className="space-y-2 sm:space-y-3">
-          <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
-            Laboratory Intel
-          </p>
-          <h1 className="retro text-xl uppercase leading-tight tracking-[0.2em] sm:text-2xl sm:tracking-[0.25em] md:text-3xl md:tracking-[0.3em]">
-            Welcome to Fyke&#39;s Laboratory
-          </h1>
-          <p className="retro text-xs leading-relaxed text-muted-foreground sm:text-sm md:text-base">
-            My laboratory, my playground, my sandbox.
-          </p>
-        </div>
-        <Button
-          asChild
-          className="retro h-10 px-6 text-xs uppercase tracking-[0.2em] sm:h-11 sm:px-8 sm:text-sm sm:tracking-[0.25em] md:h-12 md:px-10 md:text-base md:tracking-[0.3em]"
-        >
-          <Link href="#lab-container">Learn More</Link>
-        </Button>
-      </section>
-
-      <section
-        id="lab-container"
-        className={`${shellClass} border-dashed border-foreground/50 dark:border-ring/50 relative`}
-      >
-        {/* Tulips on borders for Ally theme */}
-        <div className="pointer-events-none absolute -left-2 top-0 bottom-0 theme-ally:block hidden">
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute top-4 opacity-60" />
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute bottom-4 opacity-60" />
-        </div>
-        <div className="pointer-events-none absolute -right-2 top-0 bottom-0 theme-ally:block hidden">
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute top-4 opacity-60" />
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute bottom-4 opacity-60" />
-        </div>
-        <div className="pointer-events-none absolute left-0 right-0 -top-2 theme-ally:flex hidden justify-between px-4">
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
-        </div>
-        <div className="pointer-events-none absolute left-0 right-0 -bottom-2 theme-ally:flex hidden justify-between px-4">
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
-        </div>
-        <p className="retro mb-4 text-center text-[0.5rem] uppercase tracking-[0.25em] text-muted-foreground sm:mb-5 sm:text-[0.6rem] sm:tracking-[0.3em] md:mb-6 md:text-xs md:tracking-[0.35em]">
-          Lab Control Center
-        </p>
-        <div className="flex flex-col gap-4 min-[375px]:gap-5 sm:gap-6">
-          <div className="grid grid-cols-1 gap-4 min-[375px]:gap-5 sm:gap-6 lg:grid-cols-2 lg:auto-rows-[minmax(0,1fr)]">
-            <div className={`${panelClass} flex flex-col h-full`}>
-              <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
-                Mission Planner
-              </p>
-              <div className="mt-4 flex flex-1 w-full items-center justify-center sm:mt-5 md:mt-6">
-                <InteractiveCalendar className="w-full max-w-md text-[clamp(0.4rem,2vw,0.65rem)] sm:max-w-lg sm:text-[0.75rem]" />
-              </div>
+    <main className="min-h-screen w-full bg-transparent p-4 sm:p-6 md:p-8">
+      {/* Game World Container - Increased padding for breathability */}
+      <div className="mx-auto max-w-[1700px] border-4 border-border bg-background p-3 shadow-[8px_8px_0_var(--border)] sm:p-4">
+        
+        {/* Header / Intro Box - Reduced margin/padding */}
+        <section className="mb-4 border-b-4 border-border bg-card p-4 text-center sm:text-left shadow-sm">
+          <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <div>
+                <div className="mb-2 inline-block bg-primary px-3 py-1 shadow-[2px_2px_0_rgba(0,0,0,0.2)]">
+                    <p className="retro text-[0.7rem] font-bold uppercase tracking-widest text-primary-foreground sm:text-xs">
+                    CURRENT LOCATION: LABORATORY
+                    </p>
+                </div>
+                <h1 className="retro text-2xl uppercase leading-tight tracking-widest sm:text-3xl md:text-4xl">
+                Fyke&#39;s Workspace
+                </h1>
+                <p className="retro mt-2 text-xs text-muted-foreground sm:text-sm leading-relaxed">
+                Level 60 Full-Stack Developer • Class: Guardian of Chaotic Plans
+                </p>
             </div>
+            <Button
+            asChild
+            className="retro h-10 border-2 border-primary bg-primary/10 text-primary shadow-[4px_4px_0_var(--primary)] hover:translate-y-1 hover:shadow-none"
+            >
+            <Link href="#contact">INITIALIZE CONTACT</Link>
+            </Button>
+          </div>
+        </section>
 
-            <div className={`${panelClass} flex flex-col h-full`}>
-              <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground text-center sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
-                Player Card
-              </p>
-              <div className="mt-4 flex flex-1 items-center justify-center sm:mt-5 md:mt-6">
+        {/* Dashboard Grid - Increased gaps for mobile breathability */}
+        <div id="lab-container" className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-6">
+          
+          {/* Left Column: Player Status & Menu (4 cols) */}
+          <div className="flex flex-col gap-4 lg:col-span-4">
+             {/* Player Card - Compact */}
+            <div className={panelBaseClass}>
+              <h2 className={`${headerClass} text-sm`}>PLAYER_STATUS</h2>
+              <div className="flex items-center justify-center py-2">
                 <PlayerProfileCard
                   playerName="Fyke"
                   avatarSrc="/assets/minippix.png"
@@ -215,159 +162,172 @@ export default function Home() {
                   showHealth={true}
                   showMana={true}
                   showExperience={true}
-                  className="w-full max-w-full border-4 border-border shadow-none bg-transparent"
+                  className="w-full border-none shadow-none bg-transparent p-0"
                 />
               </div>
             </div>
 
-            <div id="wishlist" className={`${panelClass} flex flex-col h-full`}>
-              <p className="retro text-center text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
-                Wishlist
-              </p>
-              <div className="mt-4 flex flex-1 w-full sm:mt-5 md:mt-6">
-                <ItemGroup className="flex w-full flex-col gap-2 sm:gap-2.5 md:gap-3">
-                  {wishlistItems.map((item, index) => (
-                    <div key={item.id}>
-                      <Item 
-                        variant="outline" 
-                        className="flex flex-col transition-all duration-200 hover:bg-accent/30 hover:border-primary hover:shadow-[3px_3px_0_var(--primary)] sm:hover:shadow-[4px_4px_0_var(--primary)] hover:-translate-y-1 cursor-pointer"
-                      >
-                        <ItemContent className="flex-1">
-                          <ItemTitle className="retro text-center text-[0.5rem] uppercase tracking-[0.15em] sm:text-xs sm:tracking-[0.18em] md:text-sm md:tracking-[0.2em]">
-                            {item.title}
-                          </ItemTitle>
-                          <ItemDescription className="retro text-center text-[0.45rem] text-muted-foreground mt-1 sm:text-[0.55rem] md:text-xs">
-                            {item.description}
-                          </ItemDescription>
-                        </ItemContent>
-                        <ItemActions className="mt-2 flex items-center justify-between w-full sm:mt-2.5 md:mt-3">
-                          <span className="retro text-[0.45rem] font-bold text-primary sm:text-[0.55rem] md:text-xs">
-                            {item.price}
-                          </span>
-                          <span className="retro text-[0.4rem] text-muted-foreground sm:text-[0.5rem] md:text-xs">
-                            Haven&#39;t bought yet :(
-                          </span>
-                        </ItemActions>
-                      </Item>
-                      {index < wishlistItems.length - 1 && (
-                        <ItemSeparator className="my-2 border-dashed border-border sm:my-2.5 md:my-3" />
-                      )}
-                    </div>
-                  ))}
-                </ItemGroup>
-              </div>
+            {/* Mission Planner (Calendar) */}
+            <div className={panelBaseClass}>
+               <h2 className={headerClass}>ACTIVE_MISSIONS</h2>
+               <div className="flex justify-center">
+                 <InteractiveCalendar className="w-full text-[0.7rem]" />
+               </div>
             </div>
 
-            <div className={`${panelClass} flex flex-col h-full relative`}>
-              {/* Lotus background for Ally theme */}
-              {isAllyMode && (
-                <div className="pointer-events-none absolute inset-0 opacity-40">
-                  <Image
-                    src="/assets/tulips.png"
-                    alt=""
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
-              <p className="retro relative z-10 text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
-                A random joke for your mood.
-              </p>
-              <div className="mt-4 flex flex-1 items-center justify-center sm:mt-5 md:mt-6 relative z-10">
-                <p className="retro text-xs leading-relaxed text-center text-muted-foreground sm:text-sm md:text-base lg:text-lg">
-                  {joke}
-                </p>
+             {/* Github Contributions */}
+             <div className={panelBaseClass}>
+              <h2 className={`${headerClass} text-sm`}>CONTRIBUTION_LOG</h2>
+              <div className="min-h-[160px] overflow-hidden rounded border border-dashed border-border bg-background/50 p-2">
+                 <GitHubContributions />
               </div>
-            </div>
-          </div>
-
-          <div
-            className={`${panelClass} flex flex-col gap-2 text-center min-[375px]:gap-2.5 sm:gap-3.5 md:gap-4`}
-          >
-            <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
-              ultraelectronica GitHub Contributions
-            </p>
-            <div className={githubContainerClass}>
-              <GitHubContributions />
-            </div>
-            <Button
-              asChild
-              variant="outline"
-              className="retro h-8 text-[0.5rem] uppercase tracking-[0.2em] sm:h-9 sm:text-[0.6rem] sm:tracking-[0.25em] md:h-10 md:text-xs md:tracking-[0.3em]"
-            >
-              <a
-                href="https://github.com/ultraelectronica"
-                target="_blank"
-                rel="noopener noreferrer"
+               <Button
+                asChild
+                variant="outline"
+                className="retro mt-4 w-full h-10 text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform"
               >
-                View Profile
-              </a>
-            </Button>
+                <a
+                  href="https://github.com/ultraelectronica"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ACCESS GITHUB TERMINAL
+                </a>
+              </Button>
+            </div>
           </div>
-        </div>
-      </section>
 
-      <AchievementWall />
-
-      <InventorySystem />
-
-      <SkillTree />
-
-      <ResumeArchive />
-
-      <TechnologiesCarousel />
-
-      <section className="space-y-3 min-[375px]:space-y-4 sm:space-y-5 md:space-y-6">
-        <div className="space-y-1.5 text-center min-[375px]:space-y-2 sm:space-y-2.5 md:space-y-3">
-          <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
-            Get in Touch
-          </p>
-          <h2 className="retro text-lg uppercase tracking-[0.2em] sm:text-xl sm:tracking-[0.25em] md:text-2xl md:tracking-[0.3em]">
-            Contact Me
-          </h2>
-        </div>
-        <div className={`${shellClass} border-dashed border-foreground/50 dark:border-ring/50`}>
-          <div className={`grid ${gridGap} lg:grid-cols-2`}>
-            {/* Left Side - Contact Info */}
-            <div className={`${panelClass} flex flex-col justify-center space-y-4 sm:space-y-5 md:space-y-6`}>
-              <div className="space-y-3 sm:space-y-3.5 md:space-y-4">
-                <div>
-                  <h3 className="retro text-sm uppercase tracking-[0.2em] text-foreground sm:text-lg sm:tracking-[0.25em] md:text-xl lg:text-2xl md:tracking-[0.3em]">
-                    Fyke Simon V. Tonel
-                  </h3>
-                  <p className="retro mt-2 text-xs uppercase tracking-[0.18em] text-primary sm:mt-2.5 sm:text-sm sm:tracking-[0.22em] md:mt-3 md:text-base md:tracking-[0.25em]">
-                    Full-Stack Developer & Technical Lead
-                  </p>
+          {/* Right Column: Content & Systems (8 cols) */}
+          <div className="flex flex-col gap-4 lg:col-span-8">
+            
+            {/* Top Row: Wishlist & Joke */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {/* Wishlist - More compact items */}
+                <div id="wishlist" className={panelBaseClass}>
+                    <h2 className={headerClass}>MERCHANT_WISHLIST</h2>
+                    <ItemGroup className="flex flex-col gap-1.5">
+                    {wishlistItems.map((item, index) => (
+                        <div key={item.id}>
+                        <Item 
+                            variant="outline" 
+                            className="group flex cursor-pointer flex-col border border-dashed border-border bg-transparent transition-none hover:border-primary hover:bg-primary/5 active:translate-y-0.5"
+                        >
+                            <ItemContent className="flex-1 p-2 sm:p-1.5">
+                            <ItemTitle className="retro text-xs sm:text-[0.55rem] uppercase tracking-wider group-hover:text-primary">
+                                {item.title}
+                            </ItemTitle>
+                            <div className="mt-0.5 flex items-center justify-between">
+                                 <span className="retro text-[0.65rem] sm:text-[0.5rem] text-muted-foreground truncate max-w-[70%]">{item.description}</span>
+                                 <span className="retro text-[0.7rem] sm:text-[0.55rem] font-bold text-primary">{item.price}</span>
+                            </div>
+                            </ItemContent>
+                        </Item>
+                        {index < wishlistItems.length - 1 && (
+                            <ItemSeparator className="my-1 border-dashed border-border/30" />
+                        )}
+                        </div>
+                    ))}
+                    </ItemGroup>
                 </div>
-                
-                <div className="space-y-1.5 sm:space-y-2">
-                  <div className="flex items-center justify-center gap-1.5 sm:gap-2">
-                    <span className="retro text-xs uppercase tracking-[0.15em] text-muted-foreground sm:text-sm sm:tracking-[0.2em]">
-                      📍
-                    </span>
-                    <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-xs sm:tracking-[0.18em] md:text-sm md:tracking-[0.2em]">
-                      Metro Manila, Philippines
-                    </p>
+
+                {/* Joke/Flavor Text */}
+                <div className={`${panelBaseClass} flex flex-col justify-between`}>
+                     {/* Lotus background for Ally theme */}
+                    {isAllyMode && (
+                        <div className="pointer-events-none absolute inset-0 opacity-20">
+                        <Image
+                            src="/assets/tulips.png"
+                            alt=""
+                            fill
+                            className="object-cover"
+                        />
+                        </div>
+                    )}
+                    <div>
+                        <h2 className={headerClass}>RANDOM_ENCOUNTER_TEXT</h2>
+                        <p className="retro relative z-10 text-center text-sm leading-relaxed text-muted-foreground py-4">
+                        &quot;{joke}&quot;
+                        </p>
+                    </div>
+                    <div className="retro text-[0.5rem] uppercase text-center text-muted-foreground/50 tracking-[0.3em]">
+                        PRESS ANY KEY TO LAUGH
+                    </div>
+                </div>
+            </div>
+
+            {/* Achievement Wall */}
+            <div className={panelBaseClass}>
+                <h2 className={headerClass}>TROPHY_ROOM</h2>
+                <AchievementWall />
+            </div>
+          </div>
+
+          {/* FULL WIDTH SECTIONS - To avoid empty space on the left */}
+            
+            {/* Tech Stack Carousel */}
+            <div className={cn(panelBaseClass, "lg:col-span-12")}>
+                <h2 className={headerClass}>EQUIPPED_TECHNOLOGIES</h2>
+                <TechnologiesCarousel />
+            </div>
+
+             {/* Inventory System */}
+             <div className={cn(panelBaseClass, "lg:col-span-12 min-h-[400px]")}>
+                <h2 className={headerClass}>INVENTORY</h2>
+                <InventorySystem />
+             </div>
+
+             {/* Skill Tree */}
+             <div className="border-none lg:col-span-12">
+                 <SkillTree />
+             </div>
+
+             {/* Resume Archive */}
+             <div className="border-none lg:col-span-12">
+                <ResumeArchive />
+             </div>
+        </div>
+
+        {/* Level Ends / Footer Area Inside Game Screen */}
+        <section id="contact" className="mt-8 border-t-4 border-dashed border-border pt-8">
+          <div className="mb-4 text-center">
+             <div className="inline-block border-2 border-primary bg-background px-4 py-1.5 shadow-[4px_4px_0_var(--primary)]">
+                <h2 className="retro text-sm sm:text-lg uppercase tracking-wider sm:tracking-widest text-primary">
+                    TRANSMISSION_LINK
+                </h2>
+             </div>
+          </div>
+          
+           <div className="grid gap-6 md:grid-cols-2">
+              <div className={`${panelBaseClass} flex flex-col justify-center`}>
+                  <div className="text-center md:text-left">
+                     <p className="retro text-[0.6rem] sm:text-xs uppercase tracking-widest text-muted-foreground">OPERATOR</p>
+                     <h3 className="retro text-lg sm:text-xl md:text-2xl uppercase tracking-widest text-foreground">
+                        Fyke Simon V. Tonel
+                     </h3>
+                     <p className="retro mt-2 text-xs sm:text-sm uppercase tracking-wider text-primary">
+                        Full-Stack Developer
+                     </p>
                   </div>
-                </div>
+                  <div className="mt-6 space-y-2 border-t-2 border-dashed border-border pt-4">
+                      <div className="flex items-center gap-2">
+                          <span className="retro text-xs">📍</span>
+                          <span className="retro text-xs uppercase tracking-wider text-muted-foreground">Metro Manila, Philippines</span>
+                      </div>
+                      <p className="retro text-xs leading-relaxed text-muted-foreground">
+                        Ready for new quests. Send a transmission for collaborations.
+                      </p>
+                  </div>
               </div>
-              
-              <div className="border-t-2 border-dashed border-border pt-3 dark:border-ring sm:border-t-3 sm:pt-4 md:border-t-4 md:pt-6">
-                <p className="retro text-[0.5rem] leading-relaxed text-muted-foreground sm:text-xs md:text-sm">
-                  Let&#39;s work together! Feel free to reach out for collaborations, projects, or just to say hi.
-                </p>
-              </div>
-            </div>
 
-            {/* Right Side - Contact Form */}
-            <div className={`${panelClass} flex flex-col`}>
-              <ContactForm />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <PowerPelletHighway />
+               <div className={panelBaseClass}>
+                  <ContactForm />
+               </div>
+           </div>
+        </section>
+        
+        <PowerPelletHighway />
+        
+      </div>
     </main>
   );
 }

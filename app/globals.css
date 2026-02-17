@@ -304,6 +304,16 @@ button:not(:disabled):hover {
   }
 }
 
+@keyframes circuitFlow {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(500%, 0, 0); } /* Move far enough */
+}
+
+@keyframes circuitFlowVertical {
+  0% { transform: translate3d(0, -100%, 0); }
+  100% { transform: translate3d(0, 500%, 0); }
+}
+
 /* Prevent container overlap in Lab Control Center */
 @media (max-width: 374px) {
   #lab-container .grid > * {

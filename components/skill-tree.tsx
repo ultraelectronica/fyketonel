@@ -23,7 +23,7 @@ const skillsData: SkillNode[] = [
   // Core Skills (Root)
   {
     id: "programming-fundamentals",
-    name: "Programming Fundamentals",
+    name: "Prog. Fundamentals",
     branch: "core",
     level: 100,
     maxLevel: 100,
@@ -101,7 +101,7 @@ const skillsData: SkillNode[] = [
   },
   {
     id: "tailwind",
-    name: "Tailwind CSS",
+    name: "Tailwind",
     branch: "frontend",
     level: 90,
     maxLevel: 100,
@@ -129,7 +129,7 @@ const skillsData: SkillNode[] = [
   },
   {
     id: "databases",
-    name: "Databases (SQL/NoSQL)",
+    name: "Databases",
     branch: "backend",
     level: 70,
     maxLevel: 100,
@@ -142,7 +142,7 @@ const skillsData: SkillNode[] = [
   },
   {
     id: "api-design",
-    name: "REST API Design",
+    name: "REST APIs",
     branch: "backend",
     level: 80,
     maxLevel: 100,
@@ -155,7 +155,7 @@ const skillsData: SkillNode[] = [
   },
   {
     id: "authentication",
-    name: "Authentication",
+    name: "Auth",
     branch: "backend",
     level: 75,
     maxLevel: 100,
@@ -170,7 +170,7 @@ const skillsData: SkillNode[] = [
   // DevOps Branch
   {
     id: "git",
-    name: "Git & GitHub",
+    name: "Git",
     branch: "devops",
     level: 90,
     maxLevel: 100,
@@ -205,7 +205,7 @@ const skillsData: SkillNode[] = [
   },
   {
     id: "cloud",
-    name: "Cloud Services",
+    name: "Cloud",
     branch: "devops",
     level: 50,
     maxLevel: 100,
@@ -232,7 +232,7 @@ const skillsData: SkillNode[] = [
   },
   {
     id: "ux-principles",
-    name: "UX Principles",
+    name: "UX",
     branch: "design",
     level: 65,
     maxLevel: 100,
@@ -244,7 +244,7 @@ const skillsData: SkillNode[] = [
   },
   {
     id: "accessibility",
-    name: "Accessibility",
+    name: "A11y",
     branch: "design",
     level: 55,
     maxLevel: 100,
@@ -289,15 +289,16 @@ const branchColors = {
   },
 };
 
-const NODE_SPACING_X = 150;
-const NODE_SPACING_Y = 110;
+// COMPACT BUT BREATHABLE DIMENSIONS
+const NODE_SPACING_X = 130;
+const NODE_SPACING_Y = 100;
 const NODE_WIDTH = 110;
 const NODE_HEIGHT = 80;
 
 const maxX = Math.max(...skillsData.map((s) => s.position.x));
 const maxY = Math.max(...skillsData.map((s) => s.position.y));
-const canvasWidth = (maxX + 1) * NODE_SPACING_X + NODE_WIDTH;
-const canvasHeight = (maxY + 1) * NODE_SPACING_Y + NODE_HEIGHT;
+const canvasWidth = (maxX + 1) * NODE_SPACING_X + 20; // Reduced padding
+const canvasHeight = (maxY + 1) * NODE_SPACING_Y + 20;
 
 const branchProgress = Object.entries(branchColors).map(([branch, colors]) => {
   const branchSkills = skillsData.filter((skill) => skill.branch === branch);
@@ -322,84 +323,66 @@ export function SkillTree({ className }: { className?: string }) {
   const unlockedCount = skillsData.filter((s) => s.unlocked).length;
 
   return (
-    <section className={cn("relative space-y-4 sm:space-y-5 md:space-y-6", className)}>
-      {/* Header */}
-      <div className="space-y-2 text-center sm:space-y-2.5 md:space-y-3">
-        <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
-          Character Development
-        </p>
-        <h2 className="retro text-lg uppercase tracking-[0.2em] sm:text-xl sm:tracking-[0.25em] md:text-2xl md:tracking-[0.3em]">
-          Skill Tree
-        </h2>
-
-        {/* Stats Summary */}
-        <div className="mx-auto inline-block rounded-none border-2 border-border bg-card/80 px-3 py-2 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring sm:border-3 sm:px-4 sm:py-2.5 sm:shadow-[2px_2px_0_var(--border)] md:px-5 md:py-3">
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5">
-            <div className="text-center">
-              <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
-                Skill Points
-              </p>
-              <p className="retro text-sm font-bold tracking-[0.15em] text-primary sm:text-base md:text-lg">
-                {totalSkillPoints} / {maxSkillPoints}
-              </p>
+    <section className={cn("relative rounded-none border-2 border-border bg-card shadow-[4px_4px_0_var(--border)] overflow-hidden", className)}>
+        {/* Header Bar */}
+        <div className="flex items-center justify-between border-b-2 border-border bg-muted/30 px-3 py-2">
+            <h2 className="retro text-xs uppercase tracking-[0.2em] text-primary">Skill Tree</h2>
+            <div className="flex gap-2 sm:gap-3 flex-wrap justify-end">
+                <div className="flex items-center gap-1.5">
+                    <span className="retro text-[0.5rem] text-muted-foreground uppercase">Points</span>
+                    <span className="retro text-[0.5rem] font-bold text-foreground">
+                        {totalSkillPoints}/{maxSkillPoints}
+                    </span>
+                </div>
+                 <div className="flex items-center gap-1.5">
+                    <span className="retro text-[0.6rem] sm:text-[0.5rem] text-muted-foreground uppercase">Unlocked</span>
+                    <span className="retro text-[0.65rem] sm:text-[0.5rem] font-bold text-green-600">
+                        {unlockedCount} / {skillsData.length}
+                    </span>
+                 </div>
             </div>
-            <div className="text-center">
-              <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
-                Unlocked
-              </p>
-              <p className="retro text-sm font-bold tracking-[0.15em] text-green-600 dark:text-green-400 sm:text-base md:text-lg">
-                {unlockedCount} / {skillsData.length}
-              </p>
-            </div>
-          </div>
         </div>
-      </div>
 
-      {/* Branch Progress */}
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5 sm:gap-3">
+      {/* Branch Progress - Compact Strip */}
+      <div className="flex border-b-2 border-border overflow-x-auto no-scrollbar">
         {branchProgress.map((branch) => (
           <div
             key={branch.branch}
             className={cn(
-              "rounded-none border-2 px-3 py-2 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm sm:border-3 sm:px-3 sm:py-2.5",
-              branch.colors.border,
+              "flex-1 min-w-[80px] px-2 py-1.5 border-r border-border/50 text-center",
               branch.colors.bg
             )}
           >
-            <p className={cn("retro text-[0.4rem] uppercase tracking-[0.15em] sm:text-[0.45rem]", branch.colors.text)}>
+            <p className={cn("retro text-[0.35rem] uppercase tracking-[0.1em]", branch.colors.text)}>
               {branch.branch}
             </p>
-            <div className="mt-1 flex items-end justify-between">
-              <p className={cn("retro text-base font-bold sm:text-lg", branch.colors.text)}>{branch.percent}%</p>
-              <span className="retro text-[0.35rem] uppercase tracking-[0.1em] text-muted-foreground sm:text-[0.4rem]">
-                {branch.unlocked}/{branch.total} unlocked
-              </span>
-            </div>
-            <div className="mt-1 h-1.5 w-full border border-border bg-background dark:border-ring">
-              <div
-                className={cn("h-full transition-all", branch.colors.border)}
-                style={{ width: `${branch.percent}%` }}
-              />
+            <div className="mt-0.5 h-1 w-full bg-background/50 rounded-full overflow-hidden">
+                <div 
+                    className={cn("h-full", branch.colors.border.replace("border-", "bg-"))} 
+                    style={{ width: `${branch.percent}%` }}
+                />
             </div>
           </div>
         ))}
       </div>
 
-      {/* Skill Tree Grid */}
-      <div className="relative mx-auto max-w-4xl overflow-x-auto rounded-none border-2 border-dashed border-border bg-background/40 p-4 backdrop-blur-sm dark:border-ring sm:border-3 sm:p-6 md:p-8">
-        <div className="relative mx-auto" style={{ width: canvasWidth, height: canvasHeight }}>
+      {/* Skill Tree Grid Container */}
+      <div className="relative w-full overflow-auto bg-background/40 p-4 min-h-[250px] flex items-center justify-center">
+        
+        {/* Canvas */}
+        <div className="relative" style={{ width: canvasWidth, height: canvasHeight }}>
           {/* Background Grid */}
           <div
-            className="absolute inset-0 opacity-20"
+            className="absolute inset-0 opacity-10"
             style={{
               backgroundImage:
-                "linear-gradient(90deg, rgba(148,163,184,0.3) 1px, transparent 1px), linear-gradient(0deg, rgba(148,163,184,0.2) 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
+                "linear-gradient(90deg, currentColor 1px, transparent 1px), linear-gradient(0deg, currentColor 1px, transparent 1px)",
+              backgroundSize: "20px 20px",
             }}
           />
 
           {/* Connection Lines */}
-          <svg className="absolute inset-0 pointer-events-none" style={{ width: "100%", height: "100%" }}>
+          <svg className="absolute inset-0 pointer-events-none overflow-visible" style={{ width: "100%", height: "100%" }}>
             {skillsData.map((skill) =>
               skill.prerequisites?.map((prereqId) => {
                 const prereq = skillsData.find((s) => s.id === prereqId);
@@ -419,8 +402,8 @@ export function SkillTree({ className }: { className?: string }) {
                     y2={y2}
                     stroke="currentColor"
                     strokeWidth="2"
-                    strokeDasharray={skill.unlocked ? "0" : "6,6"}
-                    className={skill.unlocked ? "text-primary/50" : "text-border/30"}
+                    strokeDasharray={skill.unlocked ? "0" : "4,4"}
+                    className={skill.unlocked ? "text-primary/40" : "text-border/40"}
                   />
                 );
               })
@@ -442,7 +425,7 @@ export function SkillTree({ className }: { className?: string }) {
         </div>
       </div>
 
-      {/* Selected Skill Details */}
+      {/* Selected Skill Details Overlay - Bottom anchored */}
       <AnimatePresence>
         {selectedSkill && (
           <SkillDetails
@@ -480,7 +463,7 @@ function SkillNode({
         width: `${NODE_WIDTH}px`,
         height: `${NODE_HEIGHT}px`,
       }}
-      whileHover={{ scale: 1.05, y: -4, transition: { duration: 0.1, ease: steps(2) } }}
+      whileHover={{ scale: 1.05, y: -2, transition: { duration: 0.1, ease: steps(2) } }}
       transition={{ duration: 0.2, ease: steps(2) }}
       onMouseEnter={onHover}
       onMouseLeave={onHoverEnd}
@@ -488,41 +471,20 @@ function SkillNode({
       <button
         onClick={onSelect}
         className={cn(
-          "relative h-full w-full cursor-pointer rounded-none border-2 backdrop-blur-sm transition-none sm:border-3",
+          "relative h-full w-full cursor-pointer rounded-none border-2 backdrop-blur-sm transition-none",
           skill.unlocked ? colors.border : "border-border/40 dark:border-ring/40",
-          skill.unlocked ? colors.bg : "bg-background/60",
+          skill.unlocked ? colors.bg : "bg-background/80",
           skill.unlocked
-            ? "shadow-[1px_1px_0_var(--border)] hover:shadow-[3px_3px_0_var(--primary)] hover:-translate-y-1 sm:shadow-[2px_2px_0_var(--border)]"
-            : "opacity-60 grayscale",
-          isSelected && "ring-2 ring-primary ring-offset-2 ring-offset-background",
+            ? "shadow-[1px_1px_0_var(--border)] hover:shadow-[2px_2px_0_var(--primary)]"
+            : "opacity-80 grayscale",
+          isSelected && "ring-2 ring-primary ring-offset-1 ring-offset-background",
           skill.unlocked && colors.glow
         )}
       >
-        {/* Locked Overlay */}
-        {!skill.unlocked && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-[2px]">
-            <div className="relative flex flex-col items-center gap-0.5">
-              {/* Retro lock */}
-              <div className="relative">
-                <div className="mx-auto h-2 w-3 rounded-t-full border-2 border-b-0 border-muted-foreground/40 sm:h-2.5 sm:w-3.5" />
-                <div className="relative h-3 w-4 rounded-none border-2 border-muted-foreground/40 bg-muted/40 sm:h-3.5 sm:w-4.5">
-                  <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-                    <div className="h-1 w-1 rounded-full bg-muted-foreground/40 sm:h-1.5 sm:w-1.5" />
-                    <div className="h-1 w-0.5 bg-muted-foreground/40 sm:h-1.5 sm:w-1" />
-                  </div>
-                </div>
-              </div>
-              <span className="retro text-[0.35rem] uppercase tracking-[0.1em] text-muted-foreground/80">
-                Locked
-              </span>
-            </div>
-          </div>
-        )}
-
         {/* Content */}
-        <div className="flex h-full flex-col items-center justify-center gap-1 p-2">
+        <div className="flex h-full flex-col items-center justify-center gap-0.5 p-1">
           <p className={cn(
-            "retro text-center text-[0.4rem] uppercase leading-tight tracking-[0.1em] sm:text-[0.45rem] md:text-[0.5rem]",
+            "retro text-center text-[0.55rem] sm:text-[0.5rem] uppercase leading-tight tracking-[0.05em]",
             skill.unlocked ? "text-foreground" : "text-muted-foreground/60"
           )}>
             {skill.name}
@@ -530,30 +492,23 @@ function SkillNode({
           
           {skill.unlocked && (
             <>
-              {/* Progress Bar */}
-              <div className="w-full rounded-none border border-border bg-background dark:border-ring">
-                <div
-                  className={cn("h-1 transition-all", colors.bg, colors.border, "border-r")}
-                  style={{ width: `${skill.level}%` }}
-                />
+              <div className="w-full px-2 mt-1">
+                 <div className="h-0.5 w-full bg-background/50">
+                    <div 
+                        className={cn("h-full", colors.border.replace("border-", "bg-"))}
+                        style={{ width: `${skill.level}%` }}
+                    />
+                 </div>
               </div>
-              
-              {/* Level Text */}
-              <p className={cn("retro text-[0.35rem] font-bold tracking-[0.1em] sm:text-[0.4rem]", colors.text)}>
-                Lv. {skill.level}
+              <p className={cn("retro text-[0.45rem] font-bold mt-0.5", colors.text)}>
+                Lv.{skill.level}
               </p>
             </>
           )}
+          {!skill.unlocked && (
+               <span className="retro text-[0.45rem] uppercase text-muted-foreground">Locked</span>
+          )}
         </div>
-
-        {/* Pulse effect for unlocked high-level skills */}
-        {skill.unlocked && skill.level >= 80 && (
-          <motion.div
-            className={cn("absolute inset-0 rounded-none", colors.border)}
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: steps(3) }}
-          />
-        )}
       </button>
     </motion.div>
   );
@@ -567,101 +522,51 @@ function SkillDetails({ skill, onClose }: { skill: SkillNode; onClose: () => voi
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      transition={{ duration: 0.3, ease: steps(4) }}
+      transition={{ duration: 0.2, ease: steps(4) }}
       className={cn(
-        "rounded-none border-2 backdrop-blur-sm sm:border-3 md:border-4",
-        colors.border,
-        colors.bg,
-        "shadow-[2px_2px_0_var(--border)] sm:shadow-[3px_3px_0_var(--border)] md:shadow-[4px_4px_0_var(--border)]"
+        "absolute bottom-0 left-0 right-0 z-10 border-t-2 bg-card/95 p-3 shadow-negative backdrop-blur-sm",
+        colors.border
       )}
     >
-      <div className="relative p-3 sm:p-4 md:p-5">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-2 top-2 rounded-none border-2 border-border bg-background px-2 py-1 text-[0.4rem] uppercase tracking-[0.15em] transition-all hover:border-primary hover:bg-accent dark:border-ring sm:text-[0.45rem]"
+          className="absolute right-2 top-2 text-[0.7rem] sm:text-[0.6rem] text-muted-foreground hover:text-foreground p-1"
         >
-          ✕
+          ✕ CLOSE
         </button>
 
-        <div className="space-y-2 sm:space-y-2.5 md:space-y-3">
-          {/* Header */}
-          <div>
-            <p className={cn("retro text-[0.4rem] uppercase tracking-[0.15em] sm:text-[0.45rem] md:text-[0.5rem]", colors.text)}>
-              {skill.branch} skill
-            </p>
-            <h3 className="retro text-sm uppercase tracking-[0.15em] text-foreground sm:text-base md:text-lg">
-              {skill.name}
-            </h3>
-          </div>
-
-          {/* Description */}
-          <p className="retro text-[0.45rem] leading-relaxed tracking-[0.1em] text-muted-foreground sm:text-[0.5rem] md:text-[0.55rem]">
-            {skill.description}
-          </p>
-
-          {/* Level & Experience */}
-          {skill.unlocked && (
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
-                  Mastery Level
-                </span>
-                <span className={cn("retro text-[0.4rem] font-bold tracking-[0.15em] sm:text-[0.45rem] md:text-[0.5rem]", colors.text)}>
-                  {skill.level}%
-                </span>
-              </div>
-              {skill.yearsExperience && (
-                <p className="retro text-[0.4rem] tracking-[0.1em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
-                  ⏱️ {skill.yearsExperience} {skill.yearsExperience === 1 ? "year" : "years"} experience
+        <div className="flex gap-3">
+             <div className={cn("w-1 self-stretch", colors.border.replace("border-", "bg-"))} />
+             <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                    <h3 className="retro text-sm uppercase tracking-wider text-foreground">
+                    {skill.name}
+                    </h3>
+                    <span className={cn(
+                        "retro text-[0.35rem] px-1.5 py-0.5 border uppercase",
+                        colors.border, colors.text
+                    )}>
+                        {skill.branch}
+                    </span>
+                </div>
+                
+                <p className="retro text-xs sm:text-[0.5rem] text-muted-foreground leading-relaxed max-w-[90%]">
+                    {skill.description}
                 </p>
-              )}
-            </div>
-          )}
 
-          {/* Projects */}
-          {skill.projects && skill.projects.length > 0 && (
-            <div>
-              <p className="retro mb-1 text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
-                Used in Projects:
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {skill.projects.map((project) => (
-                  <span
-                    key={project}
-                    className={cn(
-                      "retro rounded-none border px-2 py-0.5 text-[0.35rem] uppercase tracking-[0.1em] sm:text-[0.4rem]",
-                      colors.border,
-                      colors.text
-                    )}
-                  >
-                    {project}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Prerequisites */}
-          {skill.prerequisites && skill.prerequisites.length > 0 && (
-            <div>
-              <p className="retro mb-1 text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
-                Prerequisites:
-              </p>
-              <div className="space-y-0.5">
-                {skill.prerequisites.map((prereqId) => {
-                  const prereq = skillsData.find((s) => s.id === prereqId);
-                  return (
-                    <p key={prereqId} className="retro text-[0.4rem] tracking-[0.1em] text-foreground sm:text-[0.45rem] md:text-[0.5rem]">
-                      • {prereq?.name}
-                    </p>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+                 {/* Projects */}
+                 {skill.projects && skill.projects.length > 0 && (
+                    <div className="mt-2 flex gap-1">
+                        {skill.projects.map((p) => (
+                           <span key={p} className="retro text-[0.35rem] px-1 py-0.5 bg-muted/50 text-muted-foreground border border-border/50">
+                                {p}
+                           </span>
+                        ))}
+                    </div>
+                )}
+             </div>
         </div>
-      </div>
     </motion.div>
   );
 }

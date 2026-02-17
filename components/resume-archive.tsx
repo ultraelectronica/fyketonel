@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/8bit/button";
-import { useMediaQuery } from "react-responsive";
 
 // ============================================
 // PIXEL ART COMPONENTS
@@ -283,8 +282,6 @@ export function ResumeArchive({ className }: { className?: string }) {
   const [showAchievementToast, setShowAchievementToast] = useState<Achievement | null>(null);
   const [viewedFullScreen, setViewedFullScreen] = useState(false);
 
-  const isVerySmall = useMediaQuery({ maxWidth: 374 });
-
   // Unlock achievement helper
   const unlockAchievement = useCallback((achievementId: string) => {
     if (!unlockedAchievements.includes(achievementId)) {
@@ -353,12 +350,8 @@ export function ResumeArchive({ className }: { className?: string }) {
     return sum + (achievement?.points || 0);
   }, 0);
 
-  const panelClass = isVerySmall
-    ? "rounded-none border border-border bg-card/80 p-2 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : "rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring min-[375px]:border-3 min-[375px]:p-4 min-[375px]:shadow-[3px_3px_0_var(--border)] sm:border-4 sm:p-5 sm:shadow-[4px_4px_0_var(--border)] md:p-6 md:shadow-[6px_6px_0_var(--border)]";
-
   return (
-    <section className={cn("relative space-y-4 sm:space-y-5 md:space-y-6", className)}>
+    <section className={cn("relative rounded-none border-2 border-border bg-card shadow-[4px_4px_0_var(--border)] overflow-hidden", className)}>
       {/* Loot Drop Overlay */}
       <LootDrop isActive={showLootDrop} onComplete={() => setShowLootDrop(false)} />
 
@@ -387,31 +380,19 @@ export function ResumeArchive({ className }: { className?: string }) {
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <div className="space-y-2 text-center sm:space-y-2.5 md:space-y-3">
-        <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
-          Classified Documents
-        </p>
-        <h2 className="retro text-lg uppercase tracking-[0.2em] sm:text-xl sm:tracking-[0.25em] md:text-2xl md:tracking-[0.3em]">
-          Resume Archive
-        </h2>
-
-        {/* Achievement Counter */}
-        <div className="mx-auto inline-flex items-center gap-2 rounded-none border-2 border-border bg-card/80 px-3 py-1.5 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring sm:gap-2.5 sm:border-3 sm:px-4 sm:py-2 sm:shadow-[2px_2px_0_var(--border)]">
-          <span className="text-lg sm:text-xl">🏆</span>
-          <div className="text-left">
-            <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem]">
-              Archive Progress
-            </p>
-            <p className="retro text-xs font-bold tracking-[0.15em] text-primary sm:text-sm">
+      {/* Header Bar - Compact */}
+      <div className="flex items-center justify-between border-b-2 border-border bg-muted/30 px-3 py-2">
+        <h2 className="retro text-xs uppercase tracking-[0.2em] text-primary">Resume Archive</h2>
+        <div className="flex items-center gap-2">
+             <span className="text-base">🏆</span>
+             <p className="retro text-[0.5rem] font-bold tracking-[0.15em] text-foreground">
               {unlockedAchievements.length}/{achievements.length} • {totalPoints}G
             </p>
-          </div>
         </div>
       </div>
 
       {/* Main Archive Container */}
-      <div className={cn(panelClass, "relative overflow-hidden")}>
+      <div className="relative p-3 sm:p-4">
         {/* Animated scanlines overlay */}
         <div
           className="pointer-events-none absolute inset-0 z-10 opacity-[0.03]"
@@ -426,18 +407,18 @@ export function ResumeArchive({ className }: { className?: string }) {
         {/* Particle burst */}
         <ParticleBurst isActive={showParticles} />
 
-        <div className="relative z-0 grid gap-4 sm:gap-5 md:gap-6 lg:grid-cols-2">
+        <div className="relative z-0 flex flex-col md:flex-row items-center justify-center gap-6 max-w-4xl mx-auto">
           {/* Left Side - Document Preview */}
-          <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-5">
+          <div className="flex flex-col items-center justify-center flex-1">
             {/* Document Frame */}
-            <div className="relative w-full max-w-xs">
+            <div className="relative w-full max-w-[220px]">
               {/* Holographic frame effect */}
               <div
                 className={cn(
-                  "relative aspect-[8.5/11] w-full overflow-hidden rounded-none border-2 transition-all duration-500 sm:border-3 md:border-4",
+                  "relative aspect-[8.5/11] w-full overflow-hidden rounded-none border-2 transition-all duration-500",
                   isDecrypted
                     ? "border-primary/60 shadow-[0_0_30px_rgba(var(--primary),0.4)]"
-                    : "border-border/60 dark:border-ring/60"
+                    : "border-border/60 dark:border-ring/60 shadow-inner"
                 )}
               >
                 {/* Glowing animated corners */}
@@ -478,31 +459,25 @@ export function ResumeArchive({ className }: { className?: string }) {
                       initial={{ opacity: 1 }}
                       exit={{ opacity: 0, scale: 0.95, rotateY: 90 }}
                       transition={{ duration: 0.5 }}
-                      className="flex h-full flex-col items-center justify-center gap-4 bg-background/80 p-4"
+                      className="flex h-full flex-col items-center justify-center gap-3 bg-background/80 p-4"
                     >
                       <ChestPixel isGlowing={isScanning} />
-                      <div className="space-y-2 text-center">
-                        <p className="retro text-xs uppercase tracking-[0.2em] text-foreground sm:text-sm">
+                      <div className="space-y-1 text-center">
+                        <p className="retro text-[0.6rem] uppercase tracking-[0.2em] text-foreground">
                           [ENCRYPTED]
                         </p>
-                        <p className="retro text-[0.45rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem]">
-                          Access level: Public
-                        </p>
                         {isScanning && (
-                          <div className="space-y-2">
-                            <div className="mx-auto mt-3 flex items-center justify-center gap-2">
+                          <div className="space-y-1">
+                            <div className="mx-auto mt-2 flex items-center justify-center gap-2">
                               <KeyPixel />
                             </div>
-                            <div className="mx-auto h-2.5 w-32 overflow-hidden rounded-none border-2 border-border bg-background/80 dark:border-ring sm:h-3 sm:w-40">
+                            <div className="mx-auto h-1.5 w-24 overflow-hidden rounded-none border border-border bg-background/80 dark:border-ring">
                               <motion.div
-                                className="h-full bg-gradient-to-r from-primary via-primary to-green-400"
+                                className="h-full bg-primary"
                                 initial={{ width: 0 }}
                                 animate={{ width: `${scanProgress}%` }}
                               />
                             </div>
-                            <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-primary animate-pulse sm:text-[0.45rem]">
-                              Decrypting... {scanProgress}%
-                            </p>
                           </div>
                         )}
                       </div>
@@ -544,11 +519,11 @@ export function ResumeArchive({ className }: { className?: string }) {
                   )}
                 >
                   <motion.div 
-                    className="rotate-[-15deg] border-4 border-dashed border-red-500/50 px-3 py-1 sm:px-4 sm:py-2"
+                    className="rotate-[-15deg] border-2 border-dashed border-red-500/50 px-2 py-0.5"
                     animate={!isDecrypted ? { scale: [1, 1.02, 1] } : {}}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <p className="retro text-lg uppercase tracking-[0.3em] text-red-500/60 sm:text-xl md:text-2xl">
+                    <p className="retro text-sm uppercase tracking-[0.3em] text-red-500/60">
                       Classified
                     </p>
                   </motion.div>
@@ -556,83 +531,44 @@ export function ResumeArchive({ className }: { className?: string }) {
               </div>
 
               {/* Enhanced Document Stats */}
-              <div className="mt-3 grid grid-cols-3 gap-2 sm:mt-4 sm:gap-3">
-                <div className="rounded-none border border-border bg-background/60 px-2 py-1 text-center dark:border-ring sm:px-3 sm:py-1.5">
-                  <p className="retro text-[0.4rem] uppercase tracking-[0.12em] text-muted-foreground sm:text-[0.45rem]">
-                    Archive Date
+              <div className="mt-2 grid grid-cols-3 gap-1">
+                <div className="rounded-none border border-border bg-background/60 px-1 py-0.5 text-center dark:border-ring">
+                  <p className="retro text-[0.35rem] uppercase tracking-[0.12em] text-muted-foreground">
+                    Date
                   </p>
-                  <p className="retro text-[0.5rem] uppercase tracking-[0.1em] text-foreground sm:text-[0.55rem]">
+                  <p className="retro text-[0.4rem] uppercase tracking-[0.1em] text-foreground">
                     {documentMetadata.archiveDate}
                   </p>
                 </div>
-                <div className="rounded-none border border-border bg-background/60 px-2 py-1 text-center dark:border-ring sm:px-3 sm:py-1.5">
-                  <p className="retro text-[0.4rem] uppercase tracking-[0.12em] text-muted-foreground sm:text-[0.45rem]">
-                    Data Weight
+                <div className="rounded-none border border-border bg-background/60 px-1 py-0.5 text-center dark:border-ring">
+                  <p className="retro text-[0.35rem] uppercase tracking-[0.12em] text-muted-foreground">
+                    Size
                   </p>
-                  <p className="retro text-[0.5rem] uppercase tracking-[0.1em] text-foreground sm:text-[0.55rem]">
+                  <p className="retro text-[0.4rem] uppercase tracking-[0.1em] text-foreground">
                     {documentMetadata.dataWeight}
                   </p>
                 </div>
-                <div className="rounded-none border border-border bg-background/60 px-2 py-1 text-center dark:border-ring sm:px-3 sm:py-1.5">
-                  <p className="retro text-[0.4rem] uppercase tracking-[0.12em] text-muted-foreground sm:text-[0.45rem]">
+                <div className="rounded-none border border-border bg-background/60 px-1 py-0.5 text-center dark:border-ring">
+                  <p className="retro text-[0.35rem] uppercase tracking-[0.12em] text-muted-foreground">
                     Pages
                   </p>
-                  <p className="retro text-[0.5rem] uppercase tracking-[0.1em] text-foreground sm:text-[0.55rem]">
+                  <p className="retro text-[0.4rem] uppercase tracking-[0.1em] text-foreground">
                     {documentMetadata.scrollLength}
                   </p>
                 </div>
               </div>
-
-              {/* Extended Metadata (shown when decrypted) */}
-              <AnimatePresence>
-                {isDecrypted && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="mt-2 overflow-hidden sm:mt-3"
-                  >
-                    <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                      <div className="rounded-none border border-primary/30 bg-primary/5 px-2 py-1 text-center sm:px-3 sm:py-1.5">
-                        <p className="retro text-[0.4rem] uppercase tracking-[0.12em] text-primary sm:text-[0.45rem]">
-                          Experience
-                        </p>
-                        <p className="retro text-[0.55rem] font-bold uppercase tracking-[0.1em] text-foreground sm:text-[0.6rem]">
-                          {documentMetadata.experienceYears}+ Years
-                        </p>
-                      </div>
-                      <div className="rounded-none border border-primary/30 bg-primary/5 px-2 py-1 text-center sm:px-3 sm:py-1.5">
-                        <p className="retro text-[0.4rem] uppercase tracking-[0.12em] text-primary sm:text-[0.45rem]">
-                          Projects
-                        </p>
-                        <p className="retro text-[0.55rem] font-bold uppercase tracking-[0.1em] text-foreground sm:text-[0.6rem]">
-                          {documentMetadata.projectsCount}+
-                        </p>
-                      </div>
-                      <div className="rounded-none border border-green-500/30 bg-green-500/5 px-2 py-1 text-center sm:px-3 sm:py-1.5">
-                        <p className="retro text-[0.4rem] uppercase tracking-[0.12em] text-green-600 dark:text-green-400 sm:text-[0.45rem]">
-                          Integrity
-                        </p>
-                        <p className="retro text-[0.55rem] font-bold uppercase tracking-[0.1em] text-green-600 dark:text-green-400 sm:text-[0.6rem]">
-                          {documentMetadata.fileIntegrity}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </div>
 
           {/* Right Side - Actions & Skills */}
-          <div className="flex flex-col justify-center space-y-4 sm:space-y-5">
+          <div className="flex flex-col space-y-3 flex-1 w-full max-w-sm">
             {/* Action Buttons */}
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-3">
               {!isDecrypted ? (
                 <Button
                   onClick={handleDecrypt}
                   disabled={isScanning}
-                  className="retro w-full h-12 text-[0.55rem] uppercase tracking-[0.2em] sm:h-14 sm:text-[0.65rem] sm:tracking-[0.25em] md:h-16 md:text-xs"
+                  className="retro w-full h-10 text-[0.55rem] uppercase tracking-[0.2em]"
                 >
                   {isScanning ? (
                     <span className="flex items-center gap-2">
@@ -651,13 +587,13 @@ export function ResumeArchive({ className }: { className?: string }) {
                   )}
                 </Button>
               ) : (
-                <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+                <div className="flex gap-2">
                   <Button
                     onClick={handleDownload}
-                    className="retro flex-1 h-12 text-[0.55rem] uppercase tracking-[0.2em] sm:h-14 sm:text-[0.65rem] sm:tracking-[0.25em] md:h-16 md:text-xs transition-all hover:shadow-[0_0_20px_rgba(var(--primary),0.4)]"
+                    className="retro flex-1 h-10 text-[0.55rem] uppercase tracking-[0.2em] transition-all hover:shadow-[0_0_20px_rgba(var(--primary),0.4)]"
                   >
                     <span className="mr-2">📦</span>
-                    Collect Loot
+                    Loot
                     {downloadCount > 0 && (
                       <motion.span 
                         initial={{ scale: 0 }}
@@ -671,10 +607,10 @@ export function ResumeArchive({ className }: { className?: string }) {
                   <Button
                     variant="outline"
                     onClick={handleFullView}
-                    className="retro flex-1 h-12 text-[0.55rem] uppercase tracking-[0.2em] sm:h-14 sm:text-[0.65rem] sm:tracking-[0.25em] md:h-16 md:text-xs"
+                    className="retro flex-1 h-10 text-[0.55rem] uppercase tracking-[0.2em]"
                   >
                     <span className="mr-2">🔍</span>
-                    Full View
+                    View
                   </Button>
                 </div>
               )}
@@ -687,28 +623,23 @@ export function ResumeArchive({ className }: { className?: string }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4 }}
-                  className="rounded-none border-2 border-dashed border-border bg-background/60 p-3 dark:border-ring sm:border-3 sm:p-4"
+                  className="rounded-none border border-dashed border-border bg-background/60 p-2 dark:border-ring flex-1 overflow-auto max-h-[220px]"
                 >
-                  <div className="mb-3 flex items-center justify-between sm:mb-4">
+                  <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <ScrollPixel />
                       <div>
-                        <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-foreground sm:text-[0.6rem]">
-                          Skill Scan Complete
+                        <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-foreground">
+                          Skill Scan
                         </p>
-                        <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem]">
-                          {extractedSkills.length} abilities detected
+                        <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+                          {extractedSkills.length} found
                         </p>
                       </div>
                     </div>
-                    <div className="rounded-none border border-green-500/50 bg-green-500/10 px-2 py-0.5">
-                      <p className="retro text-[0.4rem] uppercase tracking-[0.12em] text-green-600 dark:text-green-400 sm:text-[0.45rem]">
-                        ● Online
-                      </p>
-                    </div>
                   </div>
 
-                  <div className="space-y-2.5 sm:space-y-3">
+                  <div className="space-y-1.5">
                     {extractedSkills.map((skill, index) => {
                       const colors = categoryColors[skill.category] || categoryColors.Frontend;
                       return (
@@ -717,97 +648,34 @@ export function ResumeArchive({ className }: { className?: string }) {
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className="space-y-1"
+                          className="space-y-0.5"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1.5">
-                              <span className="text-sm">{skill.icon}</span>
-                              <span className="retro text-[0.45rem] uppercase tracking-[0.12em] text-foreground sm:text-[0.5rem]">
+                              <span className="text-xs">{skill.icon}</span>
+                              <span className={cn("retro text-[0.45rem] uppercase tracking-[0.12em]", colors.text)}>
                                 {skill.name}
                               </span>
-                              <span className={cn(
-                                "retro rounded-none border px-1 py-0.5 text-[0.35rem] uppercase tracking-[0.1em] sm:text-[0.4rem]",
-                                colors.bg, colors.text, colors.border
-                              )}>
-                                {skill.category}
-                              </span>
                             </div>
-                            <span className="retro text-[0.45rem] font-bold uppercase tracking-[0.1em] text-primary sm:text-[0.5rem]">
+                            <span className="retro text-[0.45rem] font-bold uppercase tracking-[0.1em] text-primary">
                               LV.{skill.level}
                             </span>
                           </div>
-                          <div className="h-2 w-full overflow-hidden rounded-none border border-border bg-background dark:border-ring sm:h-2.5">
+                          <div className="h-1.5 w-full overflow-hidden rounded-none border border-border bg-background dark:border-ring">
                             <motion.div
-                              className="h-full bg-gradient-to-r from-primary/60 via-primary to-primary"
+                              className="h-full bg-primary"
                               initial={{ width: 0 }}
                               animate={{ width: `${skill.level}%` }}
                               transition={{ duration: 0.8, delay: index * 0.1 }}
-                            >
-                              {/* Animated shine */}
-                              <motion.div
-                                className="h-full w-4 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                                animate={{ x: ["-100%", "400%"] }}
-                                transition={{ duration: 2, delay: index * 0.1 + 0.8, repeat: Infinity, repeatDelay: 3 }}
-                              />
-                            </motion.div>
+                            />
                           </div>
                         </motion.div>
                       );
                     })}
                   </div>
-
-                  {/* Achievements mini-display */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.8 }}
-                    className="mt-4 border-t border-dashed border-border pt-3 dark:border-ring sm:mt-5 sm:pt-4"
-                  >
-                    <p className="retro mb-2 text-[0.45rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.5rem]">
-                      Archive Achievements
-                    </p>
-                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                      {achievements.map((achievement) => {
-                        const isUnlocked = unlockedAchievements.includes(achievement.id);
-                        return (
-                          <div
-                            key={achievement.id}
-                            className={cn(
-                              "flex items-center gap-1 rounded-none border px-2 py-1 transition-all",
-                              isUnlocked
-                                ? "border-amber-500/50 bg-amber-500/10"
-                                : "border-border/50 bg-background/40 opacity-50 grayscale"
-                            )}
-                          >
-                            <span className="text-base">{achievement.icon}</span>
-                            <span className={cn(
-                              "retro text-[0.4rem] uppercase tracking-[0.1em] sm:text-[0.45rem]",
-                              isUnlocked ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"
-                            )}>
-                              {achievement.title}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>
-
-            {/* Lore text */}
-            {!isDecrypted && (
-              <motion.div 
-                className="rounded-none border border-border/50 bg-background/40 p-3 dark:border-ring/50 sm:p-4"
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                <p className="retro text-center text-[0.45rem] leading-relaxed text-muted-foreground sm:text-[0.55rem]">
-                  「 An ancient scroll containing the chronicles of a developer&apos;s journey.
-                  Decrypt to reveal the artifacts within. 」
-                </p>
-              </motion.div>
-            )}
           </div>
         </div>
       </div>

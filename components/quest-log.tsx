@@ -309,25 +309,25 @@ export function QuestLog({ className }: { className?: string }) {
       {/* Quest Stats */}
       <div className="flex justify-center">
         <div className="inline-block rounded-none border-2 border-border bg-card/80 px-3 py-2 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring sm:border-3 sm:px-4 sm:py-2.5 sm:shadow-[3px_3px_0_var(--border)] md:border-4 md:px-5 md:py-3 md:shadow-[4px_4px_0_var(--border)]">
-          <p className="retro mb-2 text-center text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground sm:mb-2.5 sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]">
+          <p className="retro mb-2 text-center text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:mb-2.5 sm:text-xs sm:tracking-[0.25em] md:text-sm md:tracking-[0.3em]">
             Quest Progress
           </p>
         <div className="grid grid-cols-4 gap-3 sm:gap-4 md:gap-5">
           <div className="text-center">
-            <p className="retro text-lg font-bold text-primary sm:text-xl md:text-2xl">{stats.total}</p>
-            <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">Total</p>
+            <p className="retro text-xl font-bold text-primary sm:text-2xl md:text-3xl">{stats.total}</p>
+            <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem] md:text-[0.6rem]">Total</p>
           </div>
           <div className="text-center">
-            <p className="retro text-lg font-bold text-green-600 dark:text-green-400 sm:text-xl md:text-2xl">{stats.completed}</p>
-            <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">Done</p>
+            <p className="retro text-xl font-bold text-green-600 dark:text-green-400 sm:text-2xl md:text-3xl">{stats.completed}</p>
+            <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem] md:text-[0.6rem]">Done</p>
           </div>
           <div className="text-center">
-            <p className="retro text-lg font-bold text-blue-600 dark:text-blue-400 sm:text-xl md:text-2xl">{stats.inProgress}</p>
-            <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">Active</p>
+            <p className="retro text-xl font-bold text-blue-600 dark:text-blue-400 sm:text-2xl md:text-3xl">{stats.inProgress}</p>
+            <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem] md:text-[0.6rem]">Active</p>
           </div>
           <div className="text-center">
-            <p className="retro text-lg font-bold text-gray-600 dark:text-gray-400 sm:text-xl md:text-2xl">{stats.notStarted}</p>
-            <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">Pending</p>
+            <p className="retro text-xl font-bold text-gray-600 dark:text-gray-400 sm:text-2xl md:text-3xl">{stats.notStarted}</p>
+            <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem] md:text-[0.6rem]">Pending</p>
           </div>
         </div>
         </div>
@@ -340,7 +340,7 @@ export function QuestLog({ className }: { className?: string }) {
             key={f}
             onClick={() => setFilter(f as typeof filter)}
             className={cn(
-              "retro rounded-none border-2 px-3 py-1.5 text-[0.5rem] uppercase tracking-[0.2em] transition-all sm:border-3 sm:px-4 sm:py-2 sm:text-[0.6rem] sm:tracking-[0.25em] md:text-xs md:tracking-[0.3em]",
+              "retro rounded-none border-2 px-3 py-1.5 text-[0.55rem] uppercase tracking-[0.2em] transition-all sm:border-3 sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.25em] md:text-sm md:tracking-[0.3em]",
               filter === f
                 ? "border-primary bg-primary text-primary-foreground shadow-[3px_3px_0_var(--primary)] sm:shadow-[4px_4px_0_var(--primary)]"
                 : "border-border bg-card/80 text-foreground shadow-[2px_2px_0_var(--border)] hover:border-primary hover:bg-accent dark:border-ring sm:shadow-[3px_3px_0_var(--border)]"
@@ -437,26 +437,26 @@ function QuestCard({
           <div className="space-y-1">
             <div className="flex items-start justify-between gap-2">
               <span className={cn(
-                "retro text-[0.4rem] uppercase tracking-[0.15em] sm:text-[0.45rem] sm:tracking-[0.18em] md:text-[0.5rem] md:tracking-[0.2em]",
+                "retro text-[0.5rem] uppercase tracking-[0.15em] sm:text-[0.55rem] sm:tracking-[0.18em] md:text-xs md:tracking-[0.2em]",
                 typeColors[quest.type].replace("border-", "text-")
               )}>
                 {typeLabels[quest.type]}
               </span>
               <span className={cn(
-                "retro text-[0.4rem] font-bold uppercase tracking-[0.15em] sm:text-[0.45rem] sm:tracking-[0.18em] md:text-[0.5rem] md:tracking-[0.2em]",
+                "retro text-[0.5rem] font-bold uppercase tracking-[0.15em] sm:text-[0.55rem] sm:tracking-[0.18em] md:text-xs md:tracking-[0.2em]",
                 statusColors[quest.status]
               )}>
                 {statusLabels[quest.status]}
               </span>
             </div>
-            <h3 className="retro text-xs uppercase leading-tight tracking-[0.15em] text-foreground sm:text-sm sm:tracking-[0.18em] md:text-base md:tracking-[0.2em]">
+            <h3 className="retro text-sm uppercase leading-tight tracking-[0.15em] text-foreground sm:text-base sm:tracking-[0.18em] md:text-lg md:tracking-[0.2em]">
               {quest.title}
             </h3>
           </div>
 
           {/* Difficulty */}
           <div className="flex items-center gap-1">
-            <span className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
+            <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem] md:text-xs">
               Difficulty:
             </span>
             <div className="flex gap-0.5">
@@ -486,17 +486,17 @@ function QuestCard({
               >
                 <div className="space-y-2 border-t-2 border-dashed border-border pt-2 dark:border-ring sm:space-y-2.5 sm:pt-2.5 md:space-y-3 md:pt-3">
                   {/* Description */}
-                  <p className="retro text-[0.45rem] leading-relaxed tracking-[0.1em] text-muted-foreground sm:text-[0.5rem] sm:tracking-[0.12em] md:text-[0.55rem] md:tracking-[0.15em]">
+                  <p className="retro text-xs leading-relaxed tracking-[0.1em] text-muted-foreground sm:text-sm sm:tracking-[0.12em] md:text-base md:tracking-[0.15em]">
                     {quest.description}
                   </p>
 
                   {/* Time Estimate */}
                   {quest.timeEstimate && (
                     <div className="flex items-center gap-1.5">
-                      <span className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
+                      <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem] md:text-xs">
                         ⏱️ Time:
                       </span>
-                      <span className="retro text-[0.4rem] tracking-[0.1em] text-foreground sm:text-[0.45rem] md:text-[0.5rem]">
+                      <span className="retro text-[0.5rem] tracking-[0.1em] text-foreground sm:text-[0.55rem] md:text-xs">
                         {quest.timeEstimate}
                       </span>
                     </div>
@@ -504,22 +504,22 @@ function QuestCard({
 
                   {/* Rewards */}
                   <div className="space-y-1">
-                    <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
+                    <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem] md:text-xs">
                       🎁 Rewards:
                     </p>
                     <div className="space-y-0.5">
                       {quest.rewards.exp && (
-                        <p className="retro text-[0.4rem] tracking-[0.1em] text-green-600 dark:text-green-400 sm:text-[0.45rem] md:text-[0.5rem]">
+                        <p className="retro text-[0.5rem] tracking-[0.1em] text-green-600 dark:text-green-400 sm:text-[0.55rem] md:text-xs">
                           • +{quest.rewards.exp} EXP
                         </p>
                       )}
                       {quest.rewards.skills && quest.rewards.skills.map((skill, i) => (
-                        <p key={i} className="retro text-[0.4rem] tracking-[0.1em] text-blue-600 dark:text-blue-400 sm:text-[0.45rem] md:text-[0.5rem]">
+                        <p key={i} className="retro text-[0.5rem] tracking-[0.1em] text-blue-600 dark:text-blue-400 sm:text-[0.55rem] md:text-xs">
                           • +{skill}
                         </p>
                       ))}
                       {quest.rewards.achievement && (
-                        <p className="retro text-[0.4rem] tracking-[0.1em] text-amber-600 dark:text-amber-400 sm:text-[0.45rem] md:text-[0.5rem]">
+                        <p className="retro text-[0.5rem] tracking-[0.1em] text-amber-600 dark:text-amber-400 sm:text-[0.55rem] md:text-xs">
                           • Achievement: &quot;{quest.rewards.achievement}&quot;
                         </p>
                       )}
@@ -529,7 +529,7 @@ function QuestCard({
                   {/* Failure Message */}
                   {quest.status === "failed" && quest.failureMessage && (
                     <div className="rounded-none border-2 border-red-500 bg-red-500/10 p-2">
-                      <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-red-600 dark:text-red-400 sm:text-[0.45rem] md:text-[0.5rem]">
+                      <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-red-600 dark:text-red-400 sm:text-[0.55rem] md:text-xs">
                         ⚠️ {quest.failureMessage}
                       </p>
                     </div>

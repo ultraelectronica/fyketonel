@@ -155,13 +155,13 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
   return (
     <section className={cn("space-y-4 sm:space-y-5 md:space-y-6", className)}>
       <div className="space-y-2 text-center sm:space-y-2.5 md:space-y-3">
-        <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
+        <p className="retro text-[0.6rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.35em] md:text-sm md:tracking-[0.4em]">
           Chaotic Planning HQ
         </p>
-        <h2 className="retro text-lg uppercase tracking-[0.2em] sm:text-xl sm:tracking-[0.25em] md:text-2xl md:tracking-[0.3em]">
+        <h2 className="retro text-xl uppercase tracking-[0.2em] sm:text-2xl sm:tracking-[0.25em] md:text-3xl md:tracking-[0.3em]">
           Chaos Meter Dashboard
         </h2>
-        <p className="retro text-[0.55rem] text-muted-foreground sm:text-[0.65rem] md:text-sm">
+        <p className="retro text-xs text-muted-foreground sm:text-sm md:text-base">
           Real-time metrics from Fyke&apos;s chaos core. Planning is optional,
           improvisation mandatory.
         </p>
@@ -171,13 +171,13 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
       <div className="rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] dark:border-ring sm:border-3 sm:p-4 md:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem]">
+            <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem]">
               Chaos Level
             </p>
             <p className="retro text-3xl font-bold tracking-[0.15em] text-primary sm:text-4xl md:text-5xl">
               {chaosLevel}%
             </p>
-            <p className="retro text-[0.45rem] text-muted-foreground sm:text-[0.5rem]">
+            <p className="retro text-[0.55rem] text-muted-foreground sm:text-[0.6rem]">
               Currently: Stable chaos (subject to change)
             </p>
           </div>
@@ -188,7 +188,7 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
                 style={{ width: `${chaosLevel}%` }}
               />
             </div>
-            <div className="mt-1 flex justify-between text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+            <div className="mt-1 flex justify-between text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
               <span>Serene</span>
               <span>Total Pandemonium</span>
             </div>
@@ -205,14 +205,14 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
           >
             <div className="mb-2 flex items-center justify-between">
               <div>
-                <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+                <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
                   {category.limit}
                 </p>
-                <h3 className="retro text-sm uppercase tracking-[0.18em] text-foreground sm:text-base md:text-lg">
+                <h3 className="retro text-base uppercase tracking-[0.18em] text-foreground sm:text-lg md:text-xl">
                   {category.title}
                 </h3>
               </div>
-              <span className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+              <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
                 {category.plans.length} quests
               </span>
             </div>
@@ -220,7 +220,7 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
               {category.plans.map((plan) => (
                 <li
                   key={plan}
-                  className="retro rounded-none border border-dashed border-border/70 px-2 py-1 text-[0.45rem] uppercase tracking-[0.15em] text-foreground dark:border-ring/70"
+                  className="retro rounded-none border border-dashed border-border/70 px-2 py-1 text-[0.55rem] uppercase tracking-[0.15em] text-foreground dark:border-ring/70"
                 >
                   • {plan}
                 </li>
@@ -235,24 +235,24 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
         {/* Randomizer */}
         <div className="rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] dark:border-ring sm:border-3 sm:p-4 md:p-5">
           <div className="flex flex-col gap-2">
-            <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+            <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
               Random Plan Generator
             </p>
-            <p className="retro text-[0.45rem] leading-relaxed tracking-[0.1em] text-muted-foreground">
+            <p className="retro text-xs leading-relaxed tracking-[0.1em] text-muted-foreground">
               Warning: button may reshuffle your life priorities.
             </p>
             <button
               onClick={handleRandomize}
-              className="retro rounded-none border-2 border-border bg-primary px-3 py-2 text-[0.45rem] uppercase tracking-[0.2em] text-primary-foreground transition hover:translate-y-0.5 hover:border-primary dark:border-ring sm:px-4 sm:py-2.5 sm:text-[0.5rem]"
+              className="retro rounded-none border-2 border-border bg-primary px-3 py-2 text-[0.55rem] uppercase tracking-[0.2em] text-primary-foreground transition hover:translate-y-0.5 hover:border-primary dark:border-ring sm:px-4 sm:py-2.5 sm:text-xs"
             >
               Shuffle Priorities
             </button>
             {randomPlan && (
               <div className="rounded-none border border-dashed border-border/70 bg-background/60 p-2 dark:border-ring/70">
-                <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+                <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
                   Highlighted Quest
                 </p>
-                <p className="retro text-[0.45rem] tracking-[0.12em] text-foreground">
+                <p className="retro text-[0.55rem] tracking-[0.12em] text-foreground">
                   {randomPlan}
                 </p>
               </div>
@@ -263,10 +263,10 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
         {/* Chaos Events */}
         <div className="rounded-none border-2 border-border bg-background/85 p-3 shadow-[2px_2px_0_var(--border)] dark:border-ring sm:border-3 sm:p-4 md:p-5">
           <div className="flex items-center justify-between">
-            <h3 className="retro text-sm uppercase tracking-[0.18em] text-foreground sm:text-base md:text-lg">
+            <h3 className="retro text-base uppercase tracking-[0.18em] text-foreground sm:text-lg md:text-xl">
               Chaos Events
             </h3>
-            <span className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+            <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
               Unexpected disruptions
             </span>
           </div>
@@ -277,12 +277,12 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
                 className="rounded-none border border-dashed border-border/80 p-2 dark:border-ring/80"
               >
                 <div className="flex items-center justify-between">
-                  <p className="retro text-[0.45rem] uppercase tracking-[0.15em] text-foreground">
+                  <p className="retro text-[0.55rem] uppercase tracking-[0.15em] text-foreground">
                     {event.title}
                   </p>
                   <span
                     className={cn(
-                      "retro text-[0.35rem] uppercase tracking-[0.15em]",
+                      "retro text-[0.45rem] uppercase tracking-[0.15em]",
                       event.impact === "catastrophic"
                         ? "text-rose-600 dark:text-rose-400"
                         : event.impact === "major"
@@ -293,7 +293,7 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
                     {event.impact}
                   </span>
                 </div>
-                <p className="retro text-[0.4rem] leading-relaxed tracking-[0.1em] text-muted-foreground">
+                <p className="retro text-[0.55rem] leading-relaxed tracking-[0.1em] text-muted-foreground">
                   {event.description}
                 </p>
               </div>
@@ -305,10 +305,10 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
       {/* Order Restoration Attempts */}
       <div className="rounded-none border-2 border-border bg-card/85 p-3 shadow-[2px_2px_0_var(--border)] dark:border-ring sm:border-3 sm:p-4 md:p-5">
         <div className="flex items-center justify-between">
-          <h3 className="retro text-sm uppercase tracking-[0.18em] text-foreground sm:text-base md:text-lg">
+          <h3 className="retro text-base uppercase tracking-[0.18em] text-foreground sm:text-lg md:text-xl">
             Order Restoration Attempts
           </h3>
-          <span className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+          <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
             Success rate: 0.03%
           </span>
         </div>
@@ -318,16 +318,16 @@ export function ChaosMeterDashboard({ className }: { className?: string }) {
               key={attempt.id}
               className="rounded-none border border-dashed border-border/80 p-2 text-left dark:border-ring/80"
             >
-              <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+              <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
                 Attempt
               </p>
-              <p className="retro text-[0.45rem] leading-tight tracking-[0.1em] text-foreground">
+              <p className="retro text-[0.55rem] leading-tight tracking-[0.1em] text-foreground">
                 {attempt.attempt}
               </p>
-              <p className="retro mt-1 text-[0.35rem] uppercase tracking-[0.15em] text-muted-foreground">
+              <p className="retro mt-1 text-[0.45rem] uppercase tracking-[0.15em] text-muted-foreground">
                 Result
               </p>
-              <p className="retro text-[0.4rem] leading-tight tracking-[0.1em] text-rose-600 dark:text-rose-400">
+              <p className="retro text-[0.55rem] leading-tight tracking-[0.1em] text-rose-600 dark:text-rose-400">
                 {attempt.result}
               </p>
             </div>

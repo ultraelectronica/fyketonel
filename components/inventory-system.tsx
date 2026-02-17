@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useMediaQuery } from "react-responsive";
 
 interface InventoryItem {
   id: string;
@@ -130,7 +129,7 @@ const inventoryItems: InventoryItem[] = [
   },
   {
     id: "keyboard",
-    name: "Mechanical Keyboard of Typing",
+    name: "Mechanical Keyboard",
     icon: "⌨️",
     pixelArt: <KeyboardPixel />,
     slot: "weapon",
@@ -158,14 +157,13 @@ const inventoryItems: InventoryItem[] = [
   },
   {
     id: "documentation",
-    name: "Tome of Documentation",
+    name: "Tome of Docs",
     icon: "📚",
     pixelArt: <BookPixel />,
     slot: "accessory",
     stats: [
       { label: "Confusion", value: -5, type: "negative" },
       { label: "Knowledge", value: 30, type: "positive" },
-      { label: "Stack Overflow Dependency", value: -15, type: "negative" },
     ],
     rarity: "legendary",
     description: "Ancient wisdom contained within. Reading it reduces confusion but takes time.",
@@ -173,13 +171,13 @@ const inventoryItems: InventoryItem[] = [
   },
   {
     id: "coffee-mug",
-    name: "Enchanted Coffee Mug",
+    name: "Enchanted Coffee",
     icon: "☕",
     pixelArt: <CoffeeMugPixel />,
     slot: "accessory",
     stats: [
       { label: "Energy", value: 50, type: "positive" },
-      { label: "Sleep Quality", value: -10, type: "negative" },
+      { label: "Sleep", value: -10, type: "negative" },
     ],
     rarity: "epic",
     description: "Bottomless container of liquid productivity. Side effects may include night coding.",
@@ -187,7 +185,7 @@ const inventoryItems: InventoryItem[] = [
   },
   {
     id: "rubber-duck",
-    name: "Rubber Duck of Debugging",
+    name: "Rubber Duck",
     icon: "🦆",
     pixelArt: <DuckPixel />,
     slot: "tool",
@@ -201,12 +199,10 @@ const inventoryItems: InventoryItem[] = [
   },
 ];
 
-const emptySlots = 3; // Number of empty inventory slots to show
+const emptySlots = 6; // Increased empty slots to fill grid
 
 export function InventorySystem({ className }: { className?: string }) {
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
-  const isMobile = useMediaQuery({ maxWidth: 767 });
+  const [selectedItem, setSelectedItem] = useState<string | null>(inventoryItems[0].id);
 
   const totalStats = inventoryItems
     .filter((item) => item.equipped)
@@ -223,147 +219,107 @@ export function InventorySystem({ className }: { className?: string }) {
       {} as Record<string, number>
     );
 
+  const currentItem = inventoryItems.find((i) => i.id === selectedItem);
+
   return (
-    <section className={cn("relative space-y-4 sm:space-y-5 md:space-y-6", className)}>
-      {/* Header */}
-      <div className="space-y-2 text-center sm:space-y-2.5 md:space-y-3">
-        <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
-          Character Equipment
-        </p>
-        <h2 className="retro text-lg uppercase tracking-[0.2em] sm:text-xl sm:tracking-[0.25em] md:text-2xl md:tracking-[0.3em]">
-          Inventory System
-        </h2>
-
-        {/* Total Stats Panel */}
-        <div className="mx-auto inline-block rounded-none border-2 border-border bg-card/80 px-3 py-2 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring sm:border-3 sm:px-4 sm:py-2.5 sm:shadow-[2px_2px_0_var(--border)] md:px-5 md:py-3">
-          <p className="retro mb-1.5 text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground sm:mb-2 sm:text-[0.5rem] sm:tracking-[0.25em] md:text-[0.6rem]">
-            Total Stats
-          </p>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 sm:grid-cols-3 sm:gap-x-4 sm:gap-y-1 md:gap-x-5 md:gap-y-1.5">
-            {Object.entries(totalStats).map(([label, value]) => (
-              <div key={label} className="flex items-center justify-between gap-1.5 sm:gap-2">
-                <span className="retro text-[0.4rem] uppercase tracking-[0.12em] text-foreground sm:text-[0.45rem] sm:tracking-[0.15em] md:text-[0.5rem] md:tracking-[0.18em]">
-                  {label}:
-                </span>
-                <span
-                  className={cn(
-                    "retro text-[0.4rem] font-bold tracking-[0.12em] sm:text-[0.45rem] sm:tracking-[0.15em] md:text-[0.5rem] md:tracking-[0.18em]",
-                    value >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
-                  )}
-                >
-                  {value >= 0 ? "+" : ""}
-                  {value}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Inventory Grid */}
-      <div className="mx-auto grid max-w-2xl grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-        {inventoryItems.map((item) => (
-          <InventorySlot
-            key={item.id}
-            item={item}
-            isHovered={hoveredItem === item.id}
-            onHoverStart={() => setHoveredItem(item.id)}
-            onHoverEnd={() => setHoveredItem(null)}
-            isSelected={selectedItem === item.id}
-            onSelect={() =>
-              setSelectedItem((prev) => (prev === item.id ? null : item.id))
-            }
-            isMobile={isMobile}
-          />
-        ))}
-        {/* Empty slots */}
-        {Array.from({ length: emptySlots }).map((_, index) => (
-          <EmptySlot key={`empty-${index}`} />
-        ))}
-      </div>
-
-      <AnimatePresence>
-        {isMobile && selectedItem && (
-          <motion.div
-            key="mobile-item-panel"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.2 }}
-            className="rounded-none border-2 border-border bg-card/90 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-md dark:border-ring sm:border-3 sm:p-4"
-          >
-            {(() => {
-              const item = inventoryItems.find((i) => i.id === selectedItem);
-              if (!item) return null;
-              return (
-                <div className="space-y-2">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="retro text-sm uppercase tracking-[0.18em] text-foreground">
-                        {item.name}
-                      </p>
-                      <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
-                        {item.slot} slot · {item.rarity}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedItem(null)}
-                      className="retro rounded-sm border border-border px-2 py-0.5 text-[0.45rem] uppercase tracking-[0.15em] text-muted-foreground hover:border-primary hover:bg-primary/10 dark:border-ring"
-                    >
-                      Close
-                    </button>
-                  </div>
-                  <div className="rounded-none border border-border/60 bg-background/80 p-2 dark:border-ring/60">
-                    <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
-                      Buffs & Effects
-                    </p>
-                    <div className="mt-1 space-y-0.5">
-                      {item.stats.map((stat) => (
-                        <p
-                          key={stat.label}
-                          className={cn(
-                            "retro text-[0.45rem] tracking-[0.12em]",
-                            stat.type === "positive"
-                              ? "text-green-600 dark:text-green-400"
-                              : "text-red-600 dark:text-red-400"
-                          )}
-                        >
-                          {stat.label}: {stat.value >= 0 ? "+" : ""}
-                          {stat.value}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                  <p className="retro text-[0.45rem] leading-relaxed tracking-[0.12em] text-muted-foreground">
-                    {item.description}
-                  </p>
+    <section className={cn("relative h-full", className)}>
+        <div className="flex flex-col gap-3 md:flex-row h-full">
+            {/* Inventory Grid (Left/Top) */}
+            <div className="flex-1 bg-background/50 p-2 border-2 border-dashed border-border/50">
+                <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+                    {inventoryItems.map((item) => (
+                    <InventorySlot
+                        key={item.id}
+                        item={item}
+                        isSelected={selectedItem === item.id}
+                        onSelect={() => setSelectedItem(item.id)}
+                    />
+                    ))}
+                    {/* Empty slots */}
+                    {Array.from({ length: emptySlots }).map((_, index) => (
+                    <EmptySlot key={`empty-${index}`} />
+                    ))}
                 </div>
-              );
-            })()}
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+
+            {/* Info Panel (Right/Bottom) */}
+            <div className="flex-1 flex flex-col gap-3">
+                
+                {/* Selected Item Details */}
+                <div className="flex-1 rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] relative">
+                    {currentItem ? (
+                        <>
+                            <div className="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 className="retro text-xs uppercase tracking-[0.15em] text-foreground font-bold">
+                                        {currentItem.name}
+                                    </h3>
+                                    <p className="retro text-[0.5rem] uppercase tracking-wider text-muted-foreground mt-0.5">
+                                        {currentItem.rarity} • {currentItem.slot}
+                                    </p>
+                                </div>
+                                <div className="text-xl opacity-80">{currentItem.icon}</div>
+                            </div>
+                            
+                            <div className="space-y-1 mb-3 border-y border-dashed border-border/50 py-2">
+                                {currentItem.stats.map((stat) => (
+                                    <div key={stat.label} className="flex justify-between items-center text-[0.55rem]">
+                                         <span className="retro uppercase tracking-wider text-muted-foreground">{stat.label}</span>
+                                         <span className={cn(
+                                             "retro font-bold",
+                                             stat.type === "positive" ? "text-green-500" : "text-red-500"
+                                         )}>
+                                             {stat.value > 0 ? "+" : ""}{stat.value}
+                                         </span>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <p className="retro text-[0.5rem] leading-relaxed text-muted-foreground">
+                                {currentItem.description}
+                            </p>
+                        </>
+                    ) : (
+                        <div className="h-full flex items-center justify-center text-muted-foreground retro text-[0.6rem] uppercase">
+                            Select an item
+                        </div>
+                    )}
+                </div>
+
+                {/* Total Stats Summary - Compact */}
+                <div className="rounded-none border-2 border-border bg-background/80 p-2 shadow-[2px_2px_0_var(--border)]">
+                    <p className="retro mb-1.5 text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground border-b border-border/50 pb-0.5">
+                        Character Stats
+                    </p>
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                        {Object.entries(totalStats).slice(0, 6).map(([label, value]) => (
+                            <div key={label} className="flex items-center justify-between text-[0.5rem]">
+                                <span className="retro uppercase text-muted-foreground truncate mr-2">{label}</span>
+                                <span className={cn(
+                                    "retro font-bold",
+                                    value >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600"
+                                )}>
+                                    {value >= 0 ? "+" : ""}{value}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </section>
   );
 }
 
 function InventorySlot({
   item,
-  isHovered,
-  onHoverStart,
-  onHoverEnd,
   isSelected,
   onSelect,
-  isMobile,
 }: {
   item: InventoryItem;
-  isHovered: boolean;
-  onHoverStart: () => void;
-  onHoverEnd: () => void;
   isSelected: boolean;
   onSelect: () => void;
-  isMobile: boolean;
 }) {
   const rarityColors = {
     common: "border-gray-500 dark:border-gray-400",
@@ -373,180 +329,54 @@ function InventorySlot({
     legendary: "border-amber-500 dark:border-amber-400",
   };
 
-  const rarityGlow = {
-    common: "shadow-[0_0_10px_rgba(107,114,128,0.3)]",
-    uncommon: "shadow-[0_0_15px_rgba(34,197,94,0.3)]",
-    rare: "shadow-[0_0_15px_rgba(59,130,246,0.4)]",
-    epic: "shadow-[0_0_20px_rgba(168,85,247,0.5)]",
-    legendary: "shadow-[0_0_25px_rgba(245,158,11,0.6)]",
-  };
-
   const rarityBg = {
-    common: "bg-gradient-to-br from-card/80 to-gray-500/10",
-    uncommon: "bg-gradient-to-br from-card/80 to-green-500/10",
-    rare: "bg-gradient-to-br from-card/80 to-blue-500/10",
-    epic: "bg-gradient-to-br from-card/80 to-purple-500/10",
-    legendary: "bg-gradient-to-br from-card/80 to-amber-500/10",
+    common: "bg-gray-500/10",
+    uncommon: "bg-green-500/10",
+    rare: "bg-blue-500/10",
+    epic: "bg-purple-500/10",
+    legendary: "bg-amber-500/10",
   };
-
-  const shouldShowTooltip = !isMobile && isHovered;
 
   return (
     <motion.div
-      className="group relative"
-      onHoverStart={onHoverStart}
-      onHoverEnd={onHoverEnd}
+      className={cn(
+        "relative aspect-square cursor-pointer rounded-none border-2 transition-all duration-200",
+        rarityColors[item.rarity],
+        rarityBg[item.rarity],
+        isSelected ? "shadow-[0_0_0_2px_var(--primary)] z-10 scale-105" : "hover:border-primary hover:bg-primary/20"
+      )}
+      onClick={onSelect}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
     >
-      {/* Item Card */}
-      <div
-        className={cn(
-          "relative aspect-square cursor-pointer rounded-none border-2 backdrop-blur-sm transition-all duration-200 sm:border-3 md:border-3",
-          rarityColors[item.rarity],
-          rarityBg[item.rarity],
-          "shadow-[1px_1px_0_var(--border)] hover:bg-accent/30 hover:border-primary hover:shadow-[3px_3px_0_var(--primary)] sm:hover:shadow-[4px_4px_0_var(--primary)] hover:-translate-y-1 sm:shadow-[2px_2px_0_var(--border)]",
-          rarityGlow[item.rarity]
-        )}
-        onClick={() => {
-          if (isMobile) {
-            onSelect();
-          }
-        }}
-        style={{
-          transform: isSelected ? "scale(1.03)" : undefined,
-          boxShadow: isSelected ? "0 0 0 2px var(--primary)" : undefined,
-        }}
-      >
-        {/* Equipped badge */}
-        {item.equipped && (
-          <div className="absolute -right-0.5 -top-0.5 z-10 rounded-none border-2 border-border bg-primary px-1 py-0.5 shadow-[1px_1px_0_var(--border)] dark:border-ring sm:px-1.5 sm:py-0.5">
-            <span className="retro text-[0.3rem] uppercase tracking-[0.1em] text-primary-foreground sm:text-[0.35rem] md:text-[0.4rem]">
+        {/* Rarity Corner */}
+        <div className={cn(
+            "absolute top-0 left-0 w-2 h-2 border-b-2 border-r-2",
+            rarityColors[item.rarity]
+        )} />
+
+      {/* Item Icon */}
+      <div className="flex h-full items-center justify-center p-1">
+          <div className="scale-75 sm:scale-90">
+            {item.pixelArt}
+          </div>
+      </div>
+      
+       {item.equipped && (
+          <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground text-[0.3rem] px-1 font-bold">
               E
-            </span>
           </div>
         )}
-
-        {/* Item Icon */}
-        <div className="flex h-full items-center justify-center p-2 sm:p-3 md:p-4">
-          <motion.div
-            className="flex items-center justify-center"
-            animate={
-              isHovered
-                ? { rotate: [0, -10, 10, -10, 10, 0], scale: [1, 1.1, 1.1, 1.1, 1.1, 1] }
-                : {}
-            }
-            transition={{ duration: 0.5 }}
-          >
-            {item.pixelArt}
-          </motion.div>
-        </div>
-
-        {/* Rarity indicator bars (corner decoration) */}
-        <div className="pointer-events-none absolute left-0.5 top-0.5 flex gap-0.5 sm:left-1 sm:top-1">
-          {Array.from({ length: Object.keys(rarityColors).indexOf(item.rarity) + 1 }).map((_, i) => (
-            <div
-              key={i}
-              className={cn("h-0.5 w-0.5 sm:h-1 sm:w-1 md:h-1.5 md:w-1.5", rarityColors[item.rarity].replace("border-", "bg-"))}
-            />
-          ))}
-        </div>
-
-        {/* Shine effect */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{
-            background: "linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)",
-          }}
-        />
-      </div>
-
-      {/* Tooltip */}
-      <AnimatePresence>
-        {shouldShowTooltip && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 sm:w-64 md:w-72"
-          >
-            <div className="rounded-none border-2 border-border bg-card/95 p-2.5 shadow-[3px_3px_0_var(--border)] backdrop-blur-md dark:border-ring sm:border-3 sm:p-3 md:p-3.5">
-              {/* Item name with rarity */}
-              <div className="mb-2 space-y-1">
-                <h3 className="retro text-[0.55rem] uppercase leading-tight tracking-[0.15em] text-foreground sm:text-xs sm:tracking-[0.18em] md:text-sm md:tracking-[0.2em]">
-                  {item.name}
-                </h3>
-                <div className="flex items-center justify-between">
-                  <span
-                    className={cn(
-                      "retro rounded-none border-2 px-1.5 py-0.5 text-[0.4rem] uppercase tracking-[0.15em] sm:text-[0.45rem] md:text-[0.5rem]",
-                      item.rarity === "common" &&
-                        "border-gray-500 bg-gray-500/10 text-gray-600 dark:text-gray-400",
-                      item.rarity === "uncommon" &&
-                        "border-green-500 bg-green-500/10 text-green-600 dark:text-green-400",
-                      item.rarity === "rare" &&
-                        "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400",
-                      item.rarity === "epic" &&
-                        "border-purple-500 bg-purple-500/10 text-purple-600 dark:text-purple-400",
-                      item.rarity === "legendary" &&
-                        "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                    )}
-                  >
-                    {item.rarity}
-                  </span>
-                  <span className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
-                    {item.slot}
-                  </span>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="my-2 border-t-2 border-dashed border-border dark:border-ring" />
-
-              {/* Stats */}
-              <div className="mb-2 space-y-1">
-                {item.stats.map((stat, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <span className="retro text-[0.45rem] uppercase tracking-[0.15em] text-foreground sm:text-[0.5rem] md:text-[0.55rem]">
-                      {stat.label}
-                    </span>
-                    <span
-                      className={cn(
-                        "retro text-[0.45rem] font-bold tracking-[0.15em] sm:text-[0.5rem] md:text-[0.55rem]",
-                        stat.type === "positive"
-                          ? "text-green-600 dark:text-green-400"
-                          : "text-red-600 dark:text-red-400"
-                      )}
-                    >
-                      {stat.value >= 0 ? "+" : ""}
-                      {stat.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Divider */}
-              <div className="my-2 border-t-2 border-dashed border-border dark:border-ring" />
-
-              {/* Description */}
-              <p className="retro text-[0.4rem] leading-relaxed tracking-[0.1em] text-muted-foreground sm:text-[0.45rem] sm:tracking-[0.12em] md:text-[0.5rem] md:tracking-[0.15em]">
-                {item.description}
-              </p>
-            </div>
-            {/* Tooltip arrow */}
-            <div className="mx-auto h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-border dark:border-t-ring" />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
 
 function EmptySlot() {
   return (
-    <div className="relative aspect-square rounded-none border-2 border-dashed border-border/40 bg-background/40 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring/40 sm:border-3 sm:shadow-[2px_2px_0_var(--border)]">
-      <div className="flex h-full items-center justify-center">
-        <span className="text-2xl opacity-20 sm:text-3xl md:text-4xl">∅</span>
-      </div>
+    <div className="relative aspect-square rounded-none border-2 border-dashed border-border/30 bg-background/20">
+       <div className="absolute inset-0 flex items-center justify-center opacity-10">
+           <div className="w-2 h-2 rounded-full bg-foreground" />
+       </div>
     </div>
   );
 }

@@ -165,13 +165,13 @@ export function WarpDriveTimeline({ className }: { className?: string }) {
   return (
     <section className={cn("space-y-4 sm:space-y-5 md:space-y-6", className)}>
       <div className="space-y-2 text-center sm:space-y-2.5 md:space-y-3">
-        <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
+        <p className="retro text-[0.6rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.35em] md:text-sm md:tracking-[0.4em]">
           Warp Lab Scheduler
         </p>
-        <h2 className="retro text-lg uppercase tracking-[0.2em] sm:text-xl sm:tracking-[0.25em] md:text-2xl md:tracking-[0.3em]">
+        <h2 className="retro text-xl uppercase tracking-[0.2em] sm:text-2xl sm:tracking-[0.25em] md:text-3xl md:tracking-[0.3em]">
           Experiment Timeline
         </h2>
-        <p className="retro text-[0.55rem] text-muted-foreground sm:text-[0.65rem] md:text-sm">
+        <p className="retro text-xs text-muted-foreground sm:text-sm md:text-base">
           Visual map of experiments, chaos events, and quests colliding over the
           next six warp cycles.
         </p>
@@ -182,7 +182,7 @@ export function WarpDriveTimeline({ className }: { className?: string }) {
         <button
           onClick={() => setShowSuccessOnly((prev) => !prev)}
           className={cn(
-            "retro rounded-none border-2 px-3 py-1.5 text-[0.45rem] uppercase tracking-[0.18em] transition sm:border-3 sm:text-[0.5rem]",
+            "retro rounded-none border-2 px-3 py-1.5 text-[0.55rem] uppercase tracking-[0.18em] transition sm:border-3 sm:text-xs",
             showSuccessOnly
               ? "border-primary bg-primary text-primary-foreground shadow-[3px_3px_0_var(--primary)]"
               : "border-border bg-card/80 text-foreground shadow-[2px_2px_0_var(--border)] hover:border-primary hover:bg-accent dark:border-ring"
@@ -193,7 +193,7 @@ export function WarpDriveTimeline({ className }: { className?: string }) {
         <button
           onClick={() => setHighlightMeltdowns((prev) => !prev)}
           className={cn(
-            "retro rounded-none border-2 px-3 py-1.5 text-[0.45rem] uppercase tracking-[0.18em] transition sm:border-3 sm:text-[0.5rem]",
+            "retro rounded-none border-2 px-3 py-1.5 text-[0.55rem] uppercase tracking-[0.18em] transition sm:border-3 sm:text-xs",
             highlightMeltdowns
               ? "border-rose-500 bg-rose-500 text-white shadow-[3px_3px_0_var(--rose-500)]"
               : "border-border bg-card/80 text-foreground shadow-[2px_2px_0_var(--border)] hover:border-rose-500 hover:bg-rose-500/10 dark:border-ring"
@@ -222,7 +222,7 @@ export function WarpDriveTimeline({ className }: { className?: string }) {
               <div className="mb-2 grid grid-cols-6 text-center">
                 {[1, 2, 3, 4, 5, 6].map((week) => (
                   <div key={week}>
-                    <p className="retro text-[0.4rem] uppercase tracking-[0.15em] text-muted-foreground">
+                    <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
                       Warp Week {week}
                     </p>
                   </div>
@@ -242,7 +242,7 @@ export function WarpDriveTimeline({ className }: { className?: string }) {
                     >
                       <div className="space-y-2">
                         {weekItems.length === 0 ? (
-                          <p className="retro text-[0.4rem] text-muted-foreground">
+                          <p className="retro text-[0.5rem] text-muted-foreground">
                             Idle space...
                           </p>
                         ) : (
@@ -260,13 +260,13 @@ export function WarpDriveTimeline({ className }: { className?: string }) {
                                   "border-rose-500 text-rose-600 dark:text-rose-400"
                               )}
                             >
-                              <p className="retro text-[0.4rem] uppercase tracking-[0.12em]">
+                              <p className="retro text-[0.5rem] uppercase tracking-[0.12em]">
                                 {item.title}
                               </p>
-                              <p className="retro text-[0.35rem] text-muted-foreground">
+                              <p className="retro text-[0.45rem] text-muted-foreground">
                                 {item.description}
                               </p>
-                              <p className="retro text-[0.35rem] uppercase tracking-[0.15em]">
+                              <p className="retro text-[0.45rem] uppercase tracking-[0.15em]">
                                 {item.status === "success"
                                   ? "✅ Success"
                                   : item.status === "failed"
