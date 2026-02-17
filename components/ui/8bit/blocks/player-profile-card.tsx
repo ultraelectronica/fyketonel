@@ -147,7 +147,7 @@ export default function PlayerProfileCard({
     >
       <Card
         className={cn(
-          "relative w-full max-w-md overflow-hidden border-4 border-border bg-card/90 shadow-[6px_6px_0_var(--border)]",
+          "relative w-full overflow-hidden border-4 border-border bg-card/90 shadow-[6px_6px_0_var(--border)]",
           className
         )}
         {...props}
@@ -305,7 +305,7 @@ export default function PlayerProfileCard({
         />
 
 
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-4 px-6 pt-6">
         <div className="flex items-center gap-4">
           <motion.div
             className="relative"
@@ -347,7 +347,7 @@ export default function PlayerProfileCard({
         </div>
       </CardHeader>
 
-        <CardContent className="space-y-4 relative z-10">
+        <CardContent className="space-y-4 relative z-10 px-6 pb-6">
           {/* Status ticker */}
           <div className="rounded-none border-2 border-dashed border-border/60 bg-background/70 px-3 py-2 shadow-[2px_2px_0_var(--border)]">
             <div className="flex items-center justify-between text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground retro">
