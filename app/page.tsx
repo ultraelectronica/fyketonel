@@ -291,7 +291,7 @@ export default function Home() {
         <section id="contact" className="mt-8 border-t-4 border-dashed border-border pt-8">
           <div className="mb-4 text-center">
              <div className="inline-block border-2 border-primary bg-background px-4 py-1.5 shadow-[4px_4px_0_var(--primary)]">
-                <h2 className="retro text-lg uppercase tracking-widest text-primary">
+                <h2 className="retro text-sm sm:text-lg uppercase tracking-wider sm:tracking-widest text-primary">
                     TRANSMISSION_LINK
                 </h2>
              </div>
@@ -300,11 +300,11 @@ export default function Home() {
            <div className="grid gap-6 md:grid-cols-2">
               <div className={`${panelBaseClass} flex flex-col justify-center`}>
                   <div className="text-center md:text-left">
-                     <p className="retro text-xs uppercase tracking-widest text-muted-foreground">OPERATOR</p>
-                     <h3 className="retro text-xl uppercase tracking-widest text-foreground sm:text-2xl">
+                     <p className="retro text-[0.6rem] sm:text-xs uppercase tracking-widest text-muted-foreground">OPERATOR</p>
+                     <h3 className="retro text-lg sm:text-xl md:text-2xl uppercase tracking-widest text-foreground">
                         Fyke Simon V. Tonel
                      </h3>
-                     <p className="retro mt-2 text-sm uppercase tracking-wider text-primary">
+                     <p className="retro mt-2 text-xs sm:text-sm uppercase tracking-wider text-primary">
                         Full-Stack Developer
                      </p>
                   </div>
