@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
-import { useMediaQuery } from "react-responsive";
+
 import { motion, AnimatePresence } from "framer-motion";
 
 import {
@@ -2540,35 +2540,15 @@ const LabStatusMonitor = ({
 };
 
 export default function ProjectsPage() {
-  const isVerySmall = useMediaQuery({ maxWidth: 374 });
-  const isSmall = useMediaQuery({ minWidth: 375, maxWidth: 639 });
   const [activeTier, setActiveTier] = useState<TierFilter>("ALL");
   const [activeImage, setActiveImage] = useState<{ src: string; alt: string } | null>(null);
   const [hoveredProjectId, setHoveredProjectId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingTier, setLoadingTier] = useState<string>("");
 
-  const isClient =
-    typeof window !== "undefined" &&
-    (isVerySmall !== undefined || isSmall !== undefined);
+  const shellClass = "w-full border-4 border-border bg-background p-2 shadow-[8px_8px_0_var(--border)] sm:p-4";
 
-  const shellClass = isClient && isVerySmall
-    ? "rounded-none border border-border bg-card/80 p-2 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : isClient && isSmall
-    ? "rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : "rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring min-[375px]:border-3 min-[375px]:p-4 min-[375px]:shadow-[3px_3px_0_var(--border)] sm:border-4 sm:p-6 sm:shadow-[6px_6px_0_var(--border)] md:p-8 md:shadow-[8px_8px_0_var(--border)]";
-
-  const panelBaseClass = isClient && isVerySmall
-    ? "rounded-none border border-border bg-card/80 p-2 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : isClient && isSmall
-    ? "rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : "rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring min-[375px]:border-3 min-[375px]:p-4 min-[375px]:shadow-[3px_3px_0_var(--border)] sm:border-4 sm:p-5 sm:shadow-[4px_4px_0_var(--border)] md:p-6 md:shadow-[6px_6px_0_var(--border)]";
-
-  const gridGap = isClient && isVerySmall
-    ? "gap-12"
-    : isClient && isSmall
-    ? "gap-12"
-    : "gap-8 min-[375px]:gap-10 sm:gap-10 md:gap-10";
+  const panelBaseClass = "rounded-none border-2 border-border bg-card/50 p-3 shadow-[4px_4px_0_var(--border)] backdrop-blur-sm";
 
   const sortedProjects = useMemo(
     () =>
@@ -2676,23 +2656,23 @@ export default function ProjectsPage() {
         activeCount={activeProjectsCount} 
         archivedCount={archivedProjectsCount} 
       />
-      <main className="mx-auto flex min-h-screen w-full max-w-[95vw] flex-col gap-6 px-3 py-6 text-foreground min-[375px]:gap-7 min-[375px]:px-4 min-[375px]:py-8 sm:gap-10 sm:px-6 sm:py-12 md:gap-12 md:py-16">
-        <section className="flex flex-col items-center gap-3 text-center min-[375px]:gap-4 sm:gap-5 md:gap-6">
-        <div className="space-y-2 sm:space-y-3">
-          <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.35em] md:text-xs md:tracking-[0.4em]">
+      <main className="mx-auto flex min-h-screen w-full max-w-[1700px] flex-col gap-4 p-2 text-foreground sm:gap-6 sm:p-4">
+        <section className="flex flex-col items-center gap-3 text-center sm:gap-4">
+        <div className="space-y-2">
+          <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem]">
             Project Intel
           </p>
-          <h1 className="retro text-xl uppercase leading-tight tracking-[0.2em] sm:text-2xl sm:tracking-[0.25em] md:text-3xl md:tracking-[0.3em]">
+          <h1 className="retro text-xl uppercase leading-tight tracking-[0.2em] sm:text-2xl md:text-3xl">
             Lab Archive Citadel
           </h1>
-          <p className="retro text-xs leading-relaxed text-muted-foreground sm:text-sm md:text-base">
+          <p className="retro text-xs leading-relaxed text-muted-foreground sm:text-sm">
             A catalog of experiments, relics, and mission-critical deployments.
           </p>
         </div>
         <Button
           asChild
           font="retro"
-          className="retro h-10 px-6 text-[0.6rem] uppercase tracking-[0.2em] sm:h-11 sm:px-8 sm:text-sm sm:tracking-[0.25em] md:h-12 md:px-10 md:text-base md:tracking-[0.3em]"
+          className="retro h-10 px-6 text-[0.6rem] uppercase tracking-[0.2em] sm:h-11 sm:px-8 sm:text-sm"
         >
           <Link href="#archive-container">Skip to Citadel</Link>
         </Button>
@@ -2706,7 +2686,7 @@ export default function ProjectsPage() {
         id="archive-container"
         className={cn(
           shellClass,
-          "border-dashed border-foreground/50 dark:border-ring/50 space-y-6 sm:space-y-8 relative"
+          "border-dashed border-foreground/50 dark:border-ring/50 space-y-4 relative"
         )}
       >
         {/* Tulips on borders for Ally theme */}
@@ -2730,8 +2710,8 @@ export default function ProjectsPage() {
           Lab Archive Citadel
         </p>
 
-        <div className={`grid ${gridGap} lg:grid-cols-[1.1fr_0.9fr]`}>
-          <div className={cn(panelBaseClass, "space-y-4 text-left")}>
+        <div className="grid gap-4 md:grid-cols-12">
+          <div className={cn(panelBaseClass, "md:col-span-7 space-y-4 text-left")}>
             <div className="flex items-center justify-between">
               <p className="retro text-[0.55rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem]">
                 Project Manifest
@@ -2788,7 +2768,7 @@ export default function ProjectsPage() {
             )}
           </div>
 
-          <div className={cn(panelBaseClass, "space-y-4")}>
+          <div className={cn(panelBaseClass, "md:col-span-5 space-y-4")}>
             <div className="flex flex-col gap-1 text-left">
               <p className="retro text-[0.55rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem]">
                 Containment Sortation Matrix

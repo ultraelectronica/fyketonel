@@ -1,29 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { useMediaQuery } from "react-responsive";
 import QuestLog from "@/components/quest-log";
 import LaboratoryExperimentsLog from "@/components/laboratory-experiments-log";
 import ChaosMeterDashboard from "@/components/chaos-meter-dashboard";
 import WarpDriveTimeline from "@/components/warp-drive-timeline";
 
 export default function PlansPage() {
-  // Detect screen sizes
-  const isVerySmall = useMediaQuery({ maxWidth: 374 });
-  const isSmall = useMediaQuery({ minWidth: 375, maxWidth: 639 });
-
-  // Simple client-side check
-  const isClient = typeof window !== 'undefined' && (isVerySmall !== undefined || isSmall !== undefined);
-
-  // Dynamic classes based on screen size
-  const shellClass = isClient && isVerySmall
-    ? "rounded-none border border-border bg-card/80 p-2 shadow-[1px_1px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : isClient && isSmall
-    ? "rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring"
-    : "rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring min-[375px]:border-3 min-[375px]:p-4 min-[375px]:shadow-[3px_3px_0_var(--border)] sm:border-4 sm:p-6 sm:shadow-[6px_6px_0_var(--border)] md:p-8 md:shadow-[8px_8px_0_var(--border)]";
+  const shellClass = "w-full border-4 border-border bg-background p-2 shadow-[8px_8px_0_var(--border)] sm:p-4";
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-[95vw] flex-col gap-6 px-3 py-6 text-foreground min-[375px]:gap-7 min-[375px]:px-4 min-[375px]:py-8 sm:gap-10 sm:px-6 sm:py-12 md:gap-12 md:py-16">
+    <main className="mx-auto flex min-h-screen w-full max-w-[1700px] flex-col gap-4 p-2 text-foreground sm:gap-6 sm:p-4">
       {/* Hero Section */}
       <section className="flex flex-col items-center gap-3 text-center min-[375px]:gap-4 sm:gap-5 md:gap-6">
         <div className="space-y-2 sm:space-y-3">
