@@ -407,11 +407,11 @@ export function ResumeArchive({ className }: { className?: string }) {
         {/* Particle burst */}
         <ParticleBurst isActive={showParticles} />
 
-        <div className="relative z-0 grid gap-4 lg:grid-cols-2">
+        <div className="relative z-0 flex flex-col md:flex-row items-center justify-center gap-6 max-w-4xl mx-auto">
           {/* Left Side - Document Preview */}
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center flex-1">
             {/* Document Frame */}
-            <div className="relative w-full max-w-[200px]">
+            <div className="relative w-full max-w-[220px]">
               {/* Holographic frame effect */}
               <div
                 className={cn(
@@ -561,7 +561,7 @@ export function ResumeArchive({ className }: { className?: string }) {
           </div>
 
           {/* Right Side - Actions & Skills */}
-          <div className="flex flex-col space-y-3">
+          <div className="flex flex-col space-y-3 flex-1 w-full max-w-sm">
             {/* Action Buttons */}
             <div className="space-y-3">
               {!isDecrypted ? (

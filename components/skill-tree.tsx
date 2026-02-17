@@ -367,10 +367,10 @@ export function SkillTree({ className }: { className?: string }) {
       </div>
 
       {/* Skill Tree Grid Container */}
-      <div className="relative w-full overflow-auto bg-background/40 p-4 min-h-[300px]">
+      <div className="relative w-full overflow-auto bg-background/40 p-4 min-h-[250px] flex items-center justify-center">
         
         {/* Canvas */}
-        <div className="relative mx-auto" style={{ width: canvasWidth, height: canvasHeight }}>
+        <div className="relative" style={{ width: canvasWidth, height: canvasHeight }}>
           {/* Background Grid */}
           <div
             className="absolute inset-0 opacity-10"
