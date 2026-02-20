@@ -20,6 +20,7 @@ import AchievementWall from "@/components/achievement-wall";
 import InventorySystem from "@/components/inventory-system";
 import SkillTree from "@/components/skill-tree";
 import ResumeArchive from "@/components/resume-archive";
+import { HockeyGame } from "@/components/hockey-game";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -57,9 +58,15 @@ async function getJokeOfTheDay() {
   }
 }
 
+interface GameScore {
+  player: number;
+  ai: number;
+}
+
 export default function Home() {
   const [joke, setJoke] = useState("Loading joke...");
   const [isAllyMode, setIsAllyMode] = useState(false);
+  const [hockeyScore, setHockeyScore] = useState<GameScore>({ player: 0, ai: 0 });
 
   // Fetch joke on mount
   useEffect(() => {
@@ -96,6 +103,33 @@ export default function Home() {
     };
   }, []);
 
+  // Load and listen for hockey score updates
+  useEffect(() => {
+    const loadScore = () => {
+      if (typeof window === "undefined") return;
+      const saved = localStorage.getItem("hockey-game-score");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved) as GameScore;
+          setHockeyScore(parsed);
+        } catch {
+          // Invalid data, use default
+        }
+      }
+    };
+
+    const handleScoreUpdate = (e: CustomEvent<GameScore>) => {
+      setHockeyScore(e.detail);
+    };
+
+    loadScore();
+    window.addEventListener("hockeyScoreUpdate", handleScoreUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener("hockeyScoreUpdate", handleScoreUpdate as EventListener);
+    };
+  }, []);
+
   // Updated Panel styles - Denser, less padding
   const panelBaseClass = "relative bg-card text-card-foreground border-2 border-border shadow-[4px_4px_0_var(--border)] p-3 overflow-hidden";
   const headerClass = "retro text-xs uppercase tracking-[0.2em] text-primary mb-2 border-b-2 border-dashed border-border/50 pb-1";
@@ -108,7 +142,7 @@ export default function Home() {
         {/* Header / Intro Box - Reduced margin/padding */}
         <section className="mb-4 border-b-4 border-border bg-card p-4 text-center sm:text-left shadow-sm">
           <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <div>
+            <div className="flex-1">
                 <div className="mb-2 inline-block bg-primary px-3 py-1 shadow-[2px_2px_0_rgba(0,0,0,0.2)]">
                     <p className="retro text-[0.7rem] font-bold uppercase tracking-widest text-primary-foreground sm:text-xs">
                     CURRENT LOCATION: LABORATORY
@@ -121,12 +155,20 @@ export default function Home() {
                 Level 60 Full-Stack Developer • Class: Guardian of Chaotic Plans
                 </p>
             </div>
-            <Button
-            asChild
-            className="retro h-10 border-2 border-primary bg-primary/10 text-primary shadow-[4px_4px_0_var(--primary)] hover:translate-y-1 hover:shadow-none"
-            >
-            <Link href="#contact">INITIALIZE CONTACT</Link>
-            </Button>
+            <div className="flex items-center gap-4">
+              <div className="border-2 border-dashed border-border bg-background/50 px-3 py-1.5">
+                <p className="retro text-[0.6rem] uppercase tracking-wider text-muted-foreground">HOCKEY_SCORE</p>
+                <p className="retro text-sm font-bold text-primary">
+                  {hockeyScore.player} - {hockeyScore.ai}
+                </p>
+              </div>
+              <Button
+              asChild
+              className="retro h-10 border-2 border-primary bg-primary/10 text-primary shadow-[4px_4px_0_var(--primary)] hover:translate-y-1 hover:shadow-none"
+              >
+              <Link href="#contact">INITIALIZE CONTACT</Link>
+              </Button>
+            </div>
           </div>
         </section>
 
@@ -175,10 +217,20 @@ export default function Home() {
                </div>
             </div>
 
-             {/* Github Contributions */}
-             <div className={panelBaseClass}>
+            {/* Hockey Game */}
+            <div className={panelBaseClass}>
+              <h2 className={headerClass}>ARCADE_HOCKEY</h2>
+              <HockeyGame className="w-full" />
+            </div>
+
+          </div>
+
+          {/* Right Column: Content & Systems (8 cols) */}
+          <div className="flex flex-col gap-4 lg:col-span-8">
+            {/* GitHub Contributions - fills right column width */}
+            <div className={panelBaseClass}>
               <h2 className={`${headerClass} text-sm`}>CONTRIBUTION_LOG</h2>
-              <div className="min-h-[160px] overflow-hidden rounded border border-dashed border-border bg-background/50 p-2">
+              <div className="min-h-[200px] overflow-hidden rounded border border-dashed border-border bg-background/50 p-2">
                  <GitHubContributions />
               </div>
                <Button
@@ -195,11 +247,7 @@ export default function Home() {
                 </a>
               </Button>
             </div>
-          </div>
 
-          {/* Right Column: Content & Systems (8 cols) */}
-          <div className="flex flex-col gap-4 lg:col-span-8">
-            
             {/* Top Row: Wishlist & Joke */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {/* Wishlist - More compact items */}
