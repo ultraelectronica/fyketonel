@@ -35,9 +35,10 @@ interface InternalGameState {
   playerPaddle: Paddle;
   aiPaddle: Paddle;
   puck: Puck;
-  keys: { up: boolean; down: boolean };
-  // -1 means no touch active, otherwise the target Y in game coords
+  keys: { up: boolean; down: boolean; left: boolean; right: boolean };
+  // -1 means no touch active, otherwise the target in game coords
   touchTargetY: number;
+  touchTargetX: number;
   lastTime: number;
 }
 
@@ -126,6 +127,9 @@ export function HockeyGame({ className }: { className?: string }) {
   const [gameOver, setGameOver] = useState(false);
   const scoreRef = useRef<GameScore>({ player: 0, ai: 0 });
   const gameOverRef = useRef(false);
+  const awaitingServeRef = useRef(false);
+  const serveSideRef = useRef<"player" | "ai">("player");
+  const serveStartTimeRef = useRef(0);
 
   // After mount, sync score from localStorage so client matches saved state (avoids hydration mismatch).
   useEffect(() => {
@@ -145,12 +149,13 @@ export function HockeyGame({ className }: { className?: string }) {
     playerPaddle: { x: 0, y: 0, radius: 20 },
     aiPaddle: { x: 0, y: 0, radius: 20 },
     puck: { x: 0, y: 0, radius: 8, vx: 0, vy: 0 },
-    keys: { up: false, down: false },
+    keys: { up: false, down: false, left: false, right: false },
     touchTargetY: -1,
+    touchTargetX: -1,
     lastTime: 0,
   });
 
-  // convert a screen touch Y to game coordinate Y
+  // convert screen touch to game coordinates
   const screenToGameY = useCallback((screenY: number): number => {
     const svg = svgRef.current;
     if (!svg) return -1;
@@ -159,21 +164,32 @@ export function HockeyGame({ className }: { className?: string }) {
     return (screenY - rect.top) * ratio;
   }, [dimensions.height]);
 
+  const screenToGameX = useCallback((screenX: number): number => {
+    const svg = svgRef.current;
+    if (!svg) return -1;
+    const rect = svg.getBoundingClientRect();
+    const ratio = dimensions.width / rect.width;
+    return (screenX - rect.left) * ratio;
+  }, [dimensions.width]);
+
   // touch handlers for direct paddle control on the game field
   const handleTouchStart = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
     e.preventDefault();
     const touch = e.touches[0];
     gameStateRef.current.touchTargetY = screenToGameY(touch.clientY);
-  }, [screenToGameY]);
+    gameStateRef.current.touchTargetX = screenToGameX(touch.clientX);
+  }, [screenToGameY, screenToGameX]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
     e.preventDefault();
     const touch = e.touches[0];
     gameStateRef.current.touchTargetY = screenToGameY(touch.clientY);
-  }, [screenToGameY]);
+    gameStateRef.current.touchTargetX = screenToGameX(touch.clientX);
+  }, [screenToGameY, screenToGameX]);
 
   const handleTouchEnd = useCallback(() => {
     gameStateRef.current.touchTargetY = -1;
+    gameStateRef.current.touchTargetX = -1;
   }, []);
 
   // blink the start screen text every 600ms
@@ -209,33 +225,92 @@ export function HockeyGame({ className }: { className?: string }) {
   // speed scaling based on viewport diagonal
   const baseDiagonal = Math.sqrt(400 * 400 + 300 * 300);
   const currentDiagonal = Math.sqrt(dimensions.width * dimensions.width + dimensions.height * dimensions.height);
-  const speedScale = Math.min(1.8, Math.max(1, currentDiagonal / baseDiagonal));
+  const baseSpeedScale = Math.min(1.8, Math.max(1, currentDiagonal / baseDiagonal));
+  const isMobileFullscreen =
+    isFullscreen &&
+    typeof window !== "undefined" &&
+    "ontouchstart" in window;
+  const speedScale = isMobileFullscreen ? baseSpeedScale * 0.75 : baseSpeedScale;
 
-  // reset positions and launch puck
-  const initGame = useCallback(() => {
+  // in fullscreen (PC), scale up paddles and puck so they stay visibly larger
+  const entityScale = isFullscreen ? Math.min(2.2, Math.max(1.2, currentDiagonal / baseDiagonal)) : 1;
+  const paddleRadius = 20 * entityScale;
+  const puckRadius = 8 * entityScale;
+
+  // default paddle positions (used by initGame and placeAfterGoal)
+  const defaultPaddlePositions = useCallback(() => {
     const state = gameStateRef.current;
     const paddleMargin = 30 * speedScale;
-    
     state.playerPaddle.x = paddleMargin;
     state.playerPaddle.y = dimensions.height / 2;
-    
     state.aiPaddle.x = dimensions.width - paddleMargin;
     state.aiPaddle.y = dimensions.height / 2;
-    
+  }, [dimensions, speedScale]);
+
+  // reset positions and launch puck (start of game or resize)
+  const initGame = useCallback(() => {
+    awaitingServeRef.current = false;
+    const state = gameStateRef.current;
+    state.playerPaddle.radius = paddleRadius;
+    state.aiPaddle.radius = paddleRadius;
+    state.puck.radius = puckRadius;
+    defaultPaddlePositions();
+
     state.puck.x = dimensions.width / 2;
     state.puck.y = dimensions.height / 2;
-    
+
     const speed = 4.5 * speedScale;
     const angle = (Math.random() - 0.5) * Math.PI / 3;
     state.puck.vx = Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
     state.puck.vy = Math.sin(angle) * speed;
-    
+
     setGameState({
       playerPaddle: { ...state.playerPaddle },
       aiPaddle: { ...state.aiPaddle },
       puck: { ...state.puck },
     });
-  }, [dimensions, speedScale]);
+  }, [dimensions, speedScale, defaultPaddlePositions, paddleRadius, puckRadius]);
+
+  // after a goal: reset paddles, place puck in front of scorer (stationary), wait for push
+  const placeAfterGoal = useCallback(
+    (scorer: "player" | "ai") => {
+      const state = gameStateRef.current;
+      const paddleMargin = 30 * speedScale;
+      const gap = 25 * speedScale;
+
+      defaultPaddlePositions();
+
+      state.puck.vx = 0;
+      state.puck.vy = 0;
+      if (scorer === "player") {
+        state.puck.x =
+          paddleMargin +
+          state.playerPaddle.radius +
+          state.puck.radius +
+          gap;
+        state.puck.y = dimensions.height / 2;
+      } else {
+        state.puck.x =
+          dimensions.width -
+          paddleMargin -
+          state.aiPaddle.radius -
+          state.puck.radius -
+          gap;
+        state.puck.y = dimensions.height / 2;
+      }
+
+      awaitingServeRef.current = true;
+      serveSideRef.current = scorer;
+      serveStartTimeRef.current = performance.now();
+
+      setGameState({
+        playerPaddle: { ...state.playerPaddle },
+        aiPaddle: { ...state.aiPaddle },
+        puck: { ...state.puck },
+      });
+    },
+    [dimensions, speedScale, defaultPaddlePositions]
+  );
 
   // full reset: score, flags, positions
   const resetGame = useCallback(() => {
@@ -267,6 +342,14 @@ export function HockeyGame({ className }: { className?: string }) {
       gameStateRef.current.keys.down = true;
       e.preventDefault();
     }
+    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+      gameStateRef.current.keys.left = true;
+      e.preventDefault();
+    }
+    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+      gameStateRef.current.keys.right = true;
+      e.preventDefault();
+    }
   }, []);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
@@ -276,14 +359,24 @@ export function HockeyGame({ className }: { className?: string }) {
     if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
       gameStateRef.current.keys.down = false;
     }
+    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+      gameStateRef.current.keys.left = false;
+    }
+    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+      gameStateRef.current.keys.right = false;
+    }
   }, []);
 
-  // main physics tick
-  const update = useCallback(() => {
-    const state = gameStateRef.current;
-    const paddleSpeed = 6 * speedScale;
-    
-    // move player paddle via keyboard
+  // main physics tick (currentTime from requestAnimationFrame for serve delay)
+  const update = useCallback(
+    (currentTime: number) => {
+      const state = gameStateRef.current;
+      const paddleSpeed = 6 * speedScale;
+      const paddleMargin = 30 * speedScale;
+      const playerMinX = paddleMargin;
+      const playerMaxX = dimensions.width / 2 - paddleMargin;
+
+      // move player paddle via keyboard (vertical)
     if (state.keys.up && state.playerPaddle.y - state.playerPaddle.radius > 0) {
       state.playerPaddle.y -= paddleSpeed;
     }
@@ -291,92 +384,256 @@ export function HockeyGame({ className }: { className?: string }) {
       state.playerPaddle.y += paddleSpeed;
     }
 
-    // move player paddle via touch (overrides keyboard)
-    if (state.touchTargetY >= 0) {
-      const clamped = Math.max(
-        state.playerPaddle.radius,
-        Math.min(dimensions.height - state.playerPaddle.radius, state.touchTargetY)
+    // move player paddle via keyboard (horizontal)
+    if (state.keys.left && state.playerPaddle.x - state.playerPaddle.radius > playerMinX) {
+      state.playerPaddle.x -= paddleSpeed;
+    }
+    if (state.keys.right && state.playerPaddle.x + state.playerPaddle.radius < playerMaxX) {
+      state.playerPaddle.x += paddleSpeed;
+    }
+
+    // move player paddle via touch (overrides keyboard for position)
+    if (state.touchTargetY >= 0 || state.touchTargetX >= 0) {
+      if (state.touchTargetY >= 0) {
+        const clampedY = Math.max(
+          state.playerPaddle.radius,
+          Math.min(dimensions.height - state.playerPaddle.radius, state.touchTargetY)
+        );
+        state.playerPaddle.y += (clampedY - state.playerPaddle.y) * 0.3;
+      }
+      if (state.touchTargetX >= 0) {
+        const clampedX = Math.max(
+          playerMinX + state.playerPaddle.radius,
+          Math.min(playerMaxX - state.playerPaddle.radius, state.touchTargetX)
+        );
+        state.playerPaddle.x += (clampedX - state.playerPaddle.x) * 0.3;
+      }
+    }
+    
+      // dumb AI: chase the puck (vertical and horizontal, stays on right half)
+      // skip during awaiting serve so the AI doesn't move into the stationary puck
+      if (!awaitingServeRef.current) {
+        const aiSpeed = 5 * speedScale;
+        const aiMinX = dimensions.width / 2 + paddleMargin;
+        const aiMaxX = dimensions.width - paddleMargin;
+
+        if (state.aiPaddle.y < state.puck.y - 5) {
+          state.aiPaddle.y = Math.min(
+            dimensions.height - state.aiPaddle.radius,
+            state.aiPaddle.y + aiSpeed
+          );
+        } else if (state.aiPaddle.y > state.puck.y + 5) {
+          state.aiPaddle.y = Math.max(
+            state.aiPaddle.radius,
+            state.aiPaddle.y - aiSpeed
+          );
+        }
+
+        if (state.aiPaddle.x < state.puck.x - 5) {
+          state.aiPaddle.x = Math.min(
+            aiMaxX - state.aiPaddle.radius,
+            state.aiPaddle.x + aiSpeed
+          );
+        } else if (state.aiPaddle.x > state.puck.x + 5) {
+          state.aiPaddle.x = Math.max(
+            aiMinX + state.aiPaddle.radius,
+            state.aiPaddle.x - aiSpeed
+          );
+        }
+      }
+
+      // --- Awaiting serve: puck is stationary in front of scorer ---
+      if (awaitingServeRef.current) {
+        if (serveSideRef.current === "player") {
+          const playerDist = Math.sqrt(
+            Math.pow(state.puck.x - state.playerPaddle.x, 2) +
+              Math.pow(state.puck.y - state.playerPaddle.y, 2)
+          );
+          if (
+            playerDist <
+            state.playerPaddle.radius + state.puck.radius
+          ) {
+            awaitingServeRef.current = false;
+            const speed = 4.5 * speedScale;
+            const angle =
+              (Math.random() - 0.5) * (Math.PI / 3);
+            state.puck.vx = Math.cos(angle) * speed;
+            state.puck.vy = Math.sin(angle) * speed;
+            const overlap =
+              state.playerPaddle.radius +
+              state.puck.radius -
+              playerDist;
+            const pushAngle = Math.atan2(
+              state.puck.y - state.playerPaddle.y,
+              state.puck.x - state.playerPaddle.x
+            );
+            // Push out of overlap + extra margin so we don't re-collide with player next frame
+            const separation = overlap + 3;
+            state.puck.x += Math.cos(pushAngle) * separation;
+            state.puck.y += Math.sin(pushAngle) * separation;
+            state.puck.y = Math.max(state.puck.radius, Math.min(dimensions.height - state.puck.radius, state.puck.y));
+          }
+        } else {
+          if (
+            currentTime - serveStartTimeRef.current >= 1200
+          ) {
+            awaitingServeRef.current = false;
+            const speed = 4.5 * speedScale;
+            const angle =
+              (Math.random() - 0.5) * (Math.PI / 3);
+            state.puck.vx = -Math.cos(angle) * speed;
+            state.puck.vy = Math.sin(angle) * speed;
+          }
+        }
+        setGameState({
+          playerPaddle: { ...state.playerPaddle },
+          aiPaddle: { ...state.aiPaddle },
+          puck: { ...state.puck },
+        });
+        return;
+      }
+
+      // move puck (keep previous position for tunnel detection)
+      const prevPuckX = state.puck.x;
+      const prevPuckY = state.puck.y;
+      state.puck.x += state.puck.vx;
+      state.puck.y += state.puck.vy;
+
+      // bounce off top/bottom walls with position clamping
+      if (state.puck.y - state.puck.radius <= 0) {
+        state.puck.y = state.puck.radius;
+        state.puck.vy = Math.abs(state.puck.vy);
+      } else if (state.puck.y + state.puck.radius >= dimensions.height) {
+        state.puck.y = dimensions.height - state.puck.radius;
+        state.puck.vy = -Math.abs(state.puck.vy);
+      }
+
+      // player paddle collision
+      const playerDist = Math.sqrt(
+        Math.pow(state.puck.x - state.playerPaddle.x, 2) +
+          Math.pow(state.puck.y - state.playerPaddle.y, 2)
       );
-      // lerp toward target for smooth feel
-      state.playerPaddle.y += (clamped - state.playerPaddle.y) * 0.3;
-    }
-    
-    // dumb AI: chase the puck
-    const aiCenter = state.aiPaddle.y;
-    const puckY = state.puck.y;
-    const aiSpeed = 5 * speedScale;
-    
-    if (aiCenter < puckY - 5) {
-      state.aiPaddle.y = Math.min(dimensions.height - state.aiPaddle.radius, state.aiPaddle.y + aiSpeed);
-    } else if (aiCenter > puckY + 5) {
-      state.aiPaddle.y = Math.max(state.aiPaddle.radius, state.aiPaddle.y - aiSpeed);
-    }
-    
-    // move puck
-    state.puck.x += state.puck.vx;
-    state.puck.y += state.puck.vy;
-    
-    // bounce off top/bottom walls
-    if (state.puck.y - state.puck.radius <= 0 || state.puck.y + state.puck.radius >= dimensions.height) {
-      state.puck.vy = -state.puck.vy;
-    }
-    
-    // player paddle collision
-    const playerDist = Math.sqrt(
-      Math.pow(state.puck.x - state.playerPaddle.x, 2) + 
-      Math.pow(state.puck.y - state.playerPaddle.y, 2)
-    );
-    
-    if (playerDist < state.playerPaddle.radius + state.puck.radius) {
-      const angle = Math.atan2(state.puck.y - state.playerPaddle.y, state.puck.x - state.playerPaddle.x);
-      const speed = Math.sqrt(state.puck.vx * state.puck.vx + state.puck.vy * state.puck.vy);
-      state.puck.vx = Math.cos(angle) * speed * 1.2;
-      state.puck.vy = Math.sin(angle) * speed * 1.2;
-      const overlap = state.playerPaddle.radius + state.puck.radius - playerDist;
-      state.puck.x += Math.cos(angle) * overlap;
-      state.puck.y += Math.sin(angle) * overlap;
-    }
-    
-    // AI paddle collision
-    const aiDist = Math.sqrt(
-      Math.pow(state.puck.x - state.aiPaddle.x, 2) + 
-      Math.pow(state.puck.y - state.aiPaddle.y, 2)
-    );
-    
-    if (aiDist < state.aiPaddle.radius + state.puck.radius) {
-      const angle = Math.atan2(state.puck.y - state.aiPaddle.y, state.puck.x - state.aiPaddle.x);
-      const speed = Math.sqrt(state.puck.vx * state.puck.vx + state.puck.vy * state.puck.vy);
-      state.puck.vx = Math.cos(angle) * speed * 1.2;
-      state.puck.vy = Math.sin(angle) * speed * 1.2;
-      const overlap = state.aiPaddle.radius + state.puck.radius - aiDist;
-      state.puck.x += Math.cos(angle) * overlap;
-      state.puck.y += Math.sin(angle) * overlap;
-    }
-    
-    // puck went off left edge: AI scores
-    if (state.puck.x < 0) {
-      if (gameOverRef.current) return;
-      const newScore = { player: scoreRef.current.player, ai: scoreRef.current.ai + 1 };
-      updateScore(newScore);
-      initGame();
-      return;
-    }
-    // puck went off right edge: player scores
-    if (state.puck.x > dimensions.width) {
-      if (gameOverRef.current) return;
-      const newScore = { player: scoreRef.current.player + 1, ai: scoreRef.current.ai };
-      updateScore(newScore);
-      initGame();
-      return;
-    }
-    
-    // push state for render
-    setGameState({
-      playerPaddle: { ...state.playerPaddle },
-      aiPaddle: { ...state.aiPaddle },
-      puck: { ...state.puck },
-    });
-  }, [dimensions, initGame, updateScore, speedScale]);
+
+      if (
+        playerDist <
+        state.playerPaddle.radius + state.puck.radius
+      ) {
+        const angle = Math.atan2(
+          state.puck.y - state.playerPaddle.y,
+          state.puck.x - state.playerPaddle.x
+        );
+        const maxSpeed = 12 * speedScale;
+        const speed = Math.min(maxSpeed, Math.sqrt(
+          state.puck.vx * state.puck.vx +
+            state.puck.vy * state.puck.vy
+        ) * 1.2);
+        state.puck.vx = Math.cos(angle) * speed;
+        state.puck.vy = Math.sin(angle) * speed;
+        const overlap =
+          state.playerPaddle.radius +
+          state.puck.radius -
+          playerDist;
+        state.puck.x += Math.cos(angle) * overlap;
+        state.puck.y += Math.sin(angle) * overlap;
+
+        // clamp back inside walls after push
+        state.puck.y = Math.max(state.puck.radius, Math.min(dimensions.height - state.puck.radius, state.puck.y));
+      }
+
+      // AI paddle collision (including tunnel: puck passed through in one frame)
+      const aiR = state.aiPaddle.radius + state.puck.radius;
+      const aiDist = Math.sqrt(
+        Math.pow(state.puck.x - state.aiPaddle.x, 2) +
+          Math.pow(state.puck.y - state.aiPaddle.y, 2)
+      );
+
+      let aiCollided = aiDist < aiR;
+      if (!aiCollided) {
+        // Check for tunnel: segment from prev position to current intersects paddle circle
+        const dx = state.puck.x - prevPuckX;
+        const dy = state.puck.y - prevPuckY;
+        const mx = prevPuckX - state.aiPaddle.x;
+        const my = prevPuckY - state.aiPaddle.y;
+        const a = dx * dx + dy * dy;
+        if (a > 1e-10) {
+          const b = 2 * (mx * dx + my * dy);
+          const c = mx * mx + my * my - aiR * aiR;
+          const disc = b * b - 4 * a * c;
+          if (disc >= 0) {
+            const sqrtDisc = Math.sqrt(disc);
+            const t0 = (-b - sqrtDisc) / (2 * a);
+            if (t0 >= 0 && t0 <= 1) {
+              aiCollided = true;
+              state.puck.x = prevPuckX + t0 * dx;
+              state.puck.y = prevPuckY + t0 * dy;
+            }
+          }
+        }
+      }
+
+      if (aiCollided) {
+        const angle = Math.atan2(
+          state.puck.y - state.aiPaddle.y,
+          state.puck.x - state.aiPaddle.x
+        );
+        const maxSpeed = 12 * speedScale;
+        const speed = Math.min(maxSpeed, Math.sqrt(
+          state.puck.vx * state.puck.vx +
+            state.puck.vy * state.puck.vy
+        ) * 1.2);
+        state.puck.vx = Math.cos(angle) * speed;
+        state.puck.vy = Math.sin(angle) * speed;
+        const overlap =
+          state.aiPaddle.radius +
+          state.puck.radius -
+          Math.sqrt(
+            Math.pow(state.puck.x - state.aiPaddle.x, 2) +
+              Math.pow(state.puck.y - state.aiPaddle.y, 2)
+          );
+        state.puck.x += Math.cos(angle) * overlap;
+        state.puck.y += Math.sin(angle) * overlap;
+
+        // clamp back inside walls after push
+        state.puck.y = Math.max(state.puck.radius, Math.min(dimensions.height - state.puck.radius, state.puck.y));
+      }
+
+      // puck went off left edge: AI scores
+      if (state.puck.x < 0) {
+        if (gameOverRef.current) return;
+        const newScore = {
+          player: scoreRef.current.player,
+          ai: scoreRef.current.ai + 1,
+        };
+        updateScore(newScore);
+        placeAfterGoal("ai");
+        return;
+      }
+      // puck went off right edge: player scores
+      if (state.puck.x > dimensions.width) {
+        if (gameOverRef.current) return;
+        const newScore = {
+          player: scoreRef.current.player + 1,
+          ai: scoreRef.current.ai,
+        };
+        updateScore(newScore);
+        placeAfterGoal("player");
+        return;
+      }
+
+      // push state for render
+      setGameState({
+        playerPaddle: { ...state.playerPaddle },
+        aiPaddle: { ...state.aiPaddle },
+        puck: { ...state.puck },
+      });
+    },
+    [
+      dimensions,
+      placeAfterGoal,
+      updateScore,
+      speedScale,
+    ]
+  );
 
   // resize handler
   useEffect(() => {
@@ -418,7 +675,7 @@ export function HockeyGame({ className }: { className?: string }) {
       const state = gameStateRef.current;
       state.lastTime = currentTime;
 
-      update();
+      update(currentTime);
 
       animationFrameRef.current = requestAnimationFrame(gameLoop);
     };
@@ -444,17 +701,25 @@ export function HockeyGame({ className }: { className?: string }) {
     if (!container) return;
 
     if (!isFullscreen) {
+      setIsPaused(true);
       if (container.requestFullscreen) {
         container.requestFullscreen().then(() => {
+          const isMobile = typeof window !== "undefined" && "ontouchstart" in window;
+          if (isMobile && "lock" in screen.orientation && typeof screen.orientation.lock === "function") {
+            (screen.orientation as { lock: (o: string) => Promise<void> }).lock("landscape").catch(() => {});
+          }
           setIsFullscreen(true);
           setTimeout(() => {
             setDimensions({ width: window.innerWidth, height: window.innerHeight });
-          }, 100);
+          }, isMobile ? 200 : 100);
         });
       }
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen().then(() => {
+          if ("unlock" in screen.orientation && typeof screen.orientation.unlock === "function") {
+            (screen.orientation as { unlock: () => void }).unlock();
+          }
           setIsFullscreen(false);
           setTimeout(() => {
             const rect = container.getBoundingClientRect();
@@ -592,10 +857,10 @@ export function HockeyGame({ className }: { className?: string }) {
             </p>
             <div className="flex flex-col items-center gap-2">
               <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground">
-                W / ↑ &nbsp; MOVE UP
+                W / ↑ &nbsp; MOVE UP &nbsp; · &nbsp; S / ↓ &nbsp; MOVE DOWN
               </p>
               <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground">
-                S / ↓ &nbsp; MOVE DOWN
+                A / ← &nbsp; MOVE LEFT &nbsp; · &nbsp; D / → &nbsp; MOVE RIGHT
               </p>
               <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
                 TOUCH / DRAG ON MOBILE
@@ -654,30 +919,58 @@ export function HockeyGame({ className }: { className?: string }) {
       {/* bottom controls: only show after game starts */}
       {hasStarted && (
         <div className="flex flex-col gap-2">
-          {/* mobile D-pad: up/down buttons */}
-          <div className="flex gap-2 sm:hidden">
-            <Button
-              onTouchStart={() => { gameStateRef.current.keys.up = true; }}
-              onTouchEnd={() => { gameStateRef.current.keys.up = false; }}
-              onMouseDown={() => { gameStateRef.current.keys.up = true; }}
-              onMouseUp={() => { gameStateRef.current.keys.up = false; }}
-              onMouseLeave={() => { gameStateRef.current.keys.up = false; }}
-              variant="outline"
-              className="retro flex-1 h-12 text-lg uppercase tracking-widest select-none"
-            >
-              ▲
-            </Button>
-            <Button
-              onTouchStart={() => { gameStateRef.current.keys.down = true; }}
-              onTouchEnd={() => { gameStateRef.current.keys.down = false; }}
-              onMouseDown={() => { gameStateRef.current.keys.down = true; }}
-              onMouseUp={() => { gameStateRef.current.keys.down = false; }}
-              onMouseLeave={() => { gameStateRef.current.keys.down = false; }}
-              variant="outline"
-              className="retro flex-1 h-12 text-lg uppercase tracking-widest select-none"
-            >
-              ▼
-            </Button>
+          {/* mobile D-pad: up/down and left/right buttons */}
+          <div className="flex flex-col gap-2 sm:hidden">
+            <div className="flex gap-2 justify-center">
+              <Button
+                onTouchStart={() => { gameStateRef.current.keys.up = true; }}
+                onTouchEnd={() => { gameStateRef.current.keys.up = false; }}
+                onMouseDown={() => { gameStateRef.current.keys.up = true; }}
+                onMouseUp={() => { gameStateRef.current.keys.up = false; }}
+                onMouseLeave={() => { gameStateRef.current.keys.up = false; }}
+                variant="outline"
+                className="retro w-14 h-12 text-lg uppercase tracking-widest select-none"
+              >
+                ▲
+              </Button>
+            </div>
+            <div className="flex gap-2 justify-center">
+              <Button
+                onTouchStart={() => { gameStateRef.current.keys.left = true; }}
+                onTouchEnd={() => { gameStateRef.current.keys.left = false; }}
+                onMouseDown={() => { gameStateRef.current.keys.left = true; }}
+                onMouseUp={() => { gameStateRef.current.keys.left = false; }}
+                onMouseLeave={() => { gameStateRef.current.keys.left = false; }}
+                variant="outline"
+                className="retro flex-1 h-12 text-lg uppercase tracking-widest select-none"
+              >
+                ◀
+              </Button>
+              <Button
+                onTouchStart={() => { gameStateRef.current.keys.right = true; }}
+                onTouchEnd={() => { gameStateRef.current.keys.right = false; }}
+                onMouseDown={() => { gameStateRef.current.keys.right = true; }}
+                onMouseUp={() => { gameStateRef.current.keys.right = false; }}
+                onMouseLeave={() => { gameStateRef.current.keys.right = false; }}
+                variant="outline"
+                className="retro flex-1 h-12 text-lg uppercase tracking-widest select-none"
+              >
+                ▶
+              </Button>
+            </div>
+            <div className="flex gap-2 justify-center">
+              <Button
+                onTouchStart={() => { gameStateRef.current.keys.down = true; }}
+                onTouchEnd={() => { gameStateRef.current.keys.down = false; }}
+                onMouseDown={() => { gameStateRef.current.keys.down = true; }}
+                onMouseUp={() => { gameStateRef.current.keys.down = false; }}
+                onMouseLeave={() => { gameStateRef.current.keys.down = false; }}
+                variant="outline"
+                className="retro w-14 h-12 text-lg uppercase tracking-widest select-none"
+              >
+                ▼
+              </Button>
+            </div>
           </div>
           {/* pause + fullscreen row */}
           <div className="flex gap-2">
