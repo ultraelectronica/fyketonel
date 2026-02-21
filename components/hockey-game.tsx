@@ -127,6 +127,9 @@ export function HockeyGame({ className }: { className?: string }) {
   const [gameOver, setGameOver] = useState(false);
   const scoreRef = useRef<GameScore>({ player: 0, ai: 0 });
   const gameOverRef = useRef(false);
+  const awaitingServeRef = useRef(false);
+  const serveSideRef = useRef<"player" | "ai">("player");
+  const serveStartTimeRef = useRef(0);
 
   // After mount, sync score from localStorage so client matches saved state (avoids hydration mismatch).
   useEffect(() => {
@@ -224,31 +227,77 @@ export function HockeyGame({ className }: { className?: string }) {
   const currentDiagonal = Math.sqrt(dimensions.width * dimensions.width + dimensions.height * dimensions.height);
   const speedScale = Math.min(1.8, Math.max(1, currentDiagonal / baseDiagonal));
 
-  // reset positions and launch puck
-  const initGame = useCallback(() => {
+  // default paddle positions (used by initGame and placeAfterGoal)
+  const defaultPaddlePositions = useCallback(() => {
     const state = gameStateRef.current;
     const paddleMargin = 30 * speedScale;
-    
     state.playerPaddle.x = paddleMargin;
     state.playerPaddle.y = dimensions.height / 2;
-    
     state.aiPaddle.x = dimensions.width - paddleMargin;
     state.aiPaddle.y = dimensions.height / 2;
-    
+  }, [dimensions, speedScale]);
+
+  // reset positions and launch puck (start of game or resize)
+  const initGame = useCallback(() => {
+    awaitingServeRef.current = false;
+    const state = gameStateRef.current;
+    defaultPaddlePositions();
+
     state.puck.x = dimensions.width / 2;
     state.puck.y = dimensions.height / 2;
-    
+
     const speed = 4.5 * speedScale;
     const angle = (Math.random() - 0.5) * Math.PI / 3;
     state.puck.vx = Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
     state.puck.vy = Math.sin(angle) * speed;
-    
+
     setGameState({
       playerPaddle: { ...state.playerPaddle },
       aiPaddle: { ...state.aiPaddle },
       puck: { ...state.puck },
     });
-  }, [dimensions, speedScale]);
+  }, [dimensions, speedScale, defaultPaddlePositions]);
+
+  // after a goal: reset paddles, place puck in front of scorer (stationary), wait for push
+  const placeAfterGoal = useCallback(
+    (scorer: "player" | "ai") => {
+      const state = gameStateRef.current;
+      const paddleMargin = 30 * speedScale;
+      const gap = 25 * speedScale;
+
+      defaultPaddlePositions();
+
+      state.puck.vx = 0;
+      state.puck.vy = 0;
+      if (scorer === "player") {
+        state.puck.x =
+          paddleMargin +
+          state.playerPaddle.radius +
+          state.puck.radius +
+          gap;
+        state.puck.y = dimensions.height / 2;
+      } else {
+        state.puck.x =
+          dimensions.width -
+          paddleMargin -
+          state.aiPaddle.radius -
+          state.puck.radius -
+          gap;
+        state.puck.y = dimensions.height / 2;
+      }
+
+      awaitingServeRef.current = true;
+      serveSideRef.current = scorer;
+      serveStartTimeRef.current = performance.now();
+
+      setGameState({
+        playerPaddle: { ...state.playerPaddle },
+        aiPaddle: { ...state.aiPaddle },
+        puck: { ...state.puck },
+      });
+    },
+    [dimensions, speedScale, defaultPaddlePositions]
+  );
 
   // full reset: score, flags, positions
   const resetGame = useCallback(() => {
@@ -305,15 +354,16 @@ export function HockeyGame({ className }: { className?: string }) {
     }
   }, []);
 
-  // main physics tick
-  const update = useCallback(() => {
-    const state = gameStateRef.current;
-    const paddleSpeed = 6 * speedScale;
-    const paddleMargin = 30 * speedScale;
-    const playerMinX = paddleMargin;
-    const playerMaxX = dimensions.width / 2 - paddleMargin;
+  // main physics tick (currentTime from requestAnimationFrame for serve delay)
+  const update = useCallback(
+    (currentTime: number) => {
+      const state = gameStateRef.current;
+      const paddleSpeed = 6 * speedScale;
+      const paddleMargin = 30 * speedScale;
+      const playerMinX = paddleMargin;
+      const playerMaxX = dimensions.width / 2 - paddleMargin;
 
-    // move player paddle via keyboard (vertical)
+      // move player paddle via keyboard (vertical)
     if (state.keys.up && state.playerPaddle.y - state.playerPaddle.radius > 0) {
       state.playerPaddle.y -= paddleSpeed;
     }
@@ -347,82 +397,220 @@ export function HockeyGame({ className }: { className?: string }) {
       }
     }
     
-    // dumb AI: chase the puck
-    const aiCenter = state.aiPaddle.y;
-    const puckY = state.puck.y;
-    const aiSpeed = 5 * speedScale;
-    
-    if (aiCenter < puckY - 5) {
-      state.aiPaddle.y = Math.min(dimensions.height - state.aiPaddle.radius, state.aiPaddle.y + aiSpeed);
-    } else if (aiCenter > puckY + 5) {
-      state.aiPaddle.y = Math.max(state.aiPaddle.radius, state.aiPaddle.y - aiSpeed);
-    }
-    
-    // move puck
-    state.puck.x += state.puck.vx;
-    state.puck.y += state.puck.vy;
-    
-    // bounce off top/bottom walls
-    if (state.puck.y - state.puck.radius <= 0 || state.puck.y + state.puck.radius >= dimensions.height) {
-      state.puck.vy = -state.puck.vy;
-    }
-    
-    // player paddle collision
-    const playerDist = Math.sqrt(
-      Math.pow(state.puck.x - state.playerPaddle.x, 2) + 
-      Math.pow(state.puck.y - state.playerPaddle.y, 2)
-    );
-    
-    if (playerDist < state.playerPaddle.radius + state.puck.radius) {
-      const angle = Math.atan2(state.puck.y - state.playerPaddle.y, state.puck.x - state.playerPaddle.x);
-      const speed = Math.sqrt(state.puck.vx * state.puck.vx + state.puck.vy * state.puck.vy);
-      state.puck.vx = Math.cos(angle) * speed * 1.2;
-      state.puck.vy = Math.sin(angle) * speed * 1.2;
-      const overlap = state.playerPaddle.radius + state.puck.radius - playerDist;
-      state.puck.x += Math.cos(angle) * overlap;
-      state.puck.y += Math.sin(angle) * overlap;
-    }
-    
-    // AI paddle collision
-    const aiDist = Math.sqrt(
-      Math.pow(state.puck.x - state.aiPaddle.x, 2) + 
-      Math.pow(state.puck.y - state.aiPaddle.y, 2)
-    );
-    
-    if (aiDist < state.aiPaddle.radius + state.puck.radius) {
-      const angle = Math.atan2(state.puck.y - state.aiPaddle.y, state.puck.x - state.aiPaddle.x);
-      const speed = Math.sqrt(state.puck.vx * state.puck.vx + state.puck.vy * state.puck.vy);
-      state.puck.vx = Math.cos(angle) * speed * 1.2;
-      state.puck.vy = Math.sin(angle) * speed * 1.2;
-      const overlap = state.aiPaddle.radius + state.puck.radius - aiDist;
-      state.puck.x += Math.cos(angle) * overlap;
-      state.puck.y += Math.sin(angle) * overlap;
-    }
-    
-    // puck went off left edge: AI scores
-    if (state.puck.x < 0) {
-      if (gameOverRef.current) return;
-      const newScore = { player: scoreRef.current.player, ai: scoreRef.current.ai + 1 };
-      updateScore(newScore);
-      initGame();
-      return;
-    }
-    // puck went off right edge: player scores
-    if (state.puck.x > dimensions.width) {
-      if (gameOverRef.current) return;
-      const newScore = { player: scoreRef.current.player + 1, ai: scoreRef.current.ai };
-      updateScore(newScore);
-      initGame();
-      return;
-    }
-    
-    // push state for render
-    setGameState({
-      playerPaddle: { ...state.playerPaddle },
-      aiPaddle: { ...state.aiPaddle },
-      puck: { ...state.puck },
-    });
-  }, [dimensions, initGame, updateScore, speedScale]);
+      // dumb AI: chase the puck (vertical and horizontal, stays on right half)
+      // skip during awaiting serve so the AI doesn't move into the stationary puck
+      if (!awaitingServeRef.current) {
+        const aiSpeed = 5 * speedScale;
+        const aiMinX = dimensions.width / 2 + paddleMargin;
+        const aiMaxX = dimensions.width - paddleMargin;
+
+        if (state.aiPaddle.y < state.puck.y - 5) {
+          state.aiPaddle.y = Math.min(
+            dimensions.height - state.aiPaddle.radius,
+            state.aiPaddle.y + aiSpeed
+          );
+        } else if (state.aiPaddle.y > state.puck.y + 5) {
+          state.aiPaddle.y = Math.max(
+            state.aiPaddle.radius,
+            state.aiPaddle.y - aiSpeed
+          );
+        }
+
+        if (state.aiPaddle.x < state.puck.x - 5) {
+          state.aiPaddle.x = Math.min(
+            aiMaxX - state.aiPaddle.radius,
+            state.aiPaddle.x + aiSpeed
+          );
+        } else if (state.aiPaddle.x > state.puck.x + 5) {
+          state.aiPaddle.x = Math.max(
+            aiMinX + state.aiPaddle.radius,
+            state.aiPaddle.x - aiSpeed
+          );
+        }
+      }
+
+      // --- Awaiting serve: puck is stationary in front of scorer ---
+      if (awaitingServeRef.current) {
+        if (serveSideRef.current === "player") {
+          const playerDist = Math.sqrt(
+            Math.pow(state.puck.x - state.playerPaddle.x, 2) +
+              Math.pow(state.puck.y - state.playerPaddle.y, 2)
+          );
+          if (
+            playerDist <
+            state.playerPaddle.radius + state.puck.radius
+          ) {
+            awaitingServeRef.current = false;
+            const speed = 4.5 * speedScale;
+            const angle =
+              (Math.random() - 0.5) * (Math.PI / 3);
+            state.puck.vx = Math.cos(angle) * speed;
+            state.puck.vy = Math.sin(angle) * speed;
+            const overlap =
+              state.playerPaddle.radius +
+              state.puck.radius -
+              playerDist;
+            const pushAngle = Math.atan2(
+              state.puck.y - state.playerPaddle.y,
+              state.puck.x - state.playerPaddle.x
+            );
+            // Push out of overlap + extra margin so we don't re-collide with player next frame
+            const separation = overlap + 3;
+            state.puck.x += Math.cos(pushAngle) * separation;
+            state.puck.y += Math.sin(pushAngle) * separation;
+          }
+        } else {
+          if (
+            currentTime - serveStartTimeRef.current >= 1200
+          ) {
+            awaitingServeRef.current = false;
+            const speed = 4.5 * speedScale;
+            const angle =
+              (Math.random() - 0.5) * (Math.PI / 3);
+            state.puck.vx = -Math.cos(angle) * speed;
+            state.puck.vy = Math.sin(angle) * speed;
+          }
+        }
+        setGameState({
+          playerPaddle: { ...state.playerPaddle },
+          aiPaddle: { ...state.aiPaddle },
+          puck: { ...state.puck },
+        });
+        return;
+      }
+
+      // move puck (keep previous position for tunnel detection)
+      const prevPuckX = state.puck.x;
+      const prevPuckY = state.puck.y;
+      state.puck.x += state.puck.vx;
+      state.puck.y += state.puck.vy;
+
+      // bounce off top/bottom walls
+      if (
+        state.puck.y - state.puck.radius <= 0 ||
+        state.puck.y + state.puck.radius >= dimensions.height
+      ) {
+        state.puck.vy = -state.puck.vy;
+      }
+
+      // player paddle collision
+      const playerDist = Math.sqrt(
+        Math.pow(state.puck.x - state.playerPaddle.x, 2) +
+          Math.pow(state.puck.y - state.playerPaddle.y, 2)
+      );
+
+      if (
+        playerDist <
+        state.playerPaddle.radius + state.puck.radius
+      ) {
+        const angle = Math.atan2(
+          state.puck.y - state.playerPaddle.y,
+          state.puck.x - state.playerPaddle.x
+        );
+        const speed = Math.sqrt(
+          state.puck.vx * state.puck.vx +
+            state.puck.vy * state.puck.vy
+        );
+        state.puck.vx = Math.cos(angle) * speed * 1.2;
+        state.puck.vy = Math.sin(angle) * speed * 1.2;
+        const overlap =
+          state.playerPaddle.radius +
+          state.puck.radius -
+          playerDist;
+        state.puck.x += Math.cos(angle) * overlap;
+        state.puck.y += Math.sin(angle) * overlap;
+      }
+
+      // AI paddle collision (including tunnel: puck passed through in one frame)
+      const aiR = state.aiPaddle.radius + state.puck.radius;
+      const aiDist = Math.sqrt(
+        Math.pow(state.puck.x - state.aiPaddle.x, 2) +
+          Math.pow(state.puck.y - state.aiPaddle.y, 2)
+      );
+
+      let aiCollided = aiDist < aiR;
+      if (!aiCollided) {
+        // Check for tunnel: segment from prev position to current intersects paddle circle
+        const dx = state.puck.x - prevPuckX;
+        const dy = state.puck.y - prevPuckY;
+        const mx = prevPuckX - state.aiPaddle.x;
+        const my = prevPuckY - state.aiPaddle.y;
+        const a = dx * dx + dy * dy;
+        if (a > 1e-10) {
+          const b = 2 * (mx * dx + my * dy);
+          const c = mx * mx + my * my - aiR * aiR;
+          const disc = b * b - 4 * a * c;
+          if (disc >= 0) {
+            const sqrtDisc = Math.sqrt(disc);
+            const t0 = (-b - sqrtDisc) / (2 * a);
+            if (t0 >= 0 && t0 <= 1) {
+              aiCollided = true;
+              state.puck.x = prevPuckX + t0 * dx;
+              state.puck.y = prevPuckY + t0 * dy;
+            }
+          }
+        }
+      }
+
+      if (aiCollided) {
+        const angle = Math.atan2(
+          state.puck.y - state.aiPaddle.y,
+          state.puck.x - state.aiPaddle.x
+        );
+        const speed = Math.sqrt(
+          state.puck.vx * state.puck.vx +
+            state.puck.vy * state.puck.vy
+        );
+        state.puck.vx = Math.cos(angle) * speed * 1.2;
+        state.puck.vy = Math.sin(angle) * speed * 1.2;
+        const overlap =
+          state.aiPaddle.radius +
+          state.puck.radius -
+          Math.sqrt(
+            Math.pow(state.puck.x - state.aiPaddle.x, 2) +
+              Math.pow(state.puck.y - state.aiPaddle.y, 2)
+          );
+        state.puck.x += Math.cos(angle) * overlap;
+        state.puck.y += Math.sin(angle) * overlap;
+      }
+
+      // puck went off left edge: AI scores
+      if (state.puck.x < 0) {
+        if (gameOverRef.current) return;
+        const newScore = {
+          player: scoreRef.current.player,
+          ai: scoreRef.current.ai + 1,
+        };
+        updateScore(newScore);
+        placeAfterGoal("ai");
+        return;
+      }
+      // puck went off right edge: player scores
+      if (state.puck.x > dimensions.width) {
+        if (gameOverRef.current) return;
+        const newScore = {
+          player: scoreRef.current.player + 1,
+          ai: scoreRef.current.ai,
+        };
+        updateScore(newScore);
+        placeAfterGoal("player");
+        return;
+      }
+
+      // push state for render
+      setGameState({
+        playerPaddle: { ...state.playerPaddle },
+        aiPaddle: { ...state.aiPaddle },
+        puck: { ...state.puck },
+      });
+    },
+    [
+      dimensions,
+      placeAfterGoal,
+      updateScore,
+      speedScale,
+    ]
+  );
 
   // resize handler
   useEffect(() => {
@@ -464,7 +652,7 @@ export function HockeyGame({ className }: { className?: string }) {
       const state = gameStateRef.current;
       state.lastTime = currentTime;
 
-      update();
+      update(currentTime);
 
       animationFrameRef.current = requestAnimationFrame(gameLoop);
     };
