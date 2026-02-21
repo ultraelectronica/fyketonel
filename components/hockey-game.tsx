@@ -891,8 +891,35 @@ export function HockeyGame({ className }: { className?: string }) {
 
         {/* pause overlay */}
         {hasStarted && isPaused && !gameOver && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/80">
             <p className="retro text-lg uppercase tracking-widest text-primary">PAUSED</p>
+            <Button
+              onClick={() => setIsPaused(false)}
+              variant="outline"
+              className="retro h-10 px-6 text-xs uppercase tracking-widest"
+            >
+              RESUME
+            </Button>
+          </div>
+        )}
+
+        {/* fullscreen: floating pause/resume + exit buttons */}
+        {isFullscreen && hasStarted && !gameOver && (
+          <div className="absolute top-2 right-2 flex gap-2 z-10">
+            <Button
+              onClick={() => setIsPaused(!isPaused)}
+              variant="outline"
+              className="retro h-9 px-4 text-xs uppercase tracking-widest bg-background/90"
+            >
+              {isPaused ? "RESUME" : "PAUSE"}
+            </Button>
+            <Button
+              onClick={toggleFullscreen}
+              variant="outline"
+              className="retro h-9 px-4 text-xs uppercase tracking-widest bg-background/90"
+            >
+              EXIT FULLSCREEN
+            </Button>
           </div>
         )}
 

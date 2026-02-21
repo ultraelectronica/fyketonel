@@ -58,16 +58,9 @@ async function getJokeOfTheDay() {
   }
 }
 
-interface GameScore {
-  player: number;
-  ai: number;
-}
-
 export default function Home() {
   const [joke, setJoke] = useState("Loading joke...");
   const [isAllyMode, setIsAllyMode] = useState(false);
-  const [hockeyScore, setHockeyScore] = useState<GameScore>({ player: 0, ai: 0 });
-
   // Fetch joke on mount
   useEffect(() => {
     let isMounted = true;
@@ -103,33 +96,6 @@ export default function Home() {
     };
   }, []);
 
-  // Load and listen for hockey score updates
-  useEffect(() => {
-    const loadScore = () => {
-      if (typeof window === "undefined") return;
-      const saved = localStorage.getItem("hockey-game-score");
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved) as GameScore;
-          setHockeyScore(parsed);
-        } catch {
-          // Invalid data, use default
-        }
-      }
-    };
-
-    const handleScoreUpdate = (e: CustomEvent<GameScore>) => {
-      setHockeyScore(e.detail);
-    };
-
-    loadScore();
-    window.addEventListener("hockeyScoreUpdate", handleScoreUpdate as EventListener);
-    
-    return () => {
-      window.removeEventListener("hockeyScoreUpdate", handleScoreUpdate as EventListener);
-    };
-  }, []);
-
   // Updated Panel styles - Denser, less padding
   const panelBaseClass = "relative bg-card text-card-foreground border-2 border-border shadow-[4px_4px_0_var(--border)] p-3 overflow-hidden";
   const headerClass = "retro text-xs uppercase tracking-[0.2em] text-primary mb-2 border-b-2 border-dashed border-border/50 pb-1";
@@ -156,12 +122,6 @@ export default function Home() {
                 </p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="border-2 border-dashed border-border bg-background/50 px-3 py-1.5">
-                <p className="retro text-[0.6rem] uppercase tracking-wider text-muted-foreground">HOCKEY_SCORE</p>
-                <p className="retro text-sm font-bold text-primary">
-                  {hockeyScore.player} - {hockeyScore.ai}
-                </p>
-              </div>
               <Button
               asChild
               className="retro h-10 border-2 border-primary bg-primary/10 text-primary shadow-[4px_4px_0_var(--primary)] hover:translate-y-1 hover:shadow-none"
