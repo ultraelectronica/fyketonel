@@ -225,7 +225,12 @@ export function HockeyGame({ className }: { className?: string }) {
   // speed scaling based on viewport diagonal
   const baseDiagonal = Math.sqrt(400 * 400 + 300 * 300);
   const currentDiagonal = Math.sqrt(dimensions.width * dimensions.width + dimensions.height * dimensions.height);
-  const speedScale = Math.min(1.8, Math.max(1, currentDiagonal / baseDiagonal));
+  const baseSpeedScale = Math.min(1.8, Math.max(1, currentDiagonal / baseDiagonal));
+  const isMobileFullscreen =
+    isFullscreen &&
+    typeof window !== "undefined" &&
+    "ontouchstart" in window;
+  const speedScale = isMobileFullscreen ? baseSpeedScale * 0.75 : baseSpeedScale;
 
   // in fullscreen (PC), scale up paddles and puck so they stay visibly larger
   const entityScale = isFullscreen ? Math.min(2.2, Math.max(1.2, currentDiagonal / baseDiagonal)) : 1;
@@ -696,17 +701,25 @@ export function HockeyGame({ className }: { className?: string }) {
     if (!container) return;
 
     if (!isFullscreen) {
+      setIsPaused(true);
       if (container.requestFullscreen) {
         container.requestFullscreen().then(() => {
+          const isMobile = typeof window !== "undefined" && "ontouchstart" in window;
+          if (isMobile && "lock" in screen.orientation && typeof screen.orientation.lock === "function") {
+            (screen.orientation as { lock: (o: string) => Promise<void> }).lock("landscape").catch(() => {});
+          }
           setIsFullscreen(true);
           setTimeout(() => {
             setDimensions({ width: window.innerWidth, height: window.innerHeight });
-          }, 100);
+          }, isMobile ? 200 : 100);
         });
       }
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen().then(() => {
+          if ("unlock" in screen.orientation && typeof screen.orientation.unlock === "function") {
+            (screen.orientation as { unlock: () => void }).unlock();
+          }
           setIsFullscreen(false);
           setTimeout(() => {
             const rect = container.getBoundingClientRect();
