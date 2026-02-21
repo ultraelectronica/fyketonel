@@ -569,7 +569,10 @@ body.simon-light.theme-simon [data-slot="accordion-trigger"] p.retro,
 /* Ally Theme - Project titles in accordions with pink pixel shadow */
 .theme-ally [data-slot="accordion-trigger"] p.retro.text-lg,
 .theme-ally [data-slot="accordion-trigger"] .retro.text-lg,
-.theme-ally [data-slot="accordion-trigger"] p.retro.text-lg.uppercase {
+.theme-ally [data-slot="accordion-trigger"] p.retro.text-lg.uppercase,
+.theme-ally [data-slot="accordion-trigger"] p.retro.text-xl,
+.theme-ally [data-slot="accordion-trigger"] .retro.text-xl,
+.theme-ally [data-slot="accordion-trigger"] p.retro.text-xl.uppercase {
   text-shadow: 
     2px 0 0 #FF69B4,
     0 2px 0 #FF69B4,

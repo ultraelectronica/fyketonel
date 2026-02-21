@@ -544,13 +544,7 @@ const projects: ProjectEntry[] = [
     detail:
       "Combines calendar management, event tracking, note-taking, and productivity tools with end-to-end encryption, cloud sync via Supabase, Spotify integration, weather widget, and a stunning aurora glassmorphism UI.",
     link: "https://revocalendar.vercel.app/",
-    tech: [
-      "React",
-      "TypeScript",
-      "Next.js",
-      "Supabase",
-      "Vercel",
-    ],
+    tech: ["React", "TypeScript", "Next.js", "Supabase", "Vercel"],
     classification: {
       tier: "A",
       codename: "Command Deck",
@@ -687,7 +681,7 @@ const QuestionMarkBlock = ({
   caption?: string;
 }) => {
   const [isAllyMode, setIsAllyMode] = useState(false);
-  
+
   useEffect(() => {
     const checkTheme = () => {
       if (typeof window !== "undefined") {
@@ -703,7 +697,7 @@ const QuestionMarkBlock = ({
       clearInterval(interval);
     };
   }, []);
-  
+
   return (
     <div className="relative flex h-full min-h-[260px] w-full flex-col items-center justify-center overflow-hidden rounded-sm border-4 border-amber-500 bg-gradient-to-b from-amber-200 via-amber-300 to-amber-500 text-center text-amber-900 shadow-[0_0_0_4px_rgba(0,0,0,0.25),inset_0_-12px_0_rgba(0,0,0,0.15)]">
       {isAllyMode ? (
@@ -715,33 +709,35 @@ const QuestionMarkBlock = ({
           className="drop-shadow-[0_6px_0_rgba(0,0,0,0.35)]"
         />
       ) : (
-        <span className="retro text-7xl drop-shadow-[0_6px_0_rgba(0,0,0,0.35)]">?</span>
+        <span className="retro text-7xl drop-shadow-[0_6px_0_rgba(0,0,0,0.35)]">
+          ?
+        </span>
       )}
       <p className="retro mt-4 max-w-xs text-[0.6rem] uppercase tracking-[0.2em]">
         {title}
       </p>
-    {caption ? (
-      <p className="retro mt-2 px-4 text-[0.55rem] text-amber-800">
-        {caption}
-      </p>
-    ) : null}
-    <span
-      aria-hidden
-      className="absolute left-3 top-3 size-3 rounded-sm bg-amber-400 shadow-[0_2px_0_rgba(0,0,0,0.3)]"
-    />
-    <span
-      aria-hidden
-      className="absolute right-3 top-3 size-3 rounded-sm bg-amber-400 shadow-[0_2px_0_rgba(0,0,0,0.3)]"
-    />
-    <span
-      aria-hidden
-      className="absolute left-3 bottom-3 size-3 rounded-sm bg-amber-400 shadow-[0_2px_0_rgba(0,0,0,0.3)]"
-    />
-    <span
-      aria-hidden
-      className="absolute right-3 bottom-3 size-3 rounded-sm bg-amber-400 shadow-[0_2px_0_rgba(0,0,0,0.3)]"
-    />
-  </div>
+      {caption ? (
+        <p className="retro mt-2 px-4 text-[0.55rem] text-amber-800">
+          {caption}
+        </p>
+      ) : null}
+      <span
+        aria-hidden
+        className="absolute left-3 top-3 size-3 rounded-sm bg-amber-400 shadow-[0_2px_0_rgba(0,0,0,0.3)]"
+      />
+      <span
+        aria-hidden
+        className="absolute right-3 top-3 size-3 rounded-sm bg-amber-400 shadow-[0_2px_0_rgba(0,0,0,0.3)]"
+      />
+      <span
+        aria-hidden
+        className="absolute left-3 bottom-3 size-3 rounded-sm bg-amber-400 shadow-[0_2px_0_rgba(0,0,0,0.3)]"
+      />
+      <span
+        aria-hidden
+        className="absolute right-3 bottom-3 size-3 rounded-sm bg-amber-400 shadow-[0_2px_0_rgba(0,0,0,0.3)]"
+      />
+    </div>
   );
 };
 
@@ -772,7 +768,7 @@ const labNotes = [
   "My magnum opus 🎨",
   "Fueled entirely by coffee and spite",
   "Started at 3 AM, finished at 3 AM (next day)",
-  "\"It's just a small change\" they said... 1st project that worked.",
+  '"It\'s just a small change" they said... 1st project that worked.',
   "Debugged this for longer than I built it",
   "Random 3 AM motivation.",
   "A short practice for the codefest.",
@@ -801,9 +797,16 @@ const StickyNote = ({ note, index }: { note: string; index: number }) => {
     "bg-green-200 dark:bg-green-600",
     "bg-purple-200 dark:bg-purple-600",
   ];
-  
-  const rotations = ["rotate-2", "-rotate-2", "rotate-1", "-rotate-1", "rotate-3", "-rotate-3"];
-  
+
+  const rotations = [
+    "rotate-2",
+    "-rotate-2",
+    "rotate-1",
+    "-rotate-1",
+    "rotate-3",
+    "-rotate-3",
+  ];
+
   const color = colors[index % colors.length];
   const rotation = rotations[index % rotations.length];
 
@@ -812,7 +815,7 @@ const StickyNote = ({ note, index }: { note: string; index: number }) => {
       className={cn(
         "pointer-events-none absolute -top-2 left-1/2 z-20 w-48 -translate-x-1/2 p-3 shadow-lg",
         color,
-        rotation
+        rotation,
       )}
       initial={{ opacity: 0, y: 10, scale: 0.8 }}
       animate={{ opacity: 1, y: -10, scale: 1 }}
@@ -823,16 +826,17 @@ const StickyNote = ({ note, index }: { note: string; index: number }) => {
       }}
     >
       {/* Tape effect */}
-      <div className="absolute -top-2 left-1/2 h-4 w-12 -translate-x-1/2 bg-white/40 dark:bg-white/20" 
-        style={{ 
+      <div
+        className="absolute -top-2 left-1/2 h-4 w-12 -translate-x-1/2 bg-white/40 dark:bg-white/20"
+        style={{
           clipPath: "polygon(0 20%, 100% 20%, 100% 80%, 0 80%)",
         }}
       />
-      
+
       <p className="retro text-center text-[0.5rem] leading-relaxed text-gray-800 dark:text-gray-200">
         {note}
       </p>
-      
+
       {/* Paper texture lines */}
       <div className="absolute inset-x-3 top-8 space-y-2 opacity-20">
         <div className="h-px bg-gray-600" />
@@ -845,7 +849,9 @@ const StickyNote = ({ note, index }: { note: string; index: number }) => {
 
 const RetroVisitorCounter = () => {
   const [visitorCount, setVisitorCount] = useState("0000000");
-  const [displayMode, setDisplayMode] = useState<"decimal" | "binary" | "hex">("decimal");
+  const [displayMode, setDisplayMode] = useState<"decimal" | "binary" | "hex">(
+    "decimal",
+  );
 
   useEffect(() => {
     // Generate ridiculous numbers that keep incrementing
@@ -873,8 +879,9 @@ const RetroVisitorCounter = () => {
         "8675309", // Jenny's number
       ];
 
-      const randomNumber = absurdNumbers[Math.floor(Math.random() * absurdNumbers.length)];
-      
+      const randomNumber =
+        absurdNumbers[Math.floor(Math.random() * absurdNumbers.length)];
+
       if (randomMode === "binary") {
         // Convert to binary and pad
         const num = parseInt(randomNumber);
@@ -909,10 +916,12 @@ const RetroVisitorCounter = () => {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className={cn(
-        "rounded-none border-4 border-border p-3 shadow-[4px_4px_0_var(--border)]",
-        "bg-[color:var(--card)]"
-      )}>
+      <div
+        className={cn(
+          "rounded-none border-4 border-border p-3 shadow-[4px_4px_0_var(--border)]",
+          "bg-[color:var(--card)]",
+        )}
+      >
         <div className="space-y-2">
           <div className="flex items-center justify-center gap-2">
             <motion.span
@@ -925,7 +934,7 @@ const RetroVisitorCounter = () => {
             <p
               className={cn(
                 "retro ally-visitor-label text-center text-[0.6rem] uppercase tracking-[0.25em] sm:text-xs",
-                "text-[color:var(--foreground)]"
+                "text-[color:var(--foreground)]",
               )}
             >
               {getLabel()}
@@ -933,16 +942,21 @@ const RetroVisitorCounter = () => {
             <motion.span
               className="text-lg"
               animate={{ rotate: [0, -10, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.5,
+              }}
             >
               🎊
             </motion.span>
           </div>
-          
+
           <div
             className={cn(
               "rounded-sm border-2 px-4 py-2",
-              "border-[color:var(--border)] bg-[color:var(--card)]"
+              "border-[color:var(--border)] bg-[color:var(--card)]",
             )}
           >
             <div className="max-w-full overflow-x-auto">
@@ -950,7 +964,7 @@ const RetroVisitorCounter = () => {
                 key={visitorCount}
                 className={cn(
                   "retro ally-visitor-counter mx-auto text-center font-mono text-xl tabular-nums sm:text-2xl md:text-3xl",
-                  "text-[color:var(--primary)]"
+                  "text-[color:var(--primary)]",
                 )}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -962,7 +976,6 @@ const RetroVisitorCounter = () => {
                   wordBreak: "break-all",
                   whiteSpace: "nowrap",
                 }}
-
               >
                 {visitorCount}
               </motion.div>
@@ -973,19 +986,28 @@ const RetroVisitorCounter = () => {
             <motion.span
               className="inline-block size-1.5 rounded-full bg-red-600"
               animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
             />
             <p className="retro text-center text-[0.4rem] italic text-foreground">
-              {displayMode === "binary" 
-                ? "Counting in machine language..." 
+              {displayMode === "binary"
+                ? "Counting in machine language..."
                 : displayMode === "hex"
-                ? "Elite hacker mode enabled"
-                : "You are visitor number [REDACTED]"}
+                  ? "Elite hacker mode enabled"
+                  : "You are visitor number [REDACTED]"}
             </p>
             <motion.span
               className="inline-block size-1.5 rounded-full bg-red-600"
               animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.75 }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.75,
+              }}
             />
           </div>
         </div>
@@ -1023,7 +1045,7 @@ const RetroLoadingScreen = ({ tier }: { tier: string }) => {
       "DECRYPTING DATABASE RECORDS...",
       `LOADING TIER ${tier} PROJECTS...`,
     ],
-    [tier]
+    [tier],
   );
 
   useEffect(() => {
@@ -1105,8 +1127,8 @@ const RetroLoadingScreen = ({ tier }: { tier: string }) => {
                     index === loadingPhase
                       ? "text-foreground"
                       : index < loadingPhase
-                      ? "text-muted-foreground line-through"
-                      : "text-muted-foreground/50"
+                        ? "text-muted-foreground line-through"
+                        : "text-muted-foreground/50"
                   }`}
                 >
                   {msg}
@@ -1154,15 +1176,17 @@ const RetroLoadingScreen = ({ tier }: { tier: string }) => {
 
                 {/* Pixel blocks */}
                 <div className="flex h-full items-center gap-0.5 px-1">
-                  {Array.from({ length: Math.floor(progress / 5) }).map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="size-1 bg-white/30"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: i * 0.02 }}
-                    />
-                  ))}
+                  {Array.from({ length: Math.floor(progress / 5) }).map(
+                    (_, i) => (
+                      <motion.div
+                        key={i}
+                        className="size-1 bg-white/30"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: i * 0.02 }}
+                      />
+                    ),
+                  )}
                 </div>
               </motion.div>
             </div>
@@ -1235,13 +1259,15 @@ const ProjectDependenciesGraph = ({
 
     // Pasada ecosystem connections
     const pasadaProjects = projects.filter((p) =>
-      p.title.toLowerCase().includes("pasada")
+      p.title.toLowerCase().includes("pasada"),
     );
 
     if (pasadaProjects.length > 1) {
       // Admin connects to all Pasada apps
       const admin = pasadaProjects.find((p) => p.title.includes("Admin"));
-      const passenger = pasadaProjects.find((p) => p.title.includes("Passenger"));
+      const passenger = pasadaProjects.find((p) =>
+        p.title.includes("Passenger"),
+      );
       const driver = pasadaProjects.find((p) => p.title.includes("Driver"));
       const website = pasadaProjects.find((p) => p.title.includes("Website"));
 
@@ -1309,7 +1335,7 @@ const ProjectDependenciesGraph = ({
 
     // Tech stack relationships - Only connect non-Pasada Flutter projects
     const flutterProjects = projects.filter((p) =>
-      p.tech.some((t) => t.toLowerCase() === "flutter")
+      p.tech.some((t) => t.toLowerCase() === "flutter"),
     );
 
     // Connect Flutter projects only if neither is a Pasada project
@@ -1317,16 +1343,16 @@ const ProjectDependenciesGraph = ({
       flutterProjects.slice(i + 1).forEach((p2) => {
         const p1IsPasada = p1.title.toLowerCase().includes("pasada");
         const p2IsPasada = p2.title.toLowerCase().includes("pasada");
-        
+
         // Skip if either is a Pasada project (they already have explicit connections)
         if (p1IsPasada || p2IsPasada) return;
-        
+
         // Skip if connection already exists
         if (
           !relations.some(
             (r) =>
               (r.from === p1.id && r.to === p2.id) ||
-              (r.from === p2.id && r.to === p1.id)
+              (r.from === p2.id && r.to === p1.id),
           )
         ) {
           relations.push({
@@ -1381,8 +1407,8 @@ const ProjectDependenciesGraph = ({
           </p>
           <p className="retro text-[0.55rem] leading-relaxed text-muted-foreground">
             <span className="hidden sm:inline">Hover or tap</span>
-            <span className="sm:hidden">Tap</span> to explore connections between
-            projects.
+            <span className="sm:hidden">Tap</span> to explore connections
+            between projects.
           </p>
         </div>
 
@@ -1402,8 +1428,8 @@ const ProjectDependenciesGraph = ({
                   isActive
                     ? "border-primary bg-primary text-primary-foreground shadow-[0_0_12px_var(--primary)]"
                     : isConnected
-                    ? "border-primary/70 bg-primary/20 text-foreground active:bg-primary/40 sm:hover:bg-primary/30"
-                    : "border-border bg-background/80 text-foreground active:border-primary/50 active:bg-primary/10 sm:hover:border-primary/50 sm:hover:bg-primary/10 dark:border-ring"
+                      ? "border-primary/70 bg-primary/20 text-foreground active:bg-primary/40 sm:hover:bg-primary/30"
+                      : "border-border bg-background/80 text-foreground active:border-primary/50 active:bg-primary/10 sm:hover:border-primary/50 sm:hover:bg-primary/10 dark:border-ring",
                 )}
                 style={{
                   opacity: isHidden ? 0.35 : 1,
@@ -1413,7 +1439,9 @@ const ProjectDependenciesGraph = ({
                 onMouseLeave={() => setHoveredProject(null)}
                 onTouchStart={() => setHoveredProject(project.id)}
                 onClick={() =>
-                  setSelectedProject(selectedProject === project.id ? null : project.id)
+                  setSelectedProject(
+                    selectedProject === project.id ? null : project.id,
+                  )
                 }
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.95 }}
@@ -1451,15 +1479,18 @@ const ProjectDependenciesGraph = ({
               if (fromIndex === -1 || toIndex === -1) return null;
 
               const isActive =
-                activeProject && (rel.from === activeProject || rel.to === activeProject);
+                activeProject &&
+                (rel.from === activeProject || rel.to === activeProject);
               const isConnected =
                 activeProject &&
                 connectedProjects.has(rel.from) &&
                 connectedProjects.has(rel.to);
 
               // Calculate positions (circular layout)
-              const angleFrom = (fromIndex / projects.length) * 2 * Math.PI - Math.PI / 2;
-              const angleTo = (toIndex / projects.length) * 2 * Math.PI - Math.PI / 2;
+              const angleFrom =
+                (fromIndex / projects.length) * 2 * Math.PI - Math.PI / 2;
+              const angleTo =
+                (toIndex / projects.length) * 2 * Math.PI - Math.PI / 2;
 
               const radius = 35; // percentage
               const centerX = 50;
@@ -1483,8 +1514,8 @@ const ProjectDependenciesGraph = ({
                       isActive
                         ? getConnectionColor(rel.type)
                         : isConnected
-                        ? `${getConnectionColor(rel.type)} opacity-40`
-                        : "stroke-muted-foreground/20"
+                          ? `${getConnectionColor(rel.type)} opacity-40`
+                          : "stroke-muted-foreground/20",
                     )}
                     strokeDasharray={rel.type === "related" ? "5,5" : "none"}
                     initial={{ pathLength: 0, opacity: 0 }}
@@ -1502,7 +1533,8 @@ const ProjectDependenciesGraph = ({
           {/* Project Nodes */}
           <div className="pointer-events-none absolute inset-0">
             {projects.map((project, index) => {
-              const angle = (index / projects.length) * 2 * Math.PI - Math.PI / 2;
+              const angle =
+                (index / projects.length) * 2 * Math.PI - Math.PI / 2;
               const radius = 35;
               const centerX = 50;
               const centerY = 50;
@@ -1520,13 +1552,15 @@ const ProjectDependenciesGraph = ({
                     isActive
                       ? "border-primary bg-primary shadow-[0_0_12px_var(--primary)]"
                       : isConnected
-                      ? "border-primary/70 bg-primary/30"
-                      : "border-muted-foreground/40 bg-muted-foreground/20"
+                        ? "border-primary/70 bg-primary/30"
+                        : "border-muted-foreground/40 bg-muted-foreground/20",
                   )}
                   style={{
                     left: `calc(${x}% - 8px)`,
                     top: `calc(${y}% - 8px)`,
-                    backgroundImage: isActive ? undefined : `linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to))`,
+                    backgroundImage: isActive
+                      ? undefined
+                      : `linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to))`,
                   }}
                   data-gradient={gradient}
                 />
@@ -1555,7 +1589,8 @@ const ProjectDependenciesGraph = ({
                     <div className="mt-2 space-y-1">
                       {relationships
                         .filter(
-                          (r) => r.from === activeProject || r.to === activeProject
+                          (r) =>
+                            r.from === activeProject || r.to === activeProject,
                         )
                         .map((rel) => {
                           const otherId =
@@ -1572,8 +1607,8 @@ const ProjectDependenciesGraph = ({
                                   rel.type === "parent"
                                     ? "bg-yellow-500"
                                     : rel.type === "sibling"
-                                    ? "bg-cyan-500"
-                                    : "bg-purple-500"
+                                      ? "bg-cyan-500"
+                                      : "bg-purple-500",
                                 )}
                               />
                               <span className="retro text-[0.5rem] text-foreground sm:text-[0.55rem]">
@@ -1633,10 +1668,10 @@ const ProjectDependenciesGraph = ({
   );
 };
 
-const TechStackConstellation = ({ 
-  projects, 
-  panelClass 
-}: { 
+const TechStackConstellation = ({
+  projects,
+  panelClass,
+}: {
   projects: ProjectEntry[];
   panelClass: string;
 }) => {
@@ -1646,12 +1681,14 @@ const TechStackConstellation = ({
   const [isSimonMode, setIsSimonMode] = useState(false);
 
   // Generate stable random positions for stars (only on client to avoid hydration mismatch)
-  const [starPositions, setStarPositions] = useState<Array<{
-    left: number;
-    top: number;
-    duration: number;
-    delay: number;
-  }>>([]);
+  const [starPositions, setStarPositions] = useState<
+    Array<{
+      left: number;
+      top: number;
+      duration: number;
+      delay: number;
+    }>
+  >([]);
   const hasInitialized = useRef(false);
 
   useEffect(() => {
@@ -1666,7 +1703,7 @@ const TechStackConstellation = ({
             top: Math.random() * 100,
             duration: 2 + Math.random() * 2,
             delay: Math.random() * 2,
-          }))
+          })),
         );
       });
     }
@@ -1693,7 +1730,7 @@ const TechStackConstellation = ({
   // Build tech stack data
   const techData = useMemo(() => {
     const techMap = new Map<string, { projects: string[]; count: number }>();
-    
+
     projects.forEach((project) => {
       project.tech.forEach((tech) => {
         if (!techMap.has(tech)) {
@@ -1717,17 +1754,19 @@ const TechStackConstellation = ({
   // Find connections between technologies
   const connections = useMemo(() => {
     const conns: Array<{ from: string; to: string; strength: number }> = [];
-    
+
     projects.forEach((project) => {
       for (let i = 0; i < project.tech.length; i++) {
         for (let j = i + 1; j < project.tech.length; j++) {
           const from = project.tech[i];
           const to = project.tech[j];
-          
+
           const existing = conns.find(
-            (c) => (c.from === from && c.to === to) || (c.from === to && c.to === from)
+            (c) =>
+              (c.from === from && c.to === to) ||
+              (c.from === to && c.to === from),
           );
-          
+
           if (existing) {
             existing.strength += 1;
           } else {
@@ -1736,7 +1775,7 @@ const TechStackConstellation = ({
         }
       }
     });
-    
+
     return conns;
   }, [projects]);
 
@@ -1745,13 +1784,13 @@ const TechStackConstellation = ({
   // Get connected technologies
   const connectedTechs = useMemo(() => {
     if (!activeTech) return new Set<string>();
-    
+
     const connected = new Set<string>([activeTech]);
     connections.forEach((conn) => {
       if (conn.from === activeTech) connected.add(conn.to);
       if (conn.to === activeTech) connected.add(conn.from);
     });
-    
+
     return connected;
   }, [activeTech, connections]);
 
@@ -1763,9 +1802,12 @@ const TechStackConstellation = ({
   };
 
   const getTechGlow = (count: number) => {
-    if (count >= 8) return "shadow-[0_0_20px_var(--primary),0_0_40px_var(--primary)]";
-    if (count >= 5) return "shadow-[0_0_15px_var(--primary),0_0_30px_var(--primary)]";
-    if (count >= 3) return "shadow-[0_0_10px_var(--primary),0_0_20px_var(--primary)]";
+    if (count >= 8)
+      return "shadow-[0_0_20px_var(--primary),0_0_40px_var(--primary)]";
+    if (count >= 5)
+      return "shadow-[0_0_15px_var(--primary),0_0_30px_var(--primary)]";
+    if (count >= 3)
+      return "shadow-[0_0_10px_var(--primary),0_0_20px_var(--primary)]";
     return "shadow-[0_0_8px_var(--primary)]";
   };
 
@@ -1777,14 +1819,15 @@ const TechStackConstellation = ({
     const centerY = 50;
     const diamondWidth = 70; // Horizontal span of diamond
     const diamondHeight = 50; // Vertical span of diamond
-    
+
     // Divide nodes into 4 sides of the diamond
     const nodesPerSide = Math.ceil(total / 4);
     const side = Math.floor(index / nodesPerSide);
-    const positionOnSide = (index % nodesPerSide) / Math.max(1, nodesPerSide - 1);
-    
+    const positionOnSide =
+      (index % nodesPerSide) / Math.max(1, nodesPerSide - 1);
+
     let x: number, y: number;
-    
+
     if (side === 0) {
       // Top-left to top edge (left to center-top)
       x = centerX - diamondWidth / 2 + positionOnSide * (diamondWidth / 2);
@@ -1802,7 +1845,7 @@ const TechStackConstellation = ({
       x = centerX - positionOnSide * (diamondWidth / 2);
       y = centerY + (diamondHeight / 2) * (1 - positionOnSide);
     }
-    
+
     return { x, y };
   };
 
@@ -1810,11 +1853,11 @@ const TechStackConstellation = ({
   const getButterflyPosition = (index: number, total: number) => {
     const centerX = 50;
     const centerY = 50;
-    
+
     // Divide nodes into body and wings
     const bodyCount = Math.max(1, Math.floor(total * 0.1)); // 10% for body
     const wingCount = Math.floor((total - bodyCount) / 4); // Divide remaining into 4 wing sections
-    
+
     if (index < bodyCount) {
       // Body nodes (vertical line in center)
       const bodyY = 30 + (index / bodyCount) * 40; // Spread vertically from 30% to 70%
@@ -1823,15 +1866,15 @@ const TechStackConstellation = ({
       const wingIndex = index - bodyCount;
       const wingSection = Math.floor(wingIndex / wingCount);
       const positionInWing = (wingIndex % wingCount) / wingCount;
-      
+
       // Butterfly wing shape parameters
       const wingBaseX = centerX;
       const wingBaseY = centerY;
       const wingSpan = 45; // How far wings extend (increased from 35)
       const wingHeight = 30; // Vertical spread of wings
-      
+
       let x, y;
-      
+
       if (wingSection === 0) {
         // Top left wing
         const angle = Math.PI * 0.75 + positionInWing * Math.PI * 0.5; // 135° to 225°
@@ -1857,7 +1900,7 @@ const TechStackConstellation = ({
         x = wingBaseX + distance * Math.cos(angle);
         y = wingBaseY + wingHeight * (0.5 + positionInWing * 0.5);
       }
-      
+
       return { x, y };
     }
   };
@@ -1871,7 +1914,8 @@ const TechStackConstellation = ({
           </p>
           <p className="retro text-[0.65rem] leading-relaxed text-muted-foreground sm:text-[0.7rem] md:text-sm">
             <span className="hidden sm:inline">Hover or tap</span>
-            <span className="sm:hidden">Tap</span> to see connections between technologies across projects.
+            <span className="sm:hidden">Tap</span> to see connections between
+            technologies across projects.
           </p>
         </div>
 
@@ -1892,11 +1936,11 @@ const TechStackConstellation = ({
                   isActive
                     ? cn(
                         "border-primary bg-primary text-primary-foreground",
-                        getTechGlow(tech.count)
+                        getTechGlow(tech.count),
                       )
                     : isConnected
-                    ? "border-primary/70 bg-primary/20 text-foreground active:bg-primary/40 sm:hover:bg-primary/30"
-                    : "border-border bg-background/80 text-foreground active:border-primary/50 active:bg-primary/10 sm:hover:border-primary/50 sm:hover:bg-primary/10 dark:border-ring"
+                      ? "border-primary/70 bg-primary/20 text-foreground active:bg-primary/40 sm:hover:bg-primary/30"
+                      : "border-border bg-background/80 text-foreground active:border-primary/50 active:bg-primary/10 sm:hover:border-primary/50 sm:hover:bg-primary/10 dark:border-ring",
                 )}
                 style={{
                   opacity: isHidden ? 0.35 : 1,
@@ -1967,7 +2011,7 @@ const TechStackConstellation = ({
             {connections.map((conn, i) => {
               const fromIndex = techData.findIndex((t) => t.name === conn.from);
               const toIndex = techData.findIndex((t) => t.name === conn.to);
-              
+
               if (fromIndex === -1 || toIndex === -1) return null;
 
               const isActive =
@@ -1975,11 +2019,12 @@ const TechStackConstellation = ({
                 (conn.from === activeTech || conn.to === activeTech);
               const isConnected =
                 activeTech &&
-                (connectedTechs.has(conn.from) && connectedTechs.has(conn.to));
+                connectedTechs.has(conn.from) &&
+                connectedTechs.has(conn.to);
 
               // Position based on theme
               let x1: number, y1: number, x2: number, y2: number;
-              
+
               if (isAllyMode) {
                 // Butterfly formation
                 const pos1 = getButterflyPosition(fromIndex, techData.length);
@@ -2008,7 +2053,7 @@ const TechStackConstellation = ({
                 x2 = centerX + radius * Math.cos(angle2);
                 y2 = centerY + radius * Math.sin(angle2);
               }
-              
+
               const x1Formatted = formatPercent(x1);
               const y1Formatted = formatPercent(y1);
               const x2Formatted = formatPercent(x2);
@@ -2028,11 +2073,14 @@ const TechStackConstellation = ({
                     isActive
                       ? "text-primary opacity-80"
                       : isConnected
-                      ? "text-primary/50 opacity-50"
-                      : "text-muted-foreground/20 opacity-20"
+                        ? "text-primary/50 opacity-50"
+                        : "text-muted-foreground/20 opacity-20",
                   )}
                   initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: isActive ? 0.8 : isConnected ? 0.5 : 0.2 }}
+                  animate={{
+                    pathLength: 1,
+                    opacity: isActive ? 0.8 : isConnected ? 0.5 : 0.2,
+                  }}
                   transition={{ duration: 1, delay: i * 0.02 }}
                 />
               );
@@ -2044,7 +2092,7 @@ const TechStackConstellation = ({
             {techData.map((tech, index) => {
               // Position based on theme
               let x: number, y: number;
-              
+
               if (isAllyMode) {
                 // Butterfly formation
                 const pos = getButterflyPosition(index, techData.length);
@@ -2064,7 +2112,7 @@ const TechStackConstellation = ({
                 x = centerX + radius * Math.cos(angle);
                 y = centerY + radius * Math.sin(angle);
               }
-              
+
               const xFormatted = formatPercent(x);
               const yFormatted = formatPercent(y);
               const isActive = activeTech === tech.name;
@@ -2078,8 +2126,8 @@ const TechStackConstellation = ({
                     isActive
                       ? "border-primary bg-primary shadow-[0_0_12px_var(--primary)]"
                       : isConnected
-                      ? "border-primary/70 bg-primary/30"
-                      : "border-muted-foreground/50 bg-muted-foreground/20"
+                        ? "border-primary/70 bg-primary/30"
+                        : "border-muted-foreground/50 bg-muted-foreground/20",
                   )}
                   style={{
                     left: `calc(${xFormatted}% - 6px)`,
@@ -2089,7 +2137,6 @@ const TechStackConstellation = ({
               );
             })}
           </div>
-
         </div>
 
         {/* Info Panel */}
@@ -2108,8 +2155,12 @@ const TechStackConstellation = ({
                     {activeTech}
                   </p>
                   <p className="retro mt-0.5 text-[0.45rem] text-muted-foreground sm:mt-1 sm:text-[0.5rem]">
-                    Used in {techData.find((t) => t.name === activeTech)?.count} project
-                    {(techData.find((t) => t.name === activeTech)?.count ?? 0) === 1 ? "" : "s"}
+                    Used in {techData.find((t) => t.name === activeTech)?.count}{" "}
+                    project
+                    {(techData.find((t) => t.name === activeTech)?.count ??
+                      0) === 1
+                      ? ""
+                      : "s"}
                   </p>
                   <div className="mt-1.5 flex flex-wrap gap-1 sm:mt-2">
                     {techData
@@ -2123,10 +2174,12 @@ const TechStackConstellation = ({
                           {project}
                         </span>
                       ))}
-                    {(techData.find((t) => t.name === activeTech)?.projects.length ?? 0) > 6 && (
+                    {(techData.find((t) => t.name === activeTech)?.projects
+                      .length ?? 0) > 6 && (
                       <span className="retro rounded-sm bg-primary/20 px-1.5 py-0.5 text-[0.4rem] leading-tight text-foreground/70 sm:px-2 sm:text-[0.45rem]">
                         +
-                        {(techData.find((t) => t.name === activeTech)?.projects.length ?? 0) - 6}
+                        {(techData.find((t) => t.name === activeTech)?.projects
+                          .length ?? 0) - 6}
                       </span>
                     )}
                   </div>
@@ -2150,11 +2203,11 @@ const TechStackConstellation = ({
   );
 };
 
-const LabStatusMonitor = ({ 
-  activeCount, 
-  archivedCount 
-}: { 
-  activeCount: number; 
+const LabStatusMonitor = ({
+  activeCount,
+  archivedCount,
+}: {
+  activeCount: number;
   archivedCount: number;
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -2168,7 +2221,7 @@ const LabStatusMonitor = ({
     startTransition(() => {
       setLabTime(new Date());
     });
-    
+
     // Update time every second
     const timeInterval = setInterval(() => {
       setLabTime(new Date());
@@ -2227,7 +2280,10 @@ const LabStatusMonitor = ({
           type="button"
           onClick={() => setIsExpanded(true)}
           className="absolute -left-8 top-1/2 flex h-16 w-8 -translate-y-1/2 items-center justify-center rounded-l-sm border-4 border-r-0 border-border bg-card/95 shadow-[4px_4px_0_var(--border)] backdrop-blur-sm transition-colors hover:bg-primary/20 dark:border-ring"
-          animate={{ opacity: isExpanded ? 0 : 1, pointerEvents: isExpanded ? "none" : "auto" }}
+          animate={{
+            opacity: isExpanded ? 0 : 1,
+            pointerEvents: isExpanded ? "none" : "auto",
+          }}
           transition={{ duration: 0.2 }}
           aria-label="Open lab status monitor"
         >
@@ -2241,143 +2297,151 @@ const LabStatusMonitor = ({
         </motion.button>
 
         <div className="rounded-none border-4 border-border bg-card/95 shadow-[6px_6px_0_var(--border)] backdrop-blur-sm dark:border-ring">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b-4 border-border bg-primary/10 px-3 py-2 dark:border-ring">
-          <div className="flex items-center gap-2">
-            <motion.span
-              className="inline-block size-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]"
-              animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <span className="retro text-[0.6rem] uppercase tracking-[0.2em] text-foreground">
-              Lab Status
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="retro flex size-6 items-center justify-center rounded-none border-2 border-border bg-background text-xs transition-transform hover:scale-110 active:scale-95 dark:border-ring"
-            aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
-          >
-            {isExpanded ? "−" : "+"}
-          </button>
-        </div>
-
-        {/* Content */}
-        <motion.div
-          className="space-y-3 p-3"
-          initial={false}
-          animate={{ opacity: isExpanded ? 1 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          {/* Lab Time */}
-          <div className="space-y-1">
-            <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
-              Lab Time
-            </p>
-            <div className="rounded-sm border border-dashed border-border/60 bg-background/70 px-2 py-1.5 dark:border-ring/60">
-              <p className="retro text-center text-sm tabular-nums text-primary">
-                {labTime ? labTime.toLocaleTimeString('en-US', { 
-                  hour12: false,
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit'
-                }) : '--:--:--'}
-              </p>
-              <p className="retro text-center text-[0.45rem] text-muted-foreground">
-                {labTime ? labTime.toLocaleDateString('en-US', { 
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric'
-                }) : '---'}
-              </p>
-            </div>
-          </div>
-
-          {/* Experiments Status */}
-          <div className="space-y-1">
-            <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
-              Specimen Status
-            </p>
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between rounded-sm border border-border/60 bg-green-600/10 px-2 py-1 dark:border-ring/60">
-                <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-foreground">
-                  Active
-                </span>
-                <span className="retro text-sm font-bold text-green-600">
-                  {activeCount}
-                </span>
-              </div>
-              <div className="flex items-center justify-between rounded-sm border border-border/60 bg-slate-600/10 px-2 py-1 dark:border-ring/60">
-                <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-foreground">
-                  Archived
-                </span>
-                <span className="retro text-sm font-bold text-slate-600">
-                  {archivedCount}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Caffeine Level */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
-                Caffeine Level
-              </p>
-              <span className="retro text-[0.5rem] text-foreground">
-                {caffeineLevel}%
+          {/* Header */}
+          <div className="flex items-center justify-between border-b-4 border-border bg-primary/10 px-3 py-2 dark:border-ring">
+            <div className="flex items-center gap-2">
+              <motion.span
+                className="inline-block size-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]"
+                animate={{ opacity: [1, 0.3, 1] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+              <span className="retro text-[0.6rem] uppercase tracking-[0.2em] text-foreground">
+                Lab Status
               </span>
             </div>
-            <div className="h-3 rounded-sm border-2 border-border bg-background dark:border-ring">
-              <motion.div
-                className={cn("h-full rounded-sm", getCaffeineColor())}
-                initial={{ width: "0%" }}
-                animate={{ width: `${caffeineLevel}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-            <p className="retro text-[0.45rem] italic text-muted-foreground">
-              {caffeineLevel >= 70
-                ? "Optimal coding conditions"
-                : caffeineLevel >= 40
-                ? "Refill recommended"
-                : "CRITICAL: Coffee needed!"}
-            </p>
-          </div>
-
-          {/* Inspiration Meter */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
-                Inspiration Meter
-              </p>
-              <span className="retro text-[0.5rem] text-foreground">
-                {inspiration.level}%
-              </span>
-            </div>
-            <div className="h-3 rounded-sm border-2 border-border bg-background dark:border-ring">
-              <motion.div
-                className={cn("h-full rounded-sm", inspiration.color)}
-                animate={{ width: `${inspiration.level}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-          </div>
-
-          {/* Motivational Quote */}
-          <div className="rounded-sm border border-dashed border-primary/40 bg-primary/5 px-2 py-2">
-            <motion.p
-              key={currentQuote}
-              className="retro text-center text-[0.5rem] leading-relaxed text-foreground"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="retro flex size-6 items-center justify-center rounded-none border-2 border-border bg-background text-xs transition-transform hover:scale-110 active:scale-95 dark:border-ring"
+              aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
             >
-              &quot;{currentQuote}&quot;
-            </motion.p>
+              {isExpanded ? "−" : "+"}
+            </button>
           </div>
-        </motion.div>
+
+          {/* Content */}
+          <motion.div
+            className="space-y-3 p-3"
+            initial={false}
+            animate={{ opacity: isExpanded ? 1 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {/* Lab Time */}
+            <div className="space-y-1">
+              <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
+                Lab Time
+              </p>
+              <div className="rounded-sm border border-dashed border-border/60 bg-background/70 px-2 py-1.5 dark:border-ring/60">
+                <p className="retro text-center text-sm tabular-nums text-primary">
+                  {labTime
+                    ? labTime.toLocaleTimeString("en-US", {
+                        hour12: false,
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })
+                    : "--:--:--"}
+                </p>
+                <p className="retro text-center text-[0.45rem] text-muted-foreground">
+                  {labTime
+                    ? labTime.toLocaleDateString("en-US", {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : "---"}
+                </p>
+              </div>
+            </div>
+
+            {/* Experiments Status */}
+            <div className="space-y-1">
+              <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
+                Specimen Status
+              </p>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between rounded-sm border border-border/60 bg-green-600/10 px-2 py-1 dark:border-ring/60">
+                  <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-foreground">
+                    Active
+                  </span>
+                  <span className="retro text-sm font-bold text-green-600">
+                    {activeCount}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between rounded-sm border border-border/60 bg-slate-600/10 px-2 py-1 dark:border-ring/60">
+                  <span className="retro text-[0.5rem] uppercase tracking-[0.15em] text-foreground">
+                    Archived
+                  </span>
+                  <span className="retro text-sm font-bold text-slate-600">
+                    {archivedCount}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Caffeine Level */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
+                  Caffeine Level
+                </p>
+                <span className="retro text-[0.5rem] text-foreground">
+                  {caffeineLevel}%
+                </span>
+              </div>
+              <div className="h-3 rounded-sm border-2 border-border bg-background dark:border-ring">
+                <motion.div
+                  className={cn("h-full rounded-sm", getCaffeineColor())}
+                  initial={{ width: "0%" }}
+                  animate={{ width: `${caffeineLevel}%` }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
+              <p className="retro text-[0.45rem] italic text-muted-foreground">
+                {caffeineLevel >= 70
+                  ? "Optimal coding conditions"
+                  : caffeineLevel >= 40
+                    ? "Refill recommended"
+                    : "CRITICAL: Coffee needed!"}
+              </p>
+            </div>
+
+            {/* Inspiration Meter */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
+                  Inspiration Meter
+                </p>
+                <span className="retro text-[0.5rem] text-foreground">
+                  {inspiration.level}%
+                </span>
+              </div>
+              <div className="h-3 rounded-sm border-2 border-border bg-background dark:border-ring">
+                <motion.div
+                  className={cn("h-full rounded-sm", inspiration.color)}
+                  animate={{ width: `${inspiration.level}%` }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
+            </div>
+
+            {/* Motivational Quote */}
+            <div className="rounded-sm border border-dashed border-primary/40 bg-primary/5 px-2 py-2">
+              <motion.p
+                key={currentQuote}
+                className="retro text-center text-[0.5rem] leading-relaxed text-foreground"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                &quot;{currentQuote}&quot;
+              </motion.p>
+            </div>
+          </motion.div>
         </div>
       </motion.aside>
 
@@ -2399,7 +2463,11 @@ const LabStatusMonitor = ({
               <motion.span
                 className="inline-block size-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]"
                 animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               />
               <span className="retro text-[0.65rem] uppercase tracking-[0.2em] text-foreground">
                 Lab Status Monitor
@@ -2418,13 +2486,16 @@ const LabStatusMonitor = ({
           <motion.div
             className="overflow-x-auto overflow-y-hidden p-3"
             initial={false}
-            animate={{ 
+            animate={{
               height: isExpanded ? "auto" : 0,
-              opacity: isExpanded ? 1 : 0 
+              opacity: isExpanded ? 1 : 0,
             }}
             transition={{ duration: 0.3 }}
           >
-            <div className="flex gap-3 pb-2" style={{ minWidth: "max-content" }}>
+            <div
+              className="flex gap-3 pb-2"
+              style={{ minWidth: "max-content" }}
+            >
               {/* Lab Time */}
               <div className="w-40 shrink-0 space-y-1">
                 <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
@@ -2432,19 +2503,23 @@ const LabStatusMonitor = ({
                 </p>
                 <div className="rounded-sm border border-dashed border-border/60 bg-background/70 px-2 py-1.5 dark:border-ring/60">
                   <p className="retro text-center text-sm tabular-nums text-primary">
-                    {labTime ? labTime.toLocaleTimeString('en-US', { 
-                      hour12: false,
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit'
-                    }) : '--:--:--'}
+                    {labTime
+                      ? labTime.toLocaleTimeString("en-US", {
+                          hour12: false,
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                        })
+                      : "--:--:--"}
                   </p>
                   <p className="retro text-center text-[0.45rem] text-muted-foreground">
-                    {labTime ? labTime.toLocaleDateString('en-US', { 
-                      weekday: 'short',
-                      month: 'short',
-                      day: 'numeric'
-                    }) : '---'}
+                    {labTime
+                      ? labTime.toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : "---"}
                   </p>
                 </div>
               </div>
@@ -2495,8 +2570,8 @@ const LabStatusMonitor = ({
                   {caffeineLevel >= 70
                     ? "Optimal"
                     : caffeineLevel >= 40
-                    ? "Refill rec."
-                    : "CRITICAL!"}
+                      ? "Refill rec."
+                      : "CRITICAL!"}
                 </p>
               </div>
 
@@ -2541,23 +2616,28 @@ const LabStatusMonitor = ({
 
 export default function ProjectsPage() {
   const [activeTier, setActiveTier] = useState<TierFilter>("ALL");
-  const [activeImage, setActiveImage] = useState<{ src: string; alt: string } | null>(null);
+  const [activeImage, setActiveImage] = useState<{
+    src: string;
+    alt: string;
+  } | null>(null);
   const [hoveredProjectId, setHoveredProjectId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingTier, setLoadingTier] = useState<string>("");
 
-  const shellClass = "w-full border-4 border-border bg-background p-2 shadow-[8px_8px_0_var(--border)] sm:p-4";
+  const shellClass =
+    "w-full border-4 border-border bg-background p-2 shadow-[8px_8px_0_var(--border)] sm:p-4";
 
-  const panelBaseClass = "rounded-none border-2 border-border bg-card/50 p-3 shadow-[4px_4px_0_var(--border)] backdrop-blur-sm";
+  const panelBaseClass =
+    "rounded-none border-2 border-border bg-card/50 p-3 shadow-[4px_4px_0_var(--border)] backdrop-blur-sm";
 
   const sortedProjects = useMemo(
     () =>
       [...projects].sort((a, b) =>
         a.classification.priority === b.classification.priority
           ? a.title.localeCompare(b.title)
-          : a.classification.priority - b.classification.priority
+          : a.classification.priority - b.classification.priority,
       ),
-    []
+    [],
   );
 
   const tierCounts = useMemo(
@@ -2574,9 +2654,9 @@ export default function ProjectsPage() {
           B: 0,
           C: 0,
           D: 0,
-        }
+        },
       ),
-    [sortedProjects]
+    [sortedProjects],
   );
 
   const filteredProjects = useMemo(
@@ -2584,29 +2664,29 @@ export default function ProjectsPage() {
       activeTier === "ALL"
         ? sortedProjects
         : sortedProjects.filter(
-            (project) => project.classification.tier === activeTier
+            (project) => project.classification.tier === activeTier,
           ),
-    [activeTier, sortedProjects]
+    [activeTier, sortedProjects],
   );
 
   const activeProjectsCount = useMemo(
     () => sortedProjects.filter((project) => project.link).length,
-    [sortedProjects]
+    [sortedProjects],
   );
 
   const archivedProjectsCount = useMemo(
     () => sortedProjects.filter((project) => !project.link).length,
-    [sortedProjects]
+    [sortedProjects],
   );
 
   const handleTierToggle = (tier: Tier) => {
     const newTier = activeTier === tier ? "ALL" : tier;
-    
+
     // Show loading screen only when changing to a specific tier (not when clearing)
     if (newTier !== "ALL") {
       setIsLoading(true);
       setLoadingTier(newTier);
-      
+
       // Show loading screen for 1.5 seconds
       setTimeout(() => {
         setActiveTier(newTier);
@@ -2652,410 +2732,493 @@ export default function ProjectsPage() {
         {isLoading && <RetroLoadingScreen tier={loadingTier} />}
       </AnimatePresence>
 
-      <LabStatusMonitor 
-        activeCount={activeProjectsCount} 
-        archivedCount={archivedProjectsCount} 
+      <LabStatusMonitor
+        activeCount={activeProjectsCount}
+        archivedCount={archivedProjectsCount}
       />
       <main className="mx-auto flex min-h-screen w-full max-w-[1700px] flex-col gap-6 p-4 text-foreground sm:gap-8 sm:p-6 md:p-8">
         <section className="flex flex-col items-center gap-4 text-center sm:gap-6">
-        <div className="space-y-2">
-          <p className="retro text-[0.6rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
-            Project Intel
-          </p>
-          <h1 className="retro text-xl uppercase leading-tight tracking-[0.2em] sm:text-2xl md:text-3xl">
-            Lab Archive Citadel
-          </h1>
-          <p className="retro text-sm leading-relaxed text-muted-foreground sm:text-base">
-            A catalog of experiments, relics, and mission-critical deployments.
-          </p>
-        </div>
-        <Button
-          asChild
-          font="retro"
-          className="retro h-12 px-8 text-xs uppercase tracking-[0.2em] sm:h-14 sm:px-10 sm:text-sm hover:scale-105 transition-transform active:scale-95 duration-75"
+          <div className="space-y-2">
+            <p className="retro text-[0.6rem] uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
+              Project Intel
+            </p>
+            <h1 className="retro text-xl uppercase leading-tight tracking-[0.2em] sm:text-2xl md:text-3xl">
+              Lab Archive Citadel
+            </h1>
+            <p className="retro text-sm leading-relaxed text-muted-foreground sm:text-base">
+              A catalog of experiments, relics, and mission-critical
+              deployments.
+            </p>
+          </div>
+          <Button
+            asChild
+            font="retro"
+            className="retro h-12 px-8 text-xs uppercase tracking-[0.2em] sm:h-14 sm:px-10 sm:text-sm hover:scale-105 transition-transform active:scale-95 duration-75"
+          >
+            <Link href="#archive-container">Skip to Citadel</Link>
+          </Button>
+          <RetroVisitorCounter />
+        </section>
+
+        {/* TERMINAL ORPHEUS - Positioned for visibility */}
+        <RetroTerminal />
+
+        <section
+          id="archive-container"
+          className={cn(
+            shellClass,
+            "border-dashed border-foreground/50 dark:border-ring/50 space-y-6 relative p-4 sm:p-6",
+          )}
         >
-          <Link href="#archive-container">Skip to Citadel</Link>
-        </Button>
-        <RetroVisitorCounter />
-      </section>
+          {/* Tulips on borders for Ally theme */}
+          <div className="pointer-events-none absolute -left-2 top-0 bottom-0 theme-ally:block hidden">
+            <Image
+              src="/assets/tulip.png"
+              alt=""
+              width={20}
+              height={40}
+              className="absolute top-4 opacity-60"
+            />
+            <Image
+              src="/assets/tulip.png"
+              alt=""
+              width={20}
+              height={40}
+              className="absolute bottom-4 opacity-60"
+            />
+          </div>
+          <div className="pointer-events-none absolute -right-2 top-0 bottom-0 theme-ally:block hidden">
+            <Image
+              src="/assets/tulip.png"
+              alt=""
+              width={20}
+              height={40}
+              className="absolute top-4 opacity-60"
+            />
+            <Image
+              src="/assets/tulip.png"
+              alt=""
+              width={20}
+              height={40}
+              className="absolute bottom-4 opacity-60"
+            />
+          </div>
+          <div className="pointer-events-none absolute left-0 right-0 -top-2 theme-ally:flex hidden justify-between px-4">
+            <Image
+              src="/assets/tulip.png"
+              alt=""
+              width={20}
+              height={40}
+              className="opacity-60"
+            />
+            <Image
+              src="/assets/tulip.png"
+              alt=""
+              width={20}
+              height={40}
+              className="opacity-60"
+            />
+          </div>
+          <div className="pointer-events-none absolute left-0 right-0 -bottom-2 theme-ally:flex hidden justify-between px-4">
+            <Image
+              src="/assets/tulip.png"
+              alt=""
+              width={20}
+              height={40}
+              className="opacity-60"
+            />
+            <Image
+              src="/assets/tulip.png"
+              alt=""
+              width={20}
+              height={40}
+              className="opacity-60"
+            />
+          </div>
+          <p className="retro text-center text-[0.6rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs sm:tracking-[0.3em] md:text-sm md:tracking-[0.35em]">
+            Lab Archive Citadel
+          </p>
+          <div className="grid gap-6 md:grid-cols-12">
+            <div
+              className={cn(
+                panelBaseClass,
+                "md:col-span-7 space-y-6 text-left",
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <p className="retro text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
+                  Project Manifest
+                </p>
+                <span className="retro text-[0.5rem] text-muted-foreground">
+                  {filteredProjects.length} specimen
+                  {filteredProjects.length === 1 ? "" : "s"}
+                  {activeTier !== "ALL" ? ` · Tier ${activeTier}` : ""}
+                </span>
+              </div>
+              {filteredProjects.length > 0 ? (
+                <ol className="grid gap-3 min-[520px]:grid-cols-2">
+                  {filteredProjects.map((project, index) => {
+                    const noteIndex = sortedProjects.findIndex(
+                      (p) => p.id === project.id,
+                    );
+                    const note = labNotes[noteIndex % labNotes.length];
 
-      {/* TERMINAL ORPHEUS - Positioned for visibility */}
-      <RetroTerminal />
+                    return (
+                      <li
+                        key={project.id}
+                        className="relative rounded-sm border border-dashed border-border/70 px-4 py-3 shadow-[2px_2px_0_var(--border)] transition-none hover:-translate-y-1 hover:border-primary hover:shadow-[4px_4px_0_var(--primary)] dark:border-ring/70 cursor-pointer active:translate-y-0.5 active:shadow-none"
+                        onMouseEnter={() => setHoveredProjectId(project.id)}
+                        onMouseLeave={() => setHoveredProjectId(null)}
+                      >
+                        <AnimatePresence>
+                          {hoveredProjectId === project.id && (
+                            <StickyNote note={note} index={noteIndex} />
+                          )}
+                        </AnimatePresence>
 
-      <section
-        id="archive-container"
-        className={cn(
-          shellClass,
-          "border-dashed border-foreground/50 dark:border-ring/50 space-y-6 relative p-4 sm:p-6"
-        )}
-      >
-        {/* Tulips on borders for Ally theme */}
-        <div className="pointer-events-none absolute -left-2 top-0 bottom-0 theme-ally:block hidden">
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute top-4 opacity-60" />
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute bottom-4 opacity-60" />
-        </div>
-        <div className="pointer-events-none absolute -right-2 top-0 bottom-0 theme-ally:block hidden">
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute top-4 opacity-60" />
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="absolute bottom-4 opacity-60" />
-        </div>
-        <div className="pointer-events-none absolute left-0 right-0 -top-2 theme-ally:flex hidden justify-between px-4">
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
-        </div>
-        <div className="pointer-events-none absolute left-0 right-0 -bottom-2 theme-ally:flex hidden justify-between px-4">
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
-          <Image src="/assets/tulip.png" alt="" width={20} height={40} className="opacity-60" />
-        </div>
-        <p className="retro text-center text-[0.6rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs sm:tracking-[0.3em] md:text-sm md:tracking-[0.35em]">
-          Lab Archive Citadel
-        </p>
-        <div className="grid gap-6 md:grid-cols-12">
-          <div className={cn(panelBaseClass, "md:col-span-7 space-y-6 text-left")}>
-            <div className="flex items-center justify-between">
-              <p className="retro text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
-                Project Manifest
-              </p>
-              <span className="retro text-[0.5rem] text-muted-foreground">
-                {filteredProjects.length} specimen
-                {filteredProjects.length === 1 ? "" : "s"}
-                {activeTier !== "ALL" ? ` · Tier ${activeTier}` : ""}
-              </span>
+                        <div className="flex items-center justify-between text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.65rem]">
+                          <span className="retro">
+                            Case {String(index + 1).padStart(2, "0")}
+                          </span>
+                          <span className="retro">
+                            Tier {project.classification.tier}
+                          </span>
+                        </div>
+                        <p className="retro mt-1.5 text-base uppercase tracking-[0.1em] sm:text-lg">
+                          {project.title}
+                        </p>
+                        <p className="retro text-[0.6rem] text-primary/80 sm:text-[0.65rem]">
+                          {project.tagline}
+                        </p>
+                      </li>
+                    );
+                  })}
+                </ol>
+              ) : (
+                <div className="rounded-sm border border-dashed border-border/70 bg-background/70 px-4 py-6 text-center shadow-[2px_2px_0_var(--border)] dark:border-ring/70">
+                  <p className="retro text-xs text-muted-foreground">
+                    No specimens cataloged under Tier {activeTier} yet. Select a
+                    different tier to continue exploring.
+                  </p>
+                </div>
+              )}
             </div>
+
+            <div className={cn(panelBaseClass, "md:col-span-5 space-y-4")}>
+              <div className="flex flex-col gap-1 text-left">
+                <p className="retro text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
+                  Containment Sortation Matrix
+                </p>
+                <p className="retro text-[0.55rem] leading-relaxed text-muted-foreground">
+                  Unique tiering that keeps the archive organized by lab
+                  priority.
+                </p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {classificationLegend.map((tier) => (
+                  <button
+                    type="button"
+                    key={tier.tier}
+                    className={cn(
+                      "rounded-sm border border-dashed border-border/60 p-4 text-left shadow-[2px_2px_0_var(--border)] transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/60 dark:border-ring/70 active:translate-y-0.5 active:shadow-none",
+                      "bg-gradient-to-br text-white",
+                      tier.gradient,
+                      activeTier === tier.tier
+                        ? "ring-4 ring-primary shadow-[0_0_0_4px_var(--primary)] scale-[1.02]"
+                        : "hover:-translate-y-1 hover:shadow-[4px_4px_0_var(--border)]",
+                    )}
+                    onClick={() => handleTierToggle(tier.tier)}
+                    aria-pressed={activeTier === tier.tier}
+                    aria-label={`Toggle Tier ${tier.tier} filter`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="retro text-[0.7rem] uppercase tracking-[0.2em] sm:text-xs">
+                        Tier {tier.tier}
+                      </span>
+                      <span className="retro text-[0.7rem] sm:text-xs">
+                        {tierCounts[tier.tier]}x
+                      </span>
+                    </div>
+                    <p className="retro mt-1.5 text-base uppercase tracking-[0.15em] sm:text-lg">
+                      {tier.label}
+                    </p>
+                    <p className="retro text-[0.6rem] leading-relaxed text-white/90 sm:text-[0.65rem]">
+                      {tier.description}
+                    </p>
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="retro text-[0.6rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.65rem]">
+                  {activeTier === "ALL"
+                    ? "Viewing all tiers"
+                    : `Filtering by Tier ${activeTier}`}
+                </p>
+                {activeTier !== "ALL" && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    font="retro"
+                    className="retro h-9 px-4 text-[0.6rem] uppercase tracking-[0.18em] sm:text-[0.65rem] hover:bg-primary/10"
+                    onClick={() => setActiveTier("ALL")}
+                  >
+                    Clear Filter
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Project Dependencies Graph */}
+          <ProjectDependenciesGraph
+            projects={sortedProjects}
+            panelClass={panelBaseClass}
+          />
+
+          {/* Tech Stack Constellation - Between Matrix and Accordions */}
+          <TechStackConstellation
+            projects={sortedProjects}
+            panelClass={panelBaseClass}
+          />
+
+          <div
+            className={cn(
+              panelBaseClass,
+              "p-0 sm:p-0 md:p-0 lg:p-0 mt-6 sm:mt-8",
+            )}
+          >
             {filteredProjects.length > 0 ? (
-              <ol className="grid gap-3 min-[520px]:grid-cols-2">
-                {filteredProjects.map((project, index) => {
-                  const noteIndex = sortedProjects.findIndex(p => p.id === project.id);
-                  const note = labNotes[noteIndex % labNotes.length];
-                  
-                  return (
-                    <li
-                      key={project.id}
-                      className="relative rounded-sm border border-dashed border-border/70 px-4 py-3 shadow-[2px_2px_0_var(--border)] transition-none hover:-translate-y-1 hover:border-primary hover:shadow-[4px_4px_0_var(--primary)] dark:border-ring/70 cursor-pointer active:translate-y-0.5 active:shadow-none"
-                      onMouseEnter={() => setHoveredProjectId(project.id)}
-                      onMouseLeave={() => setHoveredProjectId(null)}
-                    >
-                      <AnimatePresence>
-                        {hoveredProjectId === project.id && (
-                          <StickyNote note={note} index={noteIndex} />
-                        )}
-                      </AnimatePresence>
-                      
-                      <div className="flex items-center justify-between text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.65rem]">
-                        <span className="retro">
-                          Case {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <span className="retro">
-                          Tier {project.classification.tier}
-                        </span>
+              <Accordion
+                key={activeTier}
+                type="multiple"
+                defaultValue={[filteredProjects[0].id]}
+                className="divide-y-4 divide-border dark:divide-ring"
+              >
+                {filteredProjects.map((project) => (
+                  <AccordionItem key={project.id} value={project.id}>
+                    <AccordionTrigger className="flex flex-col gap-3 px-4 py-5 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
+                      <div className="space-y-1">
+                        <p className="retro text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
+                          Tier {project.classification.tier} ·{" "}
+                          {project.classification.codename}
+                        </p>
+                        <p className="retro text-xl uppercase tracking-[0.2em] sm:text-2xl pt-1">
+                          {project.title}
+                        </p>
+                        <p className="retro text-sm text-primary/80 sm:text-base">
+                          {project.tagline}
+                        </p>
                       </div>
-                      <p className="retro mt-1.5 text-base uppercase tracking-[0.1em] sm:text-lg">
-                        {project.title}
-                      </p>
-                      <p className="retro text-[0.6rem] text-primary/80 sm:text-[0.65rem]">
-                        {project.tagline}
-                      </p>
-                    </li>
-                  );
-                })}
-              </ol>
+                      <div className="text-right">
+                        <p className="retro text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.65rem]">
+                          {project.classification.status}
+                        </p>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="bg-background/70 relative overflow-hidden">
+                      <LabSpecimenScanner />
+                      <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
+                        <motion.div
+                          className="flex items-center gap-3 rounded-sm border border-dashed border-primary/40 bg-primary/5 px-4 py-3"
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: [0, 1, 1, 0] }}
+                          transition={{
+                            duration: 1.5,
+                            times: [0, 0.2, 0.8, 1],
+                          }}
+                        >
+                          <motion.span
+                            className="inline-block size-2 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]"
+                            animate={{ opacity: [1, 0.3, 1] }}
+                            transition={{
+                              duration: 1,
+                              repeat: 2,
+                              ease: "easeInOut",
+                            }}
+                          />
+                          <span className="retro text-[0.6rem] uppercase tracking-[0.25em] text-primary sm:text-xs">
+                            Specimen Analysis in Progress...
+                          </span>
+                        </motion.div>
+                        <div className="space-y-4">
+                          <div>
+                            <p className="retro text-base leading-relaxed text-foreground sm:text-lg">
+                              {project.description}
+                            </p>
+                            <p className="retro mt-2 text-sm uppercase tracking-[0.2em] text-primary sm:text-base">
+                              {project.detail}
+                            </p>
+                          </div>
+
+                          <div className="space-y-3">
+                            <p className="retro text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
+                              Lab Notes
+                            </p>
+                            <ul className="space-y-3">
+                              {project.highlights.map((highlight) => (
+                                <li
+                                  key={highlight}
+                                  className="retro text-sm leading-relaxed text-foreground sm:text-base"
+                                >
+                                  • {highlight}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div className="space-y-3">
+                            <p className="retro text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
+                              Tech Stack
+                            </p>
+                            <div className="flex flex-wrap gap-3">
+                              {project.tech.map((tech) => (
+                                <Badge
+                                  key={tech}
+                                  font="retro"
+                                  variant="secondary"
+                                  className="border border-border bg-background px-4 py-1.5 text-[0.65rem] uppercase tracking-[0.2em] text-foreground sm:text-xs"
+                                >
+                                  {tech}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+
+                          {project.link ? (
+                            <Button
+                              asChild
+                              font="retro"
+                              className="retro h-11 w-fit px-8 text-xs uppercase tracking-[0.2em] sm:h-12 sm:px-10 sm:text-sm active:translate-y-1 transition-none"
+                            >
+                              <Link
+                                href={project.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                Visit Build
+                              </Link>
+                            </Button>
+                          ) : null}
+                        </div>
+
+                        <div className="w-full px-6 sm:px-8 md:px-14">
+                          <Carousel className="relative w-full">
+                            <CarouselContent className="h-full">
+                              {(project.images && project.images.length > 0
+                                ? project.images
+                                : [
+                                    {
+                                      src: "",
+                                      alt: "placeholder",
+                                    },
+                                  ]
+                              ).map((image, idx) => {
+                                const hasGalleryImages =
+                                  project.images && project.images.length > 0;
+                                return (
+                                  <CarouselItem
+                                    key={`${project.id}-img-${idx}`}
+                                  >
+                                    <div className="overflow-hidden rounded-sm border-4 border-border bg-background shadow-[4px_4px_0_var(--border)] dark:border-ring flex items-center justify-center">
+                                      {hasGalleryImages ? (
+                                        <button
+                                          type="button"
+                                          className="group relative block w-full cursor-zoom-in focus-visible:outline-dashed focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                                          onClick={() =>
+                                            handleImageZoom({
+                                              src: image.src,
+                                              alt: image.alt,
+                                            })
+                                          }
+                                          title="Open zoomed preview"
+                                        >
+                                          <div className="relative flex h-[240px] w-full items-center justify-center sm:h-[320px] md:h-[360px]">
+                                            <Image
+                                              src={image.src}
+                                              alt={image.alt}
+                                              fill
+                                              sizes="(min-width: 1024px) 800px, 90vw"
+                                              className="object-contain"
+                                            />
+                                          </div>
+                                          <span className="retro absolute bottom-3 right-3 rounded-sm border border-border bg-background/80 px-3 py-1 text-[0.5rem] uppercase tracking-[0.2em] text-foreground shadow-[2px_2px_0_var(--border)] opacity-0 transition group-hover:opacity-100">
+                                            Zoom
+                                          </span>
+                                        </button>
+                                      ) : (
+                                        <QuestionMarkBlock
+                                          title={
+                                            project.placeholder?.title ??
+                                            "Mystery build"
+                                          }
+                                          caption={project.placeholder?.caption}
+                                        />
+                                      )}
+                                    </div>
+                                  </CarouselItem>
+                                );
+                              })}
+                            </CarouselContent>
+                            <CarouselPrevious aria-label="Previous project image" />
+                            <CarouselNext aria-label="Next project image" />
+                          </Carousel>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             ) : (
-              <div className="rounded-sm border border-dashed border-border/70 bg-background/70 px-4 py-6 text-center shadow-[2px_2px_0_var(--border)] dark:border-ring/70">
-                <p className="retro text-xs text-muted-foreground">
-                  No specimens cataloged under Tier {activeTier} yet. Select a different tier to continue exploring.
+              <div className="p-6 text-center">
+                <p className="retro text-sm text-muted-foreground">
+                  No archive entries match the current filter. Toggle another
+                  tier to continue exploring the lab files.
                 </p>
               </div>
             )}
           </div>
-
-          <div className={cn(panelBaseClass, "md:col-span-5 space-y-4")}>
-            <div className="flex flex-col gap-1 text-left">
-              <p className="retro text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
-                Containment Sortation Matrix
-              </p>
-              <p className="retro text-[0.55rem] leading-relaxed text-muted-foreground">
-                Unique tiering that keeps the archive organized by lab priority.
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {classificationLegend.map((tier) => (
-                <button
-                  type="button"
-                  key={tier.tier}
-                  className={cn(
-                    "rounded-sm border border-dashed border-border/60 p-4 text-left shadow-[2px_2px_0_var(--border)] transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/60 dark:border-ring/70 active:translate-y-0.5 active:shadow-none",
-                    "bg-gradient-to-br text-white",
-                    tier.gradient,
-                    activeTier === tier.tier
-                      ? "ring-4 ring-primary shadow-[0_0_0_4px_var(--primary)] scale-[1.02]"
-                      : "hover:-translate-y-1 hover:shadow-[4px_4px_0_var(--border)]"
-                  )}
-                  onClick={() => handleTierToggle(tier.tier)}
-                  aria-pressed={activeTier === tier.tier}
-                  aria-label={`Toggle Tier ${tier.tier} filter`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="retro text-[0.7rem] uppercase tracking-[0.2em] sm:text-xs">
-                      Tier {tier.tier}
-                    </span>
-                    <span className="retro text-[0.7rem] sm:text-xs">
-                      {tierCounts[tier.tier]}x
-                    </span>
-                  </div>
-                  <p className="retro mt-1.5 text-base uppercase tracking-[0.15em] sm:text-lg">
-                    {tier.label}
-                  </p>
-                  <p className="retro text-[0.6rem] leading-relaxed text-white/90 sm:text-[0.65rem]">
-                    {tier.description}
-                  </p>
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center justify-between">
-              <p className="retro text-[0.6rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.65rem]">
-                {activeTier === "ALL"
-                  ? "Viewing all tiers"
-                  : `Filtering by Tier ${activeTier}`}
-              </p>
-              {activeTier !== "ALL" && (
+        </section>
+        {activeImage && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-6"
+            onClick={handleImageClose}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div
+              className="relative w-full max-w-4xl rounded-sm border-4 border-border bg-background p-4 shadow-[0_0_0_4px_var(--border)] dark:border-ring"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="flex justify-between items-center">
+                <p className="retro text-sm uppercase tracking-[0.2em] text-muted-foreground">
+                  Zoomed Preview
+                </p>
                 <Button
                   type="button"
                   variant="outline"
                   font="retro"
-                  className="retro h-9 px-4 text-[0.6rem] uppercase tracking-[0.18em] sm:text-[0.65rem] hover:bg-primary/10"
-                  onClick={() => setActiveTier("ALL")}
+                  className="retro h-8 px-3 text-[0.55rem] uppercase tracking-[0.18em]"
+                  onClick={handleImageClose}
                 >
-                  Clear Filter
+                  Close
                 </Button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Project Dependencies Graph */}
-        <ProjectDependenciesGraph projects={sortedProjects} panelClass={panelBaseClass} />
-
-        {/* Tech Stack Constellation - Between Matrix and Accordions */}
-        <TechStackConstellation projects={sortedProjects} panelClass={panelBaseClass} />
-
-        <div className={cn(panelBaseClass, "p-0 sm:p-0 md:p-0 lg:p-0 mt-6 sm:mt-8")}>
-          {filteredProjects.length > 0 ? (
-            <Accordion
-              key={activeTier}
-              type="multiple"
-              defaultValue={[filteredProjects[0].id]}
-              className="divide-y-4 divide-border dark:divide-ring"
-            >
-              {filteredProjects.map((project) => (
-              <AccordionItem key={project.id} value={project.id}>
-                <AccordionTrigger className="flex flex-col gap-3 px-4 py-5 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
-                  <div className="space-y-1">
-                    <p className="retro text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
-                      Tier {project.classification.tier} ·{" "}
-                      {project.classification.codename}
-                    </p>
-                    <p className="retro text-xl uppercase tracking-[0.2em] theme-ally:drop-shadow-[2px_2px_0_oklch(0.65_0.25_350)] sm:text-2xl pt-1">
-                      {project.title}
-                    </p>
-                    <p className="retro text-sm text-primary/80 sm:text-base">
-                      {project.tagline}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="retro text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.65rem]">
-                      {project.classification.status}
-                    </p>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="bg-background/70 relative overflow-hidden">
-                  <LabSpecimenScanner />
-                  <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
-                    <motion.div
-                      className="flex items-center gap-3 rounded-sm border border-dashed border-primary/40 bg-primary/5 px-4 py-3"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: [0, 1, 1, 0] }}
-                      transition={{ duration: 1.5, times: [0, 0.2, 0.8, 1] }}
-                    >
-                      <motion.span
-                        className="inline-block size-2 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]"
-                        animate={{ opacity: [1, 0.3, 1] }}
-                        transition={{ duration: 1, repeat: 2, ease: "easeInOut" }}
-                      />
-                      <span className="retro text-[0.6rem] uppercase tracking-[0.25em] text-primary sm:text-xs">
-                        Specimen Analysis in Progress...
-                      </span>
-                    </motion.div>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="retro text-base leading-relaxed text-foreground sm:text-lg">
-                          {project.description}
-                        </p>
-                        <p className="retro mt-2 text-sm uppercase tracking-[0.2em] text-primary sm:text-base">
-                          {project.detail}
-                        </p>
-                      </div>
-
-                      <div className="space-y-3">
-                        <p className="retro text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
-                          Lab Notes
-                        </p>
-                        <ul className="space-y-3">
-                          {project.highlights.map((highlight) => (
-                            <li
-                              key={highlight}
-                              className="retro text-sm leading-relaxed text-foreground sm:text-base"
-                            >
-                              • {highlight}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div className="space-y-3">
-                        <p className="retro text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
-                          Tech Stack
-                        </p>
-                        <div className="flex flex-wrap gap-3">
-                          {project.tech.map((tech) => (
-                            <Badge
-                              key={tech}
-                              font="retro"
-                              variant="secondary"
-                              className="border border-border bg-background px-4 py-1.5 text-[0.65rem] uppercase tracking-[0.2em] text-foreground sm:text-xs"
-                            >
-                              {tech}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      {project.link ? (
-                        <Button
-                          asChild
-                          font="retro"
-                          className="retro h-11 w-fit px-8 text-xs uppercase tracking-[0.2em] sm:h-12 sm:px-10 sm:text-sm active:translate-y-1 transition-none"
-                        >
-                          <Link
-                            href={project.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Visit Build
-                          </Link>
-                        </Button>
-                      ) : null}
-                    </div>
-
-                    <div className="w-full px-6 sm:px-8 md:px-14">
-                      <Carousel className="relative w-full">
-                        <CarouselContent className="h-full">
-                          {(project.images && project.images.length > 0
-                            ? project.images
-                            : [
-                                {
-                                  src: "",
-                                  alt: "placeholder",
-                                },
-                              ]
-                          ).map((image, idx) => {
-                            const hasGalleryImages =
-                              project.images && project.images.length > 0;
-                            return (
-                              <CarouselItem key={`${project.id}-img-${idx}`}>
-                                <div className="overflow-hidden rounded-sm border-4 border-border bg-background shadow-[4px_4px_0_var(--border)] dark:border-ring flex items-center justify-center">
-                                  {hasGalleryImages ? (
-                                    <button
-                                      type="button"
-                                      className="group relative block w-full cursor-zoom-in focus-visible:outline-dashed focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-                                      onClick={() =>
-                                        handleImageZoom({ src: image.src, alt: image.alt })
-                                      }
-                                      title="Open zoomed preview"
-                                    >
-                                      <div className="relative flex h-[240px] w-full items-center justify-center sm:h-[320px] md:h-[360px]">
-                                        <Image
-                                          src={image.src}
-                                          alt={image.alt}
-                                          fill
-                                          sizes="(min-width: 1024px) 800px, 90vw"
-                                          className="object-contain"
-                                        />
-                                      </div>
-                                      <span className="retro absolute bottom-3 right-3 rounded-sm border border-border bg-background/80 px-3 py-1 text-[0.5rem] uppercase tracking-[0.2em] text-foreground shadow-[2px_2px_0_var(--border)] opacity-0 transition group-hover:opacity-100">
-                                        Zoom
-                                      </span>
-                                    </button>
-                                  ) : (
-                                    <QuestionMarkBlock
-                                      title={project.placeholder?.title ?? "Mystery build"}
-                                      caption={project.placeholder?.caption}
-                                    />
-                                  )}
-                                </div>
-                              </CarouselItem>
-                            );
-                          })}
-                        </CarouselContent>
-                        <CarouselPrevious aria-label="Previous project image" />
-                        <CarouselNext aria-label="Next project image" />
-                      </Carousel>
-                    </div>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-              ))}
-            </Accordion>
-          ) : (
-            <div className="p-6 text-center">
-              <p className="retro text-sm text-muted-foreground">
-                No archive entries match the current filter. Toggle another tier to continue exploring the lab files.
-              </p>
-            </div>
-            )}
-          </div>
-        </section>
-      {activeImage && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-6"
-          onClick={handleImageClose}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div
-            className="relative w-full max-w-4xl rounded-sm border-4 border-border bg-background p-4 shadow-[0_0_0_4px_var(--border)] dark:border-ring"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex justify-between items-center">
-              <p className="retro text-sm uppercase tracking-[0.2em] text-muted-foreground">
-                Zoomed Preview
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                font="retro"
-                className="retro h-8 px-3 text-[0.55rem] uppercase tracking-[0.18em]"
-                onClick={handleImageClose}
-              >
-                Close
-              </Button>
-            </div>
-            <div className="mt-4">
-              <div className="relative h-[60vh] w-full">
-                <Image
-                  src={activeImage.src}
-                  alt={activeImage.alt}
-                  fill
-                  sizes="90vw"
-                  className="object-contain"
-                  priority
-                />
+              </div>
+              <div className="mt-4">
+                <div className="relative h-[60vh] w-full">
+                  <Image
+                    src={activeImage.src}
+                    alt={activeImage.alt}
+                    fill
+                    sizes="90vw"
+                    className="object-contain"
+                    priority
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       </main>
     </>
   );
 }
-
-
