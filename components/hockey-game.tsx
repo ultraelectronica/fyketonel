@@ -227,6 +227,11 @@ export function HockeyGame({ className }: { className?: string }) {
   const currentDiagonal = Math.sqrt(dimensions.width * dimensions.width + dimensions.height * dimensions.height);
   const speedScale = Math.min(1.8, Math.max(1, currentDiagonal / baseDiagonal));
 
+  // in fullscreen (PC), scale up paddles and puck so they stay visibly larger
+  const entityScale = isFullscreen ? Math.min(2.2, Math.max(1.2, currentDiagonal / baseDiagonal)) : 1;
+  const paddleRadius = 20 * entityScale;
+  const puckRadius = 8 * entityScale;
+
   // default paddle positions (used by initGame and placeAfterGoal)
   const defaultPaddlePositions = useCallback(() => {
     const state = gameStateRef.current;
@@ -241,6 +246,9 @@ export function HockeyGame({ className }: { className?: string }) {
   const initGame = useCallback(() => {
     awaitingServeRef.current = false;
     const state = gameStateRef.current;
+    state.playerPaddle.radius = paddleRadius;
+    state.aiPaddle.radius = paddleRadius;
+    state.puck.radius = puckRadius;
     defaultPaddlePositions();
 
     state.puck.x = dimensions.width / 2;
@@ -256,7 +264,7 @@ export function HockeyGame({ className }: { className?: string }) {
       aiPaddle: { ...state.aiPaddle },
       puck: { ...state.puck },
     });
-  }, [dimensions, speedScale, defaultPaddlePositions]);
+  }, [dimensions, speedScale, defaultPaddlePositions, paddleRadius, puckRadius]);
 
   // after a goal: reset paddles, place puck in front of scorer (stationary), wait for push
   const placeAfterGoal = useCallback(
@@ -458,6 +466,7 @@ export function HockeyGame({ className }: { className?: string }) {
             const separation = overlap + 3;
             state.puck.x += Math.cos(pushAngle) * separation;
             state.puck.y += Math.sin(pushAngle) * separation;
+            state.puck.y = Math.max(state.puck.radius, Math.min(dimensions.height - state.puck.radius, state.puck.y));
           }
         } else {
           if (
@@ -485,12 +494,13 @@ export function HockeyGame({ className }: { className?: string }) {
       state.puck.x += state.puck.vx;
       state.puck.y += state.puck.vy;
 
-      // bounce off top/bottom walls
-      if (
-        state.puck.y - state.puck.radius <= 0 ||
-        state.puck.y + state.puck.radius >= dimensions.height
-      ) {
-        state.puck.vy = -state.puck.vy;
+      // bounce off top/bottom walls with position clamping
+      if (state.puck.y - state.puck.radius <= 0) {
+        state.puck.y = state.puck.radius;
+        state.puck.vy = Math.abs(state.puck.vy);
+      } else if (state.puck.y + state.puck.radius >= dimensions.height) {
+        state.puck.y = dimensions.height - state.puck.radius;
+        state.puck.vy = -Math.abs(state.puck.vy);
       }
 
       // player paddle collision
@@ -507,18 +517,22 @@ export function HockeyGame({ className }: { className?: string }) {
           state.puck.y - state.playerPaddle.y,
           state.puck.x - state.playerPaddle.x
         );
-        const speed = Math.sqrt(
+        const maxSpeed = 12 * speedScale;
+        const speed = Math.min(maxSpeed, Math.sqrt(
           state.puck.vx * state.puck.vx +
             state.puck.vy * state.puck.vy
-        );
-        state.puck.vx = Math.cos(angle) * speed * 1.2;
-        state.puck.vy = Math.sin(angle) * speed * 1.2;
+        ) * 1.2);
+        state.puck.vx = Math.cos(angle) * speed;
+        state.puck.vy = Math.sin(angle) * speed;
         const overlap =
           state.playerPaddle.radius +
           state.puck.radius -
           playerDist;
         state.puck.x += Math.cos(angle) * overlap;
         state.puck.y += Math.sin(angle) * overlap;
+
+        // clamp back inside walls after push
+        state.puck.y = Math.max(state.puck.radius, Math.min(dimensions.height - state.puck.radius, state.puck.y));
       }
 
       // AI paddle collision (including tunnel: puck passed through in one frame)
@@ -557,12 +571,13 @@ export function HockeyGame({ className }: { className?: string }) {
           state.puck.y - state.aiPaddle.y,
           state.puck.x - state.aiPaddle.x
         );
-        const speed = Math.sqrt(
+        const maxSpeed = 12 * speedScale;
+        const speed = Math.min(maxSpeed, Math.sqrt(
           state.puck.vx * state.puck.vx +
             state.puck.vy * state.puck.vy
-        );
-        state.puck.vx = Math.cos(angle) * speed * 1.2;
-        state.puck.vy = Math.sin(angle) * speed * 1.2;
+        ) * 1.2);
+        state.puck.vx = Math.cos(angle) * speed;
+        state.puck.vy = Math.sin(angle) * speed;
         const overlap =
           state.aiPaddle.radius +
           state.puck.radius -
@@ -572,6 +587,9 @@ export function HockeyGame({ className }: { className?: string }) {
           );
         state.puck.x += Math.cos(angle) * overlap;
         state.puck.y += Math.sin(angle) * overlap;
+
+        // clamp back inside walls after push
+        state.puck.y = Math.max(state.puck.radius, Math.min(dimensions.height - state.puck.radius, state.puck.y));
       }
 
       // puck went off left edge: AI scores
