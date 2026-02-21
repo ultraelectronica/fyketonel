@@ -35,9 +35,10 @@ interface InternalGameState {
   playerPaddle: Paddle;
   aiPaddle: Paddle;
   puck: Puck;
-  keys: { up: boolean; down: boolean };
-  // -1 means no touch active, otherwise the target Y in game coords
+  keys: { up: boolean; down: boolean; left: boolean; right: boolean };
+  // -1 means no touch active, otherwise the target in game coords
   touchTargetY: number;
+  touchTargetX: number;
   lastTime: number;
 }
 
@@ -145,12 +146,13 @@ export function HockeyGame({ className }: { className?: string }) {
     playerPaddle: { x: 0, y: 0, radius: 20 },
     aiPaddle: { x: 0, y: 0, radius: 20 },
     puck: { x: 0, y: 0, radius: 8, vx: 0, vy: 0 },
-    keys: { up: false, down: false },
+    keys: { up: false, down: false, left: false, right: false },
     touchTargetY: -1,
+    touchTargetX: -1,
     lastTime: 0,
   });
 
-  // convert a screen touch Y to game coordinate Y
+  // convert screen touch to game coordinates
   const screenToGameY = useCallback((screenY: number): number => {
     const svg = svgRef.current;
     if (!svg) return -1;
@@ -159,21 +161,32 @@ export function HockeyGame({ className }: { className?: string }) {
     return (screenY - rect.top) * ratio;
   }, [dimensions.height]);
 
+  const screenToGameX = useCallback((screenX: number): number => {
+    const svg = svgRef.current;
+    if (!svg) return -1;
+    const rect = svg.getBoundingClientRect();
+    const ratio = dimensions.width / rect.width;
+    return (screenX - rect.left) * ratio;
+  }, [dimensions.width]);
+
   // touch handlers for direct paddle control on the game field
   const handleTouchStart = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
     e.preventDefault();
     const touch = e.touches[0];
     gameStateRef.current.touchTargetY = screenToGameY(touch.clientY);
-  }, [screenToGameY]);
+    gameStateRef.current.touchTargetX = screenToGameX(touch.clientX);
+  }, [screenToGameY, screenToGameX]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
     e.preventDefault();
     const touch = e.touches[0];
     gameStateRef.current.touchTargetY = screenToGameY(touch.clientY);
-  }, [screenToGameY]);
+    gameStateRef.current.touchTargetX = screenToGameX(touch.clientX);
+  }, [screenToGameY, screenToGameX]);
 
   const handleTouchEnd = useCallback(() => {
     gameStateRef.current.touchTargetY = -1;
+    gameStateRef.current.touchTargetX = -1;
   }, []);
 
   // blink the start screen text every 600ms
@@ -267,6 +280,14 @@ export function HockeyGame({ className }: { className?: string }) {
       gameStateRef.current.keys.down = true;
       e.preventDefault();
     }
+    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+      gameStateRef.current.keys.left = true;
+      e.preventDefault();
+    }
+    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+      gameStateRef.current.keys.right = true;
+      e.preventDefault();
+    }
   }, []);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
@@ -276,14 +297,23 @@ export function HockeyGame({ className }: { className?: string }) {
     if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
       gameStateRef.current.keys.down = false;
     }
+    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+      gameStateRef.current.keys.left = false;
+    }
+    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+      gameStateRef.current.keys.right = false;
+    }
   }, []);
 
   // main physics tick
   const update = useCallback(() => {
     const state = gameStateRef.current;
     const paddleSpeed = 6 * speedScale;
-    
-    // move player paddle via keyboard
+    const paddleMargin = 30 * speedScale;
+    const playerMinX = paddleMargin;
+    const playerMaxX = dimensions.width / 2 - paddleMargin;
+
+    // move player paddle via keyboard (vertical)
     if (state.keys.up && state.playerPaddle.y - state.playerPaddle.radius > 0) {
       state.playerPaddle.y -= paddleSpeed;
     }
@@ -291,14 +321,30 @@ export function HockeyGame({ className }: { className?: string }) {
       state.playerPaddle.y += paddleSpeed;
     }
 
-    // move player paddle via touch (overrides keyboard)
-    if (state.touchTargetY >= 0) {
-      const clamped = Math.max(
-        state.playerPaddle.radius,
-        Math.min(dimensions.height - state.playerPaddle.radius, state.touchTargetY)
-      );
-      // lerp toward target for smooth feel
-      state.playerPaddle.y += (clamped - state.playerPaddle.y) * 0.3;
+    // move player paddle via keyboard (horizontal)
+    if (state.keys.left && state.playerPaddle.x - state.playerPaddle.radius > playerMinX) {
+      state.playerPaddle.x -= paddleSpeed;
+    }
+    if (state.keys.right && state.playerPaddle.x + state.playerPaddle.radius < playerMaxX) {
+      state.playerPaddle.x += paddleSpeed;
+    }
+
+    // move player paddle via touch (overrides keyboard for position)
+    if (state.touchTargetY >= 0 || state.touchTargetX >= 0) {
+      if (state.touchTargetY >= 0) {
+        const clampedY = Math.max(
+          state.playerPaddle.radius,
+          Math.min(dimensions.height - state.playerPaddle.radius, state.touchTargetY)
+        );
+        state.playerPaddle.y += (clampedY - state.playerPaddle.y) * 0.3;
+      }
+      if (state.touchTargetX >= 0) {
+        const clampedX = Math.max(
+          playerMinX + state.playerPaddle.radius,
+          Math.min(playerMaxX - state.playerPaddle.radius, state.touchTargetX)
+        );
+        state.playerPaddle.x += (clampedX - state.playerPaddle.x) * 0.3;
+      }
     }
     
     // dumb AI: chase the puck
@@ -592,10 +638,10 @@ export function HockeyGame({ className }: { className?: string }) {
             </p>
             <div className="flex flex-col items-center gap-2">
               <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground">
-                W / ↑ &nbsp; MOVE UP
+                W / ↑ &nbsp; MOVE UP &nbsp; · &nbsp; S / ↓ &nbsp; MOVE DOWN
               </p>
               <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground">
-                S / ↓ &nbsp; MOVE DOWN
+                A / ← &nbsp; MOVE LEFT &nbsp; · &nbsp; D / → &nbsp; MOVE RIGHT
               </p>
               <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
                 TOUCH / DRAG ON MOBILE
@@ -654,30 +700,58 @@ export function HockeyGame({ className }: { className?: string }) {
       {/* bottom controls: only show after game starts */}
       {hasStarted && (
         <div className="flex flex-col gap-2">
-          {/* mobile D-pad: up/down buttons */}
-          <div className="flex gap-2 sm:hidden">
-            <Button
-              onTouchStart={() => { gameStateRef.current.keys.up = true; }}
-              onTouchEnd={() => { gameStateRef.current.keys.up = false; }}
-              onMouseDown={() => { gameStateRef.current.keys.up = true; }}
-              onMouseUp={() => { gameStateRef.current.keys.up = false; }}
-              onMouseLeave={() => { gameStateRef.current.keys.up = false; }}
-              variant="outline"
-              className="retro flex-1 h-12 text-lg uppercase tracking-widest select-none"
-            >
-              ▲
-            </Button>
-            <Button
-              onTouchStart={() => { gameStateRef.current.keys.down = true; }}
-              onTouchEnd={() => { gameStateRef.current.keys.down = false; }}
-              onMouseDown={() => { gameStateRef.current.keys.down = true; }}
-              onMouseUp={() => { gameStateRef.current.keys.down = false; }}
-              onMouseLeave={() => { gameStateRef.current.keys.down = false; }}
-              variant="outline"
-              className="retro flex-1 h-12 text-lg uppercase tracking-widest select-none"
-            >
-              ▼
-            </Button>
+          {/* mobile D-pad: up/down and left/right buttons */}
+          <div className="flex flex-col gap-2 sm:hidden">
+            <div className="flex gap-2 justify-center">
+              <Button
+                onTouchStart={() => { gameStateRef.current.keys.up = true; }}
+                onTouchEnd={() => { gameStateRef.current.keys.up = false; }}
+                onMouseDown={() => { gameStateRef.current.keys.up = true; }}
+                onMouseUp={() => { gameStateRef.current.keys.up = false; }}
+                onMouseLeave={() => { gameStateRef.current.keys.up = false; }}
+                variant="outline"
+                className="retro w-14 h-12 text-lg uppercase tracking-widest select-none"
+              >
+                ▲
+              </Button>
+            </div>
+            <div className="flex gap-2 justify-center">
+              <Button
+                onTouchStart={() => { gameStateRef.current.keys.left = true; }}
+                onTouchEnd={() => { gameStateRef.current.keys.left = false; }}
+                onMouseDown={() => { gameStateRef.current.keys.left = true; }}
+                onMouseUp={() => { gameStateRef.current.keys.left = false; }}
+                onMouseLeave={() => { gameStateRef.current.keys.left = false; }}
+                variant="outline"
+                className="retro flex-1 h-12 text-lg uppercase tracking-widest select-none"
+              >
+                ◀
+              </Button>
+              <Button
+                onTouchStart={() => { gameStateRef.current.keys.right = true; }}
+                onTouchEnd={() => { gameStateRef.current.keys.right = false; }}
+                onMouseDown={() => { gameStateRef.current.keys.right = true; }}
+                onMouseUp={() => { gameStateRef.current.keys.right = false; }}
+                onMouseLeave={() => { gameStateRef.current.keys.right = false; }}
+                variant="outline"
+                className="retro flex-1 h-12 text-lg uppercase tracking-widest select-none"
+              >
+                ▶
+              </Button>
+            </div>
+            <div className="flex gap-2 justify-center">
+              <Button
+                onTouchStart={() => { gameStateRef.current.keys.down = true; }}
+                onTouchEnd={() => { gameStateRef.current.keys.down = false; }}
+                onMouseDown={() => { gameStateRef.current.keys.down = true; }}
+                onMouseUp={() => { gameStateRef.current.keys.down = false; }}
+                onMouseLeave={() => { gameStateRef.current.keys.down = false; }}
+                variant="outline"
+                className="retro w-14 h-12 text-lg uppercase tracking-widest select-none"
+              >
+                ▼
+              </Button>
+            </div>
           </div>
           {/* pause + fullscreen row */}
           <div className="flex gap-2">
