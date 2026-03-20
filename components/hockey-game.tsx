@@ -334,6 +334,12 @@ export function HockeyGame({ className }: { className?: string }) {
 
   // keyboard input handlers
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // Don't capture keys if user is typing in an input field
+    const target = e.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      return;
+    }
+
     if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
       gameStateRef.current.keys.up = true;
       e.preventDefault();
@@ -353,6 +359,12 @@ export function HockeyGame({ className }: { className?: string }) {
   }, []);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
+    // Don't capture keys if user is typing in an input field
+    const target = e.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      return;
+    }
+
     if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
       gameStateRef.current.keys.up = false;
     }

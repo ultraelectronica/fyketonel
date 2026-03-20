@@ -54,16 +54,27 @@ export default function ContactForm() {
           >
             Email
           </label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            required
-            disabled={isSubmitting}
-            className="w-full h-10 text-xs px-3 sm:h-12 sm:text-sm sm:px-4 md:h-14 md:text-base md:px-6"
-          />
+          {/* Responsive email input without jankiness */}
+          <div className="relative w-full">
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              required
+              disabled={isSubmitting}
+              className="retro relative z-10 w-full h-10 px-3 bg-background text-foreground rounded-none border-0 ring-0 focus:outline-none sm:h-12 sm:px-4 sm:text-sm md:h-14 md:px-6 md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            <div
+              className="absolute inset-0 z-0 border-y-6 -my-1.5 border-foreground dark:border-ring pointer-events-none"
+              aria-hidden="true"
+            />
+            <div
+              className="absolute inset-0 z-0 border-x-6 -mx-1.5 border-foreground dark:border-ring pointer-events-none"
+              aria-hidden="true"
+            />
+          </div>
         </div>
 
         <div className="space-y-2 sm:space-y-2.5 md:space-y-3">
