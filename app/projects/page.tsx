@@ -574,6 +574,134 @@ const projects: ProjectEntry[] = [
       },
     ],
   },
+  {
+    id: "papa-burger",
+    title: "Papa Burger System",
+    tagline: "Full-stack restaurant management monorepo",
+    description:
+      "A comprehensive restaurant management system built as a monorepo with pnpm workspaces, featuring real-time capabilities and AI-powered features.",
+    detail:
+      "Laravel PHP API with PostgreSQL 16, Redis caching, Laravel Reverb WebSocket server, Next.js frontends (customer, POS, admin, landing), FastAPI AI service, and Docker Compose orchestration.",
+    tech: [
+      "Laravel",
+      "PHP",
+      "PostgreSQL",
+      "Redis",
+      "Next.js",
+      "React",
+      "TypeScript",
+      "TanStack Query",
+      "Tailwind CSS",
+      "FastAPI",
+      "Python",
+      "Docker",
+      "WebSocket",
+    ],
+    classification: {
+      tier: "A",
+      codename: "Command Deck",
+      status: "Full-stack restaurant operations platform",
+      priority: getTierPriority("A"),
+    },
+    highlights: [
+      "Monorepo architecture with pnpm workspaces for unified development.",
+      "Real-time updates via Laravel Echo + Pusher WebSocket integration.",
+      "Multiple specialized frontends: customer ordering, POS, admin dashboard, and landing page.",
+      "AI service integration for intelligent features and recommendations.",
+      "Background job processing with Laravel queue workers.",
+      "Fully containerized with Docker Compose for seamless deployment.",
+    ],
+    images: [
+      {
+        src: "/ProjectPictures/Papa Burger/papa_burger_one.png",
+        alt: "Papa Burger customer ordering interface",
+      },
+      {
+        src: "/ProjectPictures/Papa Burger/papa_burger_two.png",
+        alt: "Papa Burger POS system",
+      },
+      {
+        src: "/ProjectPictures/Papa Burger/papa_burger_three.png",
+        alt: "Papa Burger admin dashboard",
+      },
+    ],
+  },
+  {
+    id: "lootbx-mobile",
+    title: "LootBX Mobile",
+    tagline: "Gamified e-commerce and live streaming platform",
+    description:
+      "A mobile app for a gamified e-commerce and live streaming platform built with Expo/React Native, featuring real-time interactions and virtual economy.",
+    detail:
+      "Combines live streaming via Amazon IVS, real-time chat with Socket.IO, digital collectibles inventory, virtual currency wallet, and gamification features like daily rewards and leaderboards.",
+    tech: [
+      "React Native",
+      "Expo",
+      "TypeScript",
+      "Zustand",
+      "React Query",
+      "Socket.IO",
+      "Amazon IVS",
+      "EAS Build",
+    ],
+    classification: {
+      tier: "A",
+      codename: "Field Ops",
+      status: "Live streaming and e-commerce mobile platform",
+      priority: getTierPriority("A"),
+    },
+    highlights: [
+      "Live streaming with Amazon IVS for mobile broadcasting and viewing.",
+      "Real-time chat and interactive loot drops during streams.",
+      "Digital inventory system with 40 equip slots for collectibles.",
+      "Virtual currency (LCoin) wallet with transaction history.",
+      "Gamification: daily rewards, weekly streaks, quest completion bonuses.",
+      "Leaderboard rankings by spending/engagement with period filters.",
+      "Social authentication (Google, Facebook) and email/password login.",
+    ],
+    images: [
+      {
+        src: "/ProjectPictures/Lootbx/lootbx_mobile_one.png",
+        alt: "LootBX mobile live stream view",
+      },
+      {
+        src: "/ProjectPictures/Lootbx/lootbx_mobile_two.png",
+        alt: "LootBX mobile shop and inventory",
+      },
+      {
+        src: "/ProjectPictures/Lootbx/lootbx_mobile_three.png",
+        alt: "LootBX mobile rewards and leaderboard",
+      },
+    ],
+  },
+  {
+    id: "br41ndmg",
+    title: "br41ndmg",
+    tagline: "High-performance audio resampling library",
+    description:
+      "A Rust crate for production-quality audio sample-rate conversion using polyphase, windowed-sinc FIR resampling.",
+    detail:
+      "Targets < -100 dB aliasing, < 0.1 dB passband ripple, > 100 dB stopband attenuation with arbitrary sample-rate ratios for mono/stereo PCM processing.",
+    tech: ["Rust", "DSP", "Audio Processing"],
+    classification: {
+      tier: "B",
+      codename: "Signal Furnace",
+      status: "Production-grade audio DSP library",
+      priority: getTierPriority("B"),
+    },
+    highlights: [
+      "High-performance polyphase FIR resampling with windowed-sinc kernels.",
+      "Measurable quality targets: < -100 dB aliasing, > 100 dB stopband attenuation.",
+      "Supports arbitrary sample-rate ratios for flexible audio conversion.",
+      "Comprehensive test suite covering impulse response, sine preservation, and aliasing.",
+      "Benchmarks for throughput and latency tracking.",
+      "Roadmap includes SIMD optimization and real-time streaming support.",
+    ],
+    placeholder: {
+      title: "Audio DSP Library",
+      caption: "No visual interface—pure signal processing power.",
+    },
+  },
 ];
 
 const classificationLegend: {
