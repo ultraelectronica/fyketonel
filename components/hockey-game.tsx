@@ -1,25 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { Button } from "@/components/ui/8bit/button";
 import { cn } from "@/lib/utils";
 
-// score shape
 interface GameScore {
   player: number;
   ai: number;
 }
 
-// paddle/puck shape
-interface Paddle {
+interface Vector {
   x: number;
   y: number;
+}
+
+interface Paddle extends Vector {
   radius: number;
 }
 
-interface Puck {
-  x: number;
-  y: number;
+interface Puck extends Vector {
   radius: number;
   vx: number;
   vy: number;
@@ -31,18 +36,14 @@ interface VisualGameState {
   puck: Puck;
 }
 
-interface InternalGameState {
-  playerPaddle: Paddle;
-  aiPaddle: Paddle;
-  puck: Puck;
+interface InternalGameState extends VisualGameState {
   keys: { up: boolean; down: boolean; left: boolean; right: boolean };
-  // -1 means no touch active, otherwise the target in game coords
-  touchTargetY: number;
-  touchTargetX: number;
+  pointerTarget: Vector | null;
+  playerVelocity: Vector;
+  aiVelocity: Vector;
   lastTime: number;
 }
 
-// pixel data for hollow circle outline
 interface PixelCircleProps {
   cx: number;
   cy: number;
@@ -50,7 +51,6 @@ interface PixelCircleProps {
   color: string;
 }
 
-// pixel data for solid filled circle
 interface PixelSolidCircleProps {
   cx: number;
   cy: number;
@@ -58,32 +58,261 @@ interface PixelSolidCircleProps {
   color: string;
 }
 
+interface PaddleCollisionOptions {
+  puck: Puck;
+  prevX: number;
+  prevY: number;
+  paddle: Paddle;
+  paddleVelocity: Vector;
+  tableHeight: number;
+  minPuckSpeed: number;
+  maxPuckSpeed: number;
+  fallbackNormalX: number;
+}
+
+type Side = "player" | "ai";
+
 const STORAGE_KEY = "hockey-game-score";
 const WINNING_SCORE = 6;
+const BASE_WIDTH = 400;
+const BASE_HEIGHT = 300;
+const BASE_PADDLE_RADIUS = 20;
+const BASE_PUCK_RADIUS = 8;
 
-// draws an 8-bit hollow circle from pixel coords
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function magnitude(x: number, y: number) {
+  return Math.hypot(x, y);
+}
+
+function normalizeVector(
+  x: number,
+  y: number,
+  fallbackX = 1,
+  fallbackY = 0
+): Vector {
+  const length = magnitude(x, y);
+  if (length > 1e-6) {
+    return { x: x / length, y: y / length };
+  }
+
+  const fallbackLength = magnitude(fallbackX, fallbackY);
+  if (fallbackLength > 1e-6) {
+    return { x: fallbackX / fallbackLength, y: fallbackY / fallbackLength };
+  }
+
+  return { x: 1, y: 0 };
+}
+
+function reflectIntoBounds(value: number, min: number, max: number) {
+  if (max <= min) {
+    return min;
+  }
+
+  let reflected = value;
+  while (reflected < min || reflected > max) {
+    if (reflected < min) {
+      reflected = min + (min - reflected);
+    }
+    if (reflected > max) {
+      reflected = max - (reflected - max);
+    }
+  }
+
+  return reflected;
+}
+
+function getGoalBounds(height: number) {
+  const goalHeight = Math.min(height - 48, Math.max(90, height * 0.3));
+  const goalTop = (height - goalHeight) / 2;
+  return {
+    goalTop,
+    goalBottom: goalTop + goalHeight,
+    goalHeight,
+  };
+}
+
+function getSegmentCircleHit(
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number,
+  circleX: number,
+  circleY: number,
+  radius: number
+) {
+  const dx = endX - startX;
+  const dy = endY - startY;
+  const fx = startX - circleX;
+  const fy = startY - circleY;
+  const a = dx * dx + dy * dy;
+
+  if (a <= 1e-10) {
+    return null;
+  }
+
+  const b = 2 * (fx * dx + fy * dy);
+  const c = fx * fx + fy * fy - radius * radius;
+  const discriminant = b * b - 4 * a * c;
+
+  if (discriminant < 0) {
+    return null;
+  }
+
+  const root = Math.sqrt(discriminant);
+  const t0 = (-b - root) / (2 * a);
+  const t1 = (-b + root) / (2 * a);
+  const hitT = [t0, t1].find((candidate) => candidate >= 0 && candidate <= 1);
+
+  if (hitT === undefined) {
+    return null;
+  }
+
+  return {
+    x: startX + dx * hitT,
+    y: startY + dy * hitT,
+  };
+}
+
+function resolvePaddleCollision({
+  puck,
+  prevX,
+  prevY,
+  paddle,
+  paddleVelocity,
+  tableHeight,
+  minPuckSpeed,
+  maxPuckSpeed,
+  fallbackNormalX,
+}: PaddleCollisionOptions) {
+  const combinedRadius = paddle.radius + puck.radius;
+  let collisionX = puck.x;
+  let collisionY = puck.y;
+  let collided = false;
+
+  if (magnitude(collisionX - paddle.x, collisionY - paddle.y) < combinedRadius) {
+    collided = true;
+  } else {
+    const hit = getSegmentCircleHit(
+      prevX,
+      prevY,
+      puck.x,
+      puck.y,
+      paddle.x,
+      paddle.y,
+      combinedRadius
+    );
+
+    if (hit) {
+      collisionX = hit.x;
+      collisionY = hit.y;
+      collided = true;
+    }
+  }
+
+  if (!collided) {
+    return false;
+  }
+
+  const normal = normalizeVector(
+    collisionX - paddle.x,
+    collisionY - paddle.y,
+    fallbackNormalX,
+    0
+  );
+  const tangent = { x: -normal.y, y: normal.x };
+  const relativeVx = puck.vx - paddleVelocity.x;
+  const relativeVy = puck.vy - paddleVelocity.y;
+  const normalVelocity = relativeVx * normal.x + relativeVy * normal.y;
+
+  let nextRelativeVx = relativeVx;
+  let nextRelativeVy = relativeVy;
+
+  if (normalVelocity < 0) {
+    nextRelativeVx = relativeVx - 2 * normalVelocity * normal.x;
+    nextRelativeVy = relativeVy - 2 * normalVelocity * normal.y;
+  } else {
+    nextRelativeVx += normal.x * 140;
+    nextRelativeVy += normal.y * 140;
+  }
+
+  let nextVx = nextRelativeVx + paddleVelocity.x * 0.85;
+  let nextVy = nextRelativeVy + paddleVelocity.y * 0.85;
+  const tangentTransfer =
+    (paddleVelocity.x * tangent.x + paddleVelocity.y * tangent.y) * 0.3;
+
+  nextVx += tangent.x * tangentTransfer;
+  nextVy += tangent.y * tangentTransfer;
+
+  const impactBoost =
+    Math.max(0, -normalVelocity) * 0.18 +
+    magnitude(paddleVelocity.x, paddleVelocity.y) * 0.08;
+  const direction = normalizeVector(nextVx, nextVy, normal.x, normal.y);
+  const nextSpeed = clamp(
+    magnitude(nextVx, nextVy) + impactBoost,
+    minPuckSpeed,
+    maxPuckSpeed
+  );
+
+  puck.vx = direction.x * nextSpeed;
+  puck.vy = direction.y * nextSpeed;
+  puck.x = paddle.x + normal.x * (combinedRadius + 0.75);
+  puck.y = clamp(
+    paddle.y + normal.y * (combinedRadius + 0.75),
+    puck.radius,
+    tableHeight - puck.radius
+  );
+
+  return true;
+}
+
 function PixelHollowCircle({ cx, cy, radius, color }: PixelCircleProps) {
   const s = radius / 5;
   const pixels: [number, number][] = [
-    [3,0],[4,0],[5,0],[6,0],
-    [2,1],[7,1],
-    [1,2],[8,2],
-    [0,3],[0,4],[0,5],[0,6],
-    [9,3],[9,4],[9,5],[9,6],
-    [1,7],[8,7],
-    [2,8],[7,8],
-    [3,9],[4,9],[5,9],[6,9]
+    [3, 0],
+    [4, 0],
+    [5, 0],
+    [6, 0],
+    [2, 1],
+    [7, 1],
+    [1, 2],
+    [8, 2],
+    [0, 3],
+    [0, 4],
+    [0, 5],
+    [0, 6],
+    [9, 3],
+    [9, 4],
+    [9, 5],
+    [9, 6],
+    [1, 7],
+    [8, 7],
+    [2, 8],
+    [7, 8],
+    [3, 9],
+    [4, 9],
+    [5, 9],
+    [6, 9],
   ];
+
   return (
     <g transform={`translate(${cx - radius}, ${cy - radius})`}>
-      {pixels.map(([px, py], i) => (
-        <rect key={i} x={px * s} y={py * s} width={s} height={s} fill={color} />
+      {pixels.map(([px, py], index) => (
+        <rect
+          key={index}
+          x={px * s}
+          y={py * s}
+          width={s}
+          height={s}
+          fill={color}
+        />
       ))}
     </g>
   );
 }
 
-// draws an 8-bit solid circle row by row
 function PixelSolidCircle({ cx, cy, radius, color }: PixelSolidCircleProps) {
   const s = radius / 4;
   const rows = [
@@ -96,10 +325,18 @@ function PixelSolidCircle({ cx, cy, radius, color }: PixelSolidCircleProps) {
     { y: 6, x: 1, w: 6 },
     { y: 7, x: 2, w: 4 },
   ];
+
   return (
     <g transform={`translate(${cx - radius}, ${cy - radius})`}>
-      {rows.map((row, i) => (
-        <rect key={i} x={row.x * s} y={row.y * s} width={row.w * s} height={s} fill={color} />
+      {rows.map((row, index) => (
+        <rect
+          key={index}
+          x={row.x * s}
+          y={row.y * s}
+          width={row.w * s}
+          height={s}
+          fill={color}
+        />
       ))}
     </g>
   );
@@ -108,557 +345,721 @@ function PixelSolidCircle({ cx, cy, radius, color }: PixelSolidCircleProps) {
 export function HockeyGame({ className }: { className?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const animationFrameRef = useRef<number | undefined>(undefined);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  // tracks whether the player has started the game
-  const [hasStarted, setHasStarted] = useState(false);
-  // blink toggle for the "PRESS START" text
-  const [blinkVisible, setBlinkVisible] = useState(true);
-  const [dimensions, setDimensions] = useState({ width: 400, height: 300 });
-  const [gameState, setGameState] = useState<VisualGameState>({
-    playerPaddle: { x: 0, y: 0, radius: 20 },
-    aiPaddle: { x: 0, y: 0, radius: 20 },
-    puck: { x: 0, y: 0, radius: 8, vx: 0, vy: 0 },
-  });
-
-  // Initial score must be deterministic for SSR (no localStorage on server).
-  const [score, setScore] = useState<GameScore>({ player: 0, ai: 0 });
-  const [gameOver, setGameOver] = useState(false);
+  const animationFrameRef = useRef<number | null>(null);
   const scoreRef = useRef<GameScore>({ player: 0, ai: 0 });
   const gameOverRef = useRef(false);
   const awaitingServeRef = useRef(false);
-  const serveSideRef = useRef<"player" | "ai">("player");
+  const serveSideRef = useRef<Side>("player");
   const serveStartTimeRef = useRef(0);
 
-  // After mount, sync score from localStorage so client matches saved state (avoids hydration mismatch).
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as GameScore;
-        scoreRef.current = parsed;
-        queueMicrotask(() => setScore(parsed));
-      } catch {
-        /* ignore invalid saved data */
-      }
-    }
-  }, []);
-  
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [blinkVisible, setBlinkVisible] = useState(true);
+  const [dimensions, setDimensions] = useState({
+    width: BASE_WIDTH,
+    height: BASE_HEIGHT,
+  });
+  const [gameState, setGameState] = useState<VisualGameState>({
+    playerPaddle: {
+      x: BASE_PADDLE_RADIUS + 30,
+      y: BASE_HEIGHT / 2,
+      radius: BASE_PADDLE_RADIUS,
+    },
+    aiPaddle: {
+      x: BASE_WIDTH - BASE_PADDLE_RADIUS - 30,
+      y: BASE_HEIGHT / 2,
+      radius: BASE_PADDLE_RADIUS,
+    },
+    puck: {
+      x: BASE_WIDTH / 2,
+      y: BASE_HEIGHT / 2,
+      radius: BASE_PUCK_RADIUS,
+      vx: 0,
+      vy: 0,
+    },
+  });
+  const [score, setScore] = useState<GameScore>({ player: 0, ai: 0 });
+  const [gameOver, setGameOver] = useState(false);
+
+  const baseDiagonal = magnitude(BASE_WIDTH, BASE_HEIGHT);
+  const currentDiagonal = magnitude(dimensions.width, dimensions.height);
+  const baseSpeedScale = clamp(currentDiagonal / baseDiagonal, 1, 1.85);
+  const isTouchDevice =
+    typeof window !== "undefined" && "ontouchstart" in window;
+  const speedScale =
+    isFullscreen && isTouchDevice ? baseSpeedScale * 0.82 : baseSpeedScale;
+  const entityScale =
+    isFullscreen ? clamp(currentDiagonal / baseDiagonal, 1.15, 2.1) : 1;
+  const paddleRadius = BASE_PADDLE_RADIUS * entityScale;
+  const puckRadius = BASE_PUCK_RADIUS * entityScale;
+  const lanePadding = 30 * speedScale;
+  const boardStroke = Math.max(4, 5 * entityScale);
+  const goalPocketWidth = Math.max(18, 24 * entityScale);
+  const { goalTop, goalBottom, goalHeight } = getGoalBounds(dimensions.height);
+
   const gameStateRef = useRef<InternalGameState>({
-    playerPaddle: { x: 0, y: 0, radius: 20 },
-    aiPaddle: { x: 0, y: 0, radius: 20 },
-    puck: { x: 0, y: 0, radius: 8, vx: 0, vy: 0 },
+    playerPaddle: {
+      x: BASE_PADDLE_RADIUS + 30,
+      y: BASE_HEIGHT / 2,
+      radius: BASE_PADDLE_RADIUS,
+    },
+    aiPaddle: {
+      x: BASE_WIDTH - BASE_PADDLE_RADIUS - 30,
+      y: BASE_HEIGHT / 2,
+      radius: BASE_PADDLE_RADIUS,
+    },
+    puck: {
+      x: BASE_WIDTH / 2,
+      y: BASE_HEIGHT / 2,
+      radius: BASE_PUCK_RADIUS,
+      vx: 0,
+      vy: 0,
+    },
     keys: { up: false, down: false, left: false, right: false },
-    touchTargetY: -1,
-    touchTargetX: -1,
+    pointerTarget: null,
+    playerVelocity: { x: 0, y: 0 },
+    aiVelocity: { x: 0, y: 0 },
     lastTime: 0,
   });
 
-  // convert screen touch to game coordinates
-  const screenToGameY = useCallback((screenY: number): number => {
-    const svg = svgRef.current;
-    if (!svg) return -1;
-    const rect = svg.getBoundingClientRect();
-    const ratio = dimensions.height / rect.height;
-    return (screenY - rect.top) * ratio;
-  }, [dimensions.height]);
-
-  const screenToGameX = useCallback((screenX: number): number => {
-    const svg = svgRef.current;
-    if (!svg) return -1;
-    const rect = svg.getBoundingClientRect();
-    const ratio = dimensions.width / rect.width;
-    return (screenX - rect.left) * ratio;
-  }, [dimensions.width]);
-
-  // touch handlers for direct paddle control on the game field
-  const handleTouchStart = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    gameStateRef.current.touchTargetY = screenToGameY(touch.clientY);
-    gameStateRef.current.touchTargetX = screenToGameX(touch.clientX);
-  }, [screenToGameY, screenToGameX]);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    gameStateRef.current.touchTargetY = screenToGameY(touch.clientY);
-    gameStateRef.current.touchTargetX = screenToGameX(touch.clientX);
-  }, [screenToGameY, screenToGameX]);
-
-  const handleTouchEnd = useCallback(() => {
-    gameStateRef.current.touchTargetY = -1;
-    gameStateRef.current.touchTargetX = -1;
-  }, []);
-
-  // blink the start screen text every 600ms
-  useEffect(() => {
-    if (hasStarted) return;
-    const interval = setInterval(() => {
-      setBlinkVisible((prev) => !prev);
-    }, 600);
-    return () => clearInterval(interval);
-  }, [hasStarted]);
-
-  // save score to localStorage and ref
-  const saveScore = useCallback((newScore: GameScore) => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newScore));
-    scoreRef.current = newScore;
-  }, []);
-
-  // update score, check for win condition
-  const updateScore = useCallback((newScore: GameScore) => {
-    saveScore(newScore);
-    setScore(newScore);
-    if (newScore.player >= WINNING_SCORE || newScore.ai >= WINNING_SCORE) {
-      setGameOver(true);
-      gameOverRef.current = true;
-      setIsPaused(true);
-    }
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("hockeyScoreUpdate", { detail: newScore }));
-    }
-  }, [saveScore]);
-
-  // speed scaling based on viewport diagonal
-  const baseDiagonal = Math.sqrt(400 * 400 + 300 * 300);
-  const currentDiagonal = Math.sqrt(dimensions.width * dimensions.width + dimensions.height * dimensions.height);
-  const baseSpeedScale = Math.min(1.8, Math.max(1, currentDiagonal / baseDiagonal));
-  const isMobileFullscreen =
-    isFullscreen &&
-    typeof window !== "undefined" &&
-    "ontouchstart" in window;
-  const speedScale = isMobileFullscreen ? baseSpeedScale * 0.75 : baseSpeedScale;
-
-  // in fullscreen (PC), scale up paddles and puck so they stay visibly larger
-  const entityScale = isFullscreen ? Math.min(2.2, Math.max(1.2, currentDiagonal / baseDiagonal)) : 1;
-  const paddleRadius = 20 * entityScale;
-  const puckRadius = 8 * entityScale;
-
-  // default paddle positions (used by initGame and placeAfterGoal)
-  const defaultPaddlePositions = useCallback(() => {
+  const syncVisualState = useCallback(() => {
     const state = gameStateRef.current;
-    const paddleMargin = 30 * speedScale;
-    state.playerPaddle.x = paddleMargin;
-    state.playerPaddle.y = dimensions.height / 2;
-    state.aiPaddle.x = dimensions.width - paddleMargin;
-    state.aiPaddle.y = dimensions.height / 2;
-  }, [dimensions, speedScale]);
-
-  // reset positions and launch puck (start of game or resize)
-  const initGame = useCallback(() => {
-    awaitingServeRef.current = false;
-    const state = gameStateRef.current;
-    state.playerPaddle.radius = paddleRadius;
-    state.aiPaddle.radius = paddleRadius;
-    state.puck.radius = puckRadius;
-    defaultPaddlePositions();
-
-    state.puck.x = dimensions.width / 2;
-    state.puck.y = dimensions.height / 2;
-
-    const speed = 4.5 * speedScale;
-    const angle = (Math.random() - 0.5) * Math.PI / 3;
-    state.puck.vx = Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
-    state.puck.vy = Math.sin(angle) * speed;
-
     setGameState({
       playerPaddle: { ...state.playerPaddle },
       aiPaddle: { ...state.aiPaddle },
       puck: { ...state.puck },
     });
-  }, [dimensions, speedScale, defaultPaddlePositions, paddleRadius, puckRadius]);
+  }, []);
 
-  // after a goal: reset paddles, place puck in front of scorer (stationary), wait for push
-  const placeAfterGoal = useCallback(
-    (scorer: "player" | "ai") => {
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(saved) as GameScore;
+      scoreRef.current = parsed;
+      queueMicrotask(() => setScore(parsed));
+    } catch {
+      // Ignore invalid score snapshots.
+    }
+  }, []);
+
+  useEffect(() => {
+    if (hasStarted) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setBlinkVisible((current) => !current);
+    }, 600);
+
+    return () => window.clearInterval(interval);
+  }, [hasStarted]);
+
+  const saveScore = useCallback((nextScore: GameScore) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextScore));
+    scoreRef.current = nextScore;
+  }, []);
+
+  const updateScore = useCallback(
+    (nextScore: GameScore) => {
+      saveScore(nextScore);
+      setScore(nextScore);
+
+      if (
+        nextScore.player >= WINNING_SCORE ||
+        nextScore.ai >= WINNING_SCORE
+      ) {
+        setGameOver(true);
+        gameOverRef.current = true;
+        setIsPaused(true);
+      }
+
+      window.dispatchEvent(
+        new CustomEvent("hockeyScoreUpdate", { detail: nextScore })
+      );
+    },
+    [saveScore]
+  );
+
+  const setDefaultPaddles = useCallback(() => {
+    const state = gameStateRef.current;
+
+    state.playerPaddle.radius = paddleRadius;
+    state.aiPaddle.radius = paddleRadius;
+    state.puck.radius = puckRadius;
+    state.playerPaddle.x = lanePadding + state.playerPaddle.radius;
+    state.playerPaddle.y = dimensions.height / 2;
+    state.aiPaddle.x =
+      dimensions.width - lanePadding - state.aiPaddle.radius;
+    state.aiPaddle.y = dimensions.height / 2;
+    state.playerVelocity = { x: 0, y: 0 };
+    state.aiVelocity = { x: 0, y: 0 };
+  }, [dimensions.height, dimensions.width, lanePadding, paddleRadius, puckRadius]);
+
+  const launchPuck = useCallback(
+    (direction: 1 | -1) => {
       const state = gameStateRef.current;
-      const paddleMargin = 30 * speedScale;
-      const gap = 25 * speedScale;
+      const launchSpeed = 315 * speedScale;
+      const angle = (Math.random() - 0.5) * Math.PI * 0.7;
+      const horizontal = Math.max(0.45, Math.abs(Math.cos(angle)));
 
-      defaultPaddlePositions();
+      state.puck.vx = horizontal * launchSpeed * direction;
+      state.puck.vy = Math.sin(angle) * launchSpeed;
+    },
+    [speedScale]
+  );
 
+  const initRound = useCallback(() => {
+    const state = gameStateRef.current;
+
+    awaitingServeRef.current = false;
+    setDefaultPaddles();
+    state.puck.x = dimensions.width / 2;
+    state.puck.y = dimensions.height / 2;
+
+    const openingDirection: 1 | -1 = Math.random() > 0.5 ? 1 : -1;
+    launchPuck(openingDirection);
+    syncVisualState();
+  }, [dimensions.height, dimensions.width, launchPuck, setDefaultPaddles, syncVisualState]);
+
+  const placeAfterGoal = useCallback(
+    (scorer: Side) => {
+      const state = gameStateRef.current;
+      const setupGap = 12 * entityScale;
+
+      setDefaultPaddles();
       state.puck.vx = 0;
       state.puck.vy = 0;
+      state.puck.y = dimensions.height / 2;
+
       if (scorer === "player") {
         state.puck.x =
-          paddleMargin +
+          state.playerPaddle.x +
           state.playerPaddle.radius +
           state.puck.radius +
-          gap;
-        state.puck.y = dimensions.height / 2;
+          setupGap;
       } else {
         state.puck.x =
-          dimensions.width -
-          paddleMargin -
+          state.aiPaddle.x -
           state.aiPaddle.radius -
           state.puck.radius -
-          gap;
-        state.puck.y = dimensions.height / 2;
+          setupGap;
       }
 
       awaitingServeRef.current = true;
       serveSideRef.current = scorer;
       serveStartTimeRef.current = performance.now();
-
-      setGameState({
-        playerPaddle: { ...state.playerPaddle },
-        aiPaddle: { ...state.aiPaddle },
-        puck: { ...state.puck },
-      });
+      syncVisualState();
     },
-    [dimensions, speedScale, defaultPaddlePositions]
+    [dimensions.height, entityScale, setDefaultPaddles, syncVisualState]
   );
 
-  // full reset: score, flags, positions
+  const handleGoal = useCallback(
+    (scorer: Side) => {
+      const nextScore =
+        scorer === "player"
+          ? {
+              player: scoreRef.current.player + 1,
+              ai: scoreRef.current.ai,
+            }
+          : {
+              player: scoreRef.current.player,
+              ai: scoreRef.current.ai + 1,
+            };
+
+      updateScore(nextScore);
+
+      if (
+        nextScore.player < WINNING_SCORE &&
+        nextScore.ai < WINNING_SCORE
+      ) {
+        placeAfterGoal(scorer);
+      }
+    },
+    [placeAfterGoal, updateScore]
+  );
+
   const resetGame = useCallback(() => {
-    setScore({ player: 0, ai: 0 });
-    scoreRef.current = { player: 0, ai: 0 };
+    const freshScore = { player: 0, ai: 0 };
+
+    saveScore(freshScore);
+    setScore(freshScore);
     setGameOver(false);
     gameOverRef.current = false;
     setIsPaused(false);
-    initGame();
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("hockeyScoreUpdate", { detail: { player: 0, ai: 0 } }));
-    }
-  }, [initGame]);
+    initRound();
 
-  // start the game from the title screen
+    window.dispatchEvent(
+      new CustomEvent("hockeyScoreUpdate", { detail: freshScore })
+    );
+  }, [initRound, saveScore]);
+
   const startGame = useCallback(() => {
     setHasStarted(true);
     setIsPaused(false);
     resetGame();
   }, [resetGame]);
 
-  // keyboard input handlers
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    // Don't capture keys if user is typing in an input field
-    const target = e.target as HTMLElement;
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
-      return;
-    }
-
-    if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
-      gameStateRef.current.keys.up = true;
-      e.preventDefault();
-    }
-    if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
-      gameStateRef.current.keys.down = true;
-      e.preventDefault();
-    }
-    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
-      gameStateRef.current.keys.left = true;
-      e.preventDefault();
-    }
-    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
-      gameStateRef.current.keys.right = true;
-      e.preventDefault();
-    }
+  const clearMovementKeys = useCallback(() => {
+    gameStateRef.current.keys = {
+      up: false,
+      down: false,
+      left: false,
+      right: false,
+    };
   }, []);
 
-  const handleKeyUp = useCallback((e: KeyboardEvent) => {
-    // Don't capture keys if user is typing in an input field
-    const target = e.target as HTMLElement;
-    if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      if (event.code === "Space" && hasStarted && !gameOverRef.current) {
+        setIsPaused((current) => !current);
+        event.preventDefault();
+        return;
+      }
+
+      if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") {
+        gameStateRef.current.keys.up = true;
+        event.preventDefault();
+      }
+      if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") {
+        gameStateRef.current.keys.down = true;
+        event.preventDefault();
+      }
+      if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
+        gameStateRef.current.keys.left = true;
+        event.preventDefault();
+      }
+      if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") {
+        gameStateRef.current.keys.right = true;
+        event.preventDefault();
+      }
+    },
+    [hasStarted]
+  );
+
+  const handleKeyUp = useCallback((event: KeyboardEvent) => {
+    const target = event.target as HTMLElement;
+    if (
+      target.tagName === "INPUT" ||
+      target.tagName === "TEXTAREA" ||
+      target.isContentEditable
+    ) {
       return;
     }
 
-    if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
+    if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") {
       gameStateRef.current.keys.up = false;
     }
-    if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
+    if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") {
       gameStateRef.current.keys.down = false;
     }
-    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+    if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
       gameStateRef.current.keys.left = false;
     }
-    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+    if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") {
       gameStateRef.current.keys.right = false;
     }
   }, []);
 
-  // main physics tick (currentTime from requestAnimationFrame for serve delay)
+  const screenToGamePoint = useCallback(
+    (clientX: number, clientY: number) => {
+      const svg = svgRef.current;
+      if (!svg) {
+        return null;
+      }
+
+      const rect = svg.getBoundingClientRect();
+      if (!rect.width || !rect.height) {
+        return null;
+      }
+
+      return {
+        x: (clientX - rect.left) * (dimensions.width / rect.width),
+        y: (clientY - rect.top) * (dimensions.height / rect.height),
+      };
+    },
+    [dimensions.height, dimensions.width]
+  );
+
+  const updatePointerTarget = useCallback(
+    (clientX: number, clientY: number) => {
+      const point = screenToGamePoint(clientX, clientY);
+      if (!point) {
+        return;
+      }
+
+      gameStateRef.current.pointerTarget = point;
+    },
+    [screenToGamePoint]
+  );
+
+  const clearPointerTarget = useCallback(() => {
+    gameStateRef.current.pointerTarget = null;
+  }, []);
+
+  const handlePointerDown = useCallback(
+    (event: ReactPointerEvent<SVGSVGElement>) => {
+      event.preventDefault();
+      event.currentTarget.setPointerCapture(event.pointerId);
+      updatePointerTarget(event.clientX, event.clientY);
+    },
+    [updatePointerTarget]
+  );
+
+  const handlePointerMove = useCallback(
+    (event: ReactPointerEvent<SVGSVGElement>) => {
+      if (!gameStateRef.current.pointerTarget) {
+        return;
+      }
+
+      event.preventDefault();
+      updatePointerTarget(event.clientX, event.clientY);
+    },
+    [updatePointerTarget]
+  );
+
+  const handlePointerUp = useCallback(
+    (event: ReactPointerEvent<SVGSVGElement>) => {
+      event.preventDefault();
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+      clearPointerTarget();
+    },
+    [clearPointerTarget]
+  );
+
   const update = useCallback(
     (currentTime: number) => {
       const state = gameStateRef.current;
-      const paddleSpeed = 6 * speedScale;
-      const paddleMargin = 30 * speedScale;
-      const playerMinX = paddleMargin;
-      const playerMaxX = dimensions.width / 2 - paddleMargin;
+      const elapsed = currentTime - state.lastTime;
+      const dt = clamp((elapsed || 16.67) / 1000, 1 / 240, 0.04);
+      const safeDt = Math.max(dt, 1 / 240);
+      const playerMinX = lanePadding + state.playerPaddle.radius;
+      const playerMaxX =
+        dimensions.width / 2 - lanePadding - state.playerPaddle.radius;
+      const aiMinX =
+        dimensions.width / 2 + lanePadding + state.aiPaddle.radius;
+      const aiMaxX = dimensions.width - lanePadding - state.aiPaddle.radius;
+      const playerKeyboardSpeed = 520 * speedScale;
+      const playerPointerSpeed = 900 * speedScale;
+      const aiBaseSpeed = 420 * speedScale;
+      const minPuckSpeed = 215 * speedScale;
+      const maxPuckSpeed = 760 * speedScale;
 
-      // move player paddle via keyboard (vertical)
-    if (state.keys.up && state.playerPaddle.y - state.playerPaddle.radius > 0) {
-      state.playerPaddle.y -= paddleSpeed;
-    }
-    if (state.keys.down && state.playerPaddle.y + state.playerPaddle.radius < dimensions.height) {
-      state.playerPaddle.y += paddleSpeed;
-    }
+      state.lastTime = currentTime;
 
-    // move player paddle via keyboard (horizontal)
-    if (state.keys.left && state.playerPaddle.x - state.playerPaddle.radius > playerMinX) {
-      state.playerPaddle.x -= paddleSpeed;
-    }
-    if (state.keys.right && state.playerPaddle.x + state.playerPaddle.radius < playerMaxX) {
-      state.playerPaddle.x += paddleSpeed;
-    }
+      const previousPlayer = {
+        x: state.playerPaddle.x,
+        y: state.playerPaddle.y,
+      };
 
-    // move player paddle via touch (overrides keyboard for position)
-    if (state.touchTargetY >= 0 || state.touchTargetX >= 0) {
-      if (state.touchTargetY >= 0) {
-        const clampedY = Math.max(
+      if (state.pointerTarget) {
+        const targetX = clamp(state.pointerTarget.x, playerMinX, playerMaxX);
+        const targetY = clamp(
+          state.pointerTarget.y,
           state.playerPaddle.radius,
-          Math.min(dimensions.height - state.playerPaddle.radius, state.touchTargetY)
+          dimensions.height - state.playerPaddle.radius
         );
-        state.playerPaddle.y += (clampedY - state.playerPaddle.y) * 0.3;
-      }
-      if (state.touchTargetX >= 0) {
-        const clampedX = Math.max(
-          playerMinX + state.playerPaddle.radius,
-          Math.min(playerMaxX - state.playerPaddle.radius, state.touchTargetX)
-        );
-        state.playerPaddle.x += (clampedX - state.playerPaddle.x) * 0.3;
-      }
-    }
-    
-      // dumb AI: chase the puck (vertical and horizontal, stays on right half)
-      // skip during awaiting serve so the AI doesn't move into the stationary puck
-      if (!awaitingServeRef.current) {
-        const aiSpeed = 5 * speedScale;
-        const aiMinX = dimensions.width / 2 + paddleMargin;
-        const aiMaxX = dimensions.width - paddleMargin;
+        const deltaX = targetX - state.playerPaddle.x;
+        const deltaY = targetY - state.playerPaddle.y;
+        const distance = magnitude(deltaX, deltaY);
+        const maxMove = playerPointerSpeed * dt;
 
-        if (state.aiPaddle.y < state.puck.y - 5) {
-          state.aiPaddle.y = Math.min(
-            dimensions.height - state.aiPaddle.radius,
-            state.aiPaddle.y + aiSpeed
-          );
-        } else if (state.aiPaddle.y > state.puck.y + 5) {
-          state.aiPaddle.y = Math.max(
-            state.aiPaddle.radius,
-            state.aiPaddle.y - aiSpeed
-          );
+        if (distance > maxMove) {
+          const direction = normalizeVector(deltaX, deltaY);
+          state.playerPaddle.x += direction.x * maxMove;
+          state.playerPaddle.y += direction.y * maxMove;
+        } else {
+          state.playerPaddle.x = targetX;
+          state.playerPaddle.y = targetY;
+        }
+      } else {
+        let inputX = 0;
+        let inputY = 0;
+
+        if (state.keys.left) {
+          inputX -= 1;
+        }
+        if (state.keys.right) {
+          inputX += 1;
+        }
+        if (state.keys.up) {
+          inputY -= 1;
+        }
+        if (state.keys.down) {
+          inputY += 1;
         }
 
-        if (state.aiPaddle.x < state.puck.x - 5) {
-          state.aiPaddle.x = Math.min(
-            aiMaxX - state.aiPaddle.radius,
-            state.aiPaddle.x + aiSpeed
-          );
-        } else if (state.aiPaddle.x > state.puck.x + 5) {
-          state.aiPaddle.x = Math.max(
-            aiMinX + state.aiPaddle.radius,
-            state.aiPaddle.x - aiSpeed
-          );
+        if (inputX !== 0 || inputY !== 0) {
+          const direction = normalizeVector(inputX, inputY);
+          state.playerPaddle.x += direction.x * playerKeyboardSpeed * dt;
+          state.playerPaddle.y += direction.y * playerKeyboardSpeed * dt;
         }
       }
 
-      // --- Awaiting serve: puck is stationary in front of scorer ---
-      if (awaitingServeRef.current) {
-        if (serveSideRef.current === "player") {
-          const playerDist = Math.sqrt(
-            Math.pow(state.puck.x - state.playerPaddle.x, 2) +
-              Math.pow(state.puck.y - state.playerPaddle.y, 2)
+      state.playerPaddle.x = clamp(state.playerPaddle.x, playerMinX, playerMaxX);
+      state.playerPaddle.y = clamp(
+        state.playerPaddle.y,
+        state.playerPaddle.radius,
+        dimensions.height - state.playerPaddle.radius
+      );
+      state.playerVelocity = {
+        x: (state.playerPaddle.x - previousPlayer.x) / safeDt,
+        y: (state.playerPaddle.y - previousPlayer.y) / safeDt,
+      };
+
+      const previousAi = {
+        x: state.aiPaddle.x,
+        y: state.aiPaddle.y,
+      };
+      const aiHomeX = clamp(dimensions.width * 0.77, aiMinX, aiMaxX);
+      let aiTargetX = aiHomeX;
+      let aiTargetY = dimensions.height / 2;
+
+      if (awaitingServeRef.current && serveSideRef.current === "ai") {
+        aiTargetX = clamp(
+          state.puck.x + state.aiPaddle.radius + state.puck.radius + 8 * entityScale,
+          aiMinX,
+          aiMaxX
+        );
+        aiTargetY = state.puck.y;
+      } else if (state.puck.vx > 0 || state.puck.x > dimensions.width * 0.55) {
+        const defenseX = clamp(dimensions.width * 0.74, aiMinX, aiMaxX);
+        aiTargetX = defenseX;
+
+        if (state.puck.x > dimensions.width * 0.7 && state.puck.vx > -60) {
+          aiTargetX = clamp(
+            state.puck.x + state.aiPaddle.radius * 0.7,
+            aiMinX,
+            aiMaxX
           );
-          if (
-            playerDist <
-            state.playerPaddle.radius + state.puck.radius
-          ) {
-            awaitingServeRef.current = false;
-            const speed = 4.5 * speedScale;
-            const angle =
-              (Math.random() - 0.5) * (Math.PI / 3);
-            state.puck.vx = Math.cos(angle) * speed;
-            state.puck.vy = Math.sin(angle) * speed;
-            const overlap =
-              state.playerPaddle.radius +
-              state.puck.radius -
-              playerDist;
-            const pushAngle = Math.atan2(
-              state.puck.y - state.playerPaddle.y,
-              state.puck.x - state.playerPaddle.x
+        }
+
+        if (state.puck.vx > 40) {
+          const timeToDefense = (aiTargetX - state.puck.x) / state.puck.vx;
+          if (timeToDefense > 0 && timeToDefense < 2.25) {
+            aiTargetY = reflectIntoBounds(
+              state.puck.y + state.puck.vy * timeToDefense,
+              state.aiPaddle.radius,
+              dimensions.height - state.aiPaddle.radius
             );
-            // Push out of overlap + extra margin so we don't re-collide with player next frame
-            const separation = overlap + 3;
-            state.puck.x += Math.cos(pushAngle) * separation;
-            state.puck.y += Math.sin(pushAngle) * separation;
-            state.puck.y = Math.max(state.puck.radius, Math.min(dimensions.height - state.puck.radius, state.puck.y));
+          } else {
+            aiTargetY = state.puck.y;
           }
         } else {
-          if (
-            currentTime - serveStartTimeRef.current >= 1200
-          ) {
-            awaitingServeRef.current = false;
-            const speed = 4.5 * speedScale;
-            const angle =
-              (Math.random() - 0.5) * (Math.PI / 3);
-            state.puck.vx = -Math.cos(angle) * speed;
-            state.puck.vy = Math.sin(angle) * speed;
-          }
+          aiTargetY = state.puck.y;
         }
-        setGameState({
-          playerPaddle: { ...state.playerPaddle },
-          aiPaddle: { ...state.aiPaddle },
-          puck: { ...state.puck },
-        });
-        return;
+      } else {
+        aiTargetY = dimensions.height / 2 + (state.puck.y - dimensions.height / 2) * 0.25;
       }
 
-      // move puck (keep previous position for tunnel detection)
-      const prevPuckX = state.puck.x;
-      const prevPuckY = state.puck.y;
-      state.puck.x += state.puck.vx;
-      state.puck.y += state.puck.vy;
-
-      // bounce off top/bottom walls with position clamping
-      if (state.puck.y - state.puck.radius <= 0) {
-        state.puck.y = state.puck.radius;
-        state.puck.vy = Math.abs(state.puck.vy);
-      } else if (state.puck.y + state.puck.radius >= dimensions.height) {
-        state.puck.y = dimensions.height - state.puck.radius;
-        state.puck.vy = -Math.abs(state.puck.vy);
-      }
-
-      // player paddle collision
-      const playerDist = Math.sqrt(
-        Math.pow(state.puck.x - state.playerPaddle.x, 2) +
-          Math.pow(state.puck.y - state.playerPaddle.y, 2)
+      aiTargetX = clamp(aiTargetX, aiMinX, aiMaxX);
+      aiTargetY = clamp(
+        aiTargetY,
+        state.aiPaddle.radius,
+        dimensions.height - state.aiPaddle.radius
       );
 
-      if (
-        playerDist <
-        state.playerPaddle.radius + state.puck.radius
-      ) {
-        const angle = Math.atan2(
-          state.puck.y - state.playerPaddle.y,
-          state.puck.x - state.playerPaddle.x
-        );
-        const maxSpeed = 12 * speedScale;
-        const speed = Math.min(maxSpeed, Math.sqrt(
-          state.puck.vx * state.puck.vx +
-            state.puck.vy * state.puck.vy
-        ) * 1.2);
-        state.puck.vx = Math.cos(angle) * speed;
-        state.puck.vy = Math.sin(angle) * speed;
-        const overlap =
-          state.playerPaddle.radius +
-          state.puck.radius -
-          playerDist;
-        state.puck.x += Math.cos(angle) * overlap;
-        state.puck.y += Math.sin(angle) * overlap;
+      const aiMaxMove =
+        (aiBaseSpeed + (state.puck.x > dimensions.width * 0.66 ? 120 * speedScale : 0)) *
+        dt;
+      const aiDx = aiTargetX - state.aiPaddle.x;
+      const aiDy = aiTargetY - state.aiPaddle.y;
+      const aiDistance = magnitude(aiDx, aiDy);
 
-        // clamp back inside walls after push
-        state.puck.y = Math.max(state.puck.radius, Math.min(dimensions.height - state.puck.radius, state.puck.y));
+      if (aiDistance > aiMaxMove) {
+        const direction = normalizeVector(aiDx, aiDy);
+        state.aiPaddle.x += direction.x * aiMaxMove;
+        state.aiPaddle.y += direction.y * aiMaxMove;
+      } else {
+        state.aiPaddle.x = aiTargetX;
+        state.aiPaddle.y = aiTargetY;
       }
 
-      // AI paddle collision (including tunnel: puck passed through in one frame)
-      const aiR = state.aiPaddle.radius + state.puck.radius;
-      const aiDist = Math.sqrt(
-        Math.pow(state.puck.x - state.aiPaddle.x, 2) +
-          Math.pow(state.puck.y - state.aiPaddle.y, 2)
+      state.aiPaddle.x = clamp(state.aiPaddle.x, aiMinX, aiMaxX);
+      state.aiPaddle.y = clamp(
+        state.aiPaddle.y,
+        state.aiPaddle.radius,
+        dimensions.height - state.aiPaddle.radius
       );
+      state.aiVelocity = {
+        x: (state.aiPaddle.x - previousAi.x) / safeDt,
+        y: (state.aiPaddle.y - previousAi.y) / safeDt,
+      };
 
-      let aiCollided = aiDist < aiR;
-      if (!aiCollided) {
-        // Check for tunnel: segment from prev position to current intersects paddle circle
-        const dx = state.puck.x - prevPuckX;
-        const dy = state.puck.y - prevPuckY;
-        const mx = prevPuckX - state.aiPaddle.x;
-        const my = prevPuckY - state.aiPaddle.y;
-        const a = dx * dx + dy * dy;
-        if (a > 1e-10) {
-          const b = 2 * (mx * dx + my * dy);
-          const c = mx * mx + my * my - aiR * aiR;
-          const disc = b * b - 4 * a * c;
-          if (disc >= 0) {
-            const sqrtDisc = Math.sqrt(disc);
-            const t0 = (-b - sqrtDisc) / (2 * a);
-            if (t0 >= 0 && t0 <= 1) {
-              aiCollided = true;
-              state.puck.x = prevPuckX + t0 * dx;
-              state.puck.y = prevPuckY + t0 * dy;
-            }
-          }
-        }
-      }
-
-      if (aiCollided) {
-        const angle = Math.atan2(
-          state.puck.y - state.aiPaddle.y,
-          state.puck.x - state.aiPaddle.x
-        );
-        const maxSpeed = 12 * speedScale;
-        const speed = Math.min(maxSpeed, Math.sqrt(
-          state.puck.vx * state.puck.vx +
-            state.puck.vy * state.puck.vy
-        ) * 1.2);
-        state.puck.vx = Math.cos(angle) * speed;
-        state.puck.vy = Math.sin(angle) * speed;
-        const overlap =
-          state.aiPaddle.radius +
-          state.puck.radius -
-          Math.sqrt(
-            Math.pow(state.puck.x - state.aiPaddle.x, 2) +
-              Math.pow(state.puck.y - state.aiPaddle.y, 2)
+      if (awaitingServeRef.current) {
+        if (serveSideRef.current === "player") {
+          const serveDistance = magnitude(
+            state.puck.x - state.playerPaddle.x,
+            state.puck.y - state.playerPaddle.y
           );
-        state.puck.x += Math.cos(angle) * overlap;
-        state.puck.y += Math.sin(angle) * overlap;
 
-        // clamp back inside walls after push
-        state.puck.y = Math.max(state.puck.radius, Math.min(dimensions.height - state.puck.radius, state.puck.y));
-      }
+          if (serveDistance <= state.playerPaddle.radius + state.puck.radius) {
+            const serveNormal = normalizeVector(
+              state.puck.x - state.playerPaddle.x,
+              state.puck.y - state.playerPaddle.y,
+              1,
+              0
+            );
 
-      // puck went off left edge: AI scores
-      if (state.puck.x < 0) {
-        if (gameOverRef.current) return;
-        const newScore = {
-          player: scoreRef.current.player,
-          ai: scoreRef.current.ai + 1,
-        };
-        updateScore(newScore);
-        placeAfterGoal("ai");
+            state.puck.x =
+              state.playerPaddle.x +
+              serveNormal.x * (state.playerPaddle.radius + state.puck.radius + 1);
+            state.puck.y = clamp(
+              state.playerPaddle.y +
+                serveNormal.y * (state.playerPaddle.radius + state.puck.radius + 1),
+              state.puck.radius,
+              dimensions.height - state.puck.radius
+            );
+            awaitingServeRef.current = false;
+            launchPuck(1);
+          }
+        } else if (currentTime - serveStartTimeRef.current >= 850) {
+          awaitingServeRef.current = false;
+          launchPuck(-1);
+        }
+
+        syncVisualState();
         return;
       }
-      // puck went off right edge: player scores
-      if (state.puck.x > dimensions.width) {
-        if (gameOverRef.current) return;
-        const newScore = {
-          player: scoreRef.current.player + 1,
-          ai: scoreRef.current.ai,
-        };
-        updateScore(newScore);
-        placeAfterGoal("player");
-        return;
+
+      const frameTravel = magnitude(state.puck.vx * dt, state.puck.vy * dt);
+      const substeps = Math.max(
+        1,
+        Math.ceil(frameTravel / Math.max(state.puck.radius * 0.9, 10))
+      );
+      const stepDt = dt / substeps;
+
+      for (let step = 0; step < substeps; step += 1) {
+        const prevX = state.puck.x;
+        const prevY = state.puck.y;
+
+        state.puck.x += state.puck.vx * stepDt;
+        state.puck.y += state.puck.vy * stepDt;
+
+        if (state.puck.y - state.puck.radius <= 0) {
+          state.puck.y = state.puck.radius;
+          state.puck.vy = Math.abs(state.puck.vy) * 0.99;
+        } else if (state.puck.y + state.puck.radius >= dimensions.height) {
+          state.puck.y = dimensions.height - state.puck.radius;
+          state.puck.vy = -Math.abs(state.puck.vy) * 0.99;
+        }
+
+        const inGoalChannel =
+          state.puck.y > goalTop + state.puck.radius &&
+          state.puck.y < goalBottom - state.puck.radius;
+
+        if (state.puck.x - state.puck.radius <= 0) {
+          if (inGoalChannel) {
+            if (state.puck.x < -state.puck.radius * 1.25) {
+              handleGoal("ai");
+              return;
+            }
+          } else {
+            state.puck.x = state.puck.radius;
+            state.puck.vx = Math.abs(state.puck.vx) * 0.995;
+          }
+        }
+
+        if (state.puck.x + state.puck.radius >= dimensions.width) {
+          if (inGoalChannel) {
+            if (state.puck.x > dimensions.width + state.puck.radius * 1.25) {
+              handleGoal("player");
+              return;
+            }
+          } else {
+            state.puck.x = dimensions.width - state.puck.radius;
+            state.puck.vx = -Math.abs(state.puck.vx) * 0.995;
+          }
+        }
+
+        resolvePaddleCollision({
+          puck: state.puck,
+          prevX,
+          prevY,
+          paddle: state.playerPaddle,
+          paddleVelocity: state.playerVelocity,
+          tableHeight: dimensions.height,
+          minPuckSpeed,
+          maxPuckSpeed,
+          fallbackNormalX: 1,
+        });
+
+        resolvePaddleCollision({
+          puck: state.puck,
+          prevX,
+          prevY,
+          paddle: state.aiPaddle,
+          paddleVelocity: state.aiVelocity,
+          tableHeight: dimensions.height,
+          minPuckSpeed,
+          maxPuckSpeed,
+          fallbackNormalX: -1,
+        });
+
+        const currentSpeed = magnitude(state.puck.vx, state.puck.vy);
+        if (currentSpeed > 0) {
+          const speedAfterDrag = clamp(
+            currentSpeed * Math.exp(-0.06 * stepDt),
+            minPuckSpeed,
+            maxPuckSpeed
+          );
+          const direction = normalizeVector(
+            state.puck.vx,
+            state.puck.vy,
+            Math.sign(state.puck.vx) || 1,
+            0
+          );
+
+          state.puck.vx = direction.x * speedAfterDrag;
+          state.puck.vy = direction.y * speedAfterDrag;
+        }
       }
 
-      // push state for render
-      setGameState({
-        playerPaddle: { ...state.playerPaddle },
-        aiPaddle: { ...state.aiPaddle },
-        puck: { ...state.puck },
-      });
+      syncVisualState();
     },
     [
-      dimensions,
-      placeAfterGoal,
-      updateScore,
+      dimensions.height,
+      dimensions.width,
+      entityScale,
+      goalTop,
+      goalBottom,
+      handleGoal,
+      lanePadding,
+      launchPuck,
       speedScale,
+      syncVisualState,
     ]
   );
 
-  // resize handler
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
     const resizeGame = () => {
-      const rect = container.getBoundingClientRect();
-      if (isFullscreen) {
+      if (document.fullscreenElement) {
         setDimensions({ width: window.innerWidth, height: window.innerHeight });
-      } else {
-        setDimensions({ width: rect.width, height: Math.min(400, rect.height) });
+        return;
       }
+
+      const rect = container.getBoundingClientRect();
+      setDimensions({ width: rect.width, height: Math.min(400, rect.height) });
     };
 
     resizeGame();
@@ -667,98 +1068,147 @@ export function HockeyGame({ className }: { className?: string }) {
     return () => {
       window.removeEventListener("resize", resizeGame);
     };
-  }, [isFullscreen]);
+  }, []);
 
-  // re-init when dimensions change
   useEffect(() => {
-    if (dimensions.width === 0 || dimensions.height === 0) return;
-    
-    initGame();
-  }, [dimensions, initGame]);
+    if (!dimensions.width || !dimensions.height) {
+      return;
+    }
 
-  // game loop: runs every frame, skips update if paused/over/not started
+    initRound();
+  }, [dimensions.height, dimensions.width, initRound]);
+
   useEffect(() => {
     const gameLoop = (currentTime: number) => {
-      if (!hasStarted || isPaused || gameOver || dimensions.width === 0 || dimensions.height === 0) {
-        animationFrameRef.current = requestAnimationFrame(gameLoop);
-        return;
+      if (
+        hasStarted &&
+        !isPaused &&
+        !gameOver &&
+        dimensions.width > 0 &&
+        dimensions.height > 0
+      ) {
+        update(currentTime);
+      } else {
+        gameStateRef.current.lastTime = currentTime;
       }
-
-      const state = gameStateRef.current;
-      state.lastTime = currentTime;
-
-      update(currentTime);
 
       animationFrameRef.current = requestAnimationFrame(gameLoop);
     };
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-
+    window.addEventListener("blur", clearMovementKeys);
     gameStateRef.current.lastTime = performance.now();
     animationFrameRef.current = requestAnimationFrame(gameLoop);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
-      if (animationFrameRef.current) {
+      window.removeEventListener("blur", clearMovementKeys);
+      if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [handleKeyDown, handleKeyUp, update, isPaused, gameOver, dimensions, hasStarted]);
+  }, [
+    clearMovementKeys,
+    dimensions.height,
+    dimensions.width,
+    gameOver,
+    handleKeyDown,
+    handleKeyUp,
+    hasStarted,
+    isPaused,
+    update,
+  ]);
 
-  // fullscreen toggle
   const toggleFullscreen = useCallback(() => {
     const container = containerRef.current;
-    if (!container) return;
-
-    if (!isFullscreen) {
-      setIsPaused(true);
-      if (container.requestFullscreen) {
-        container.requestFullscreen().then(() => {
-          const isMobile = typeof window !== "undefined" && "ontouchstart" in window;
-          if (isMobile && "lock" in screen.orientation && typeof screen.orientation.lock === "function") {
-            (screen.orientation as { lock: (o: string) => Promise<void> }).lock("landscape").catch(() => {});
-          }
-          setIsFullscreen(true);
-          setTimeout(() => {
-            setDimensions({ width: window.innerWidth, height: window.innerHeight });
-          }, isMobile ? 200 : 100);
-        });
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().then(() => {
-          if ("unlock" in screen.orientation && typeof screen.orientation.unlock === "function") {
-            (screen.orientation as { unlock: () => void }).unlock();
-          }
-          setIsFullscreen(false);
-          setTimeout(() => {
-            const rect = container.getBoundingClientRect();
-            setDimensions({ width: rect.width, height: Math.min(400, rect.height) });
-          }, 100);
-        });
-      }
+    if (!container) {
+      return;
     }
-  }, [isFullscreen]);
 
-  // sync fullscreen state if user exits via Escape
+    if (!document.fullscreenElement) {
+      if (!container.requestFullscreen) {
+        return;
+      }
+
+      setIsPaused(true);
+      container.requestFullscreen().then(() => {
+        if (
+          isTouchDevice &&
+          "lock" in screen.orientation &&
+          typeof screen.orientation.lock === "function"
+        ) {
+          (
+            screen.orientation as ScreenOrientation & {
+              lock: (orientation: string) => Promise<void>;
+            }
+          )
+            .lock("landscape")
+            .catch(() => {});
+        }
+
+        setIsFullscreen(true);
+        window.setTimeout(() => {
+          setDimensions({ width: window.innerWidth, height: window.innerHeight });
+        }, isTouchDevice ? 200 : 100);
+      });
+      return;
+    }
+
+    if (!document.exitFullscreen) {
+      return;
+    }
+
+    document.exitFullscreen().then(() => {
+      if (
+        "unlock" in screen.orientation &&
+        typeof screen.orientation.unlock === "function"
+      ) {
+        screen.orientation.unlock();
+      }
+
+      setIsFullscreen(false);
+      window.setTimeout(() => {
+        const rect = container.getBoundingClientRect();
+        setDimensions({ width: rect.width, height: Math.min(400, rect.height) });
+      }, 100);
+    });
+  }, [isTouchDevice]);
+
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      const inFullscreen = Boolean(document.fullscreenElement);
+      const container = containerRef.current;
+
+      setIsFullscreen(inFullscreen);
+      if (inFullscreen) {
+        setDimensions({ width: window.innerWidth, height: window.innerHeight });
+      } else if (container) {
+        const rect = container.getBoundingClientRect();
+        setDimensions({ width: rect.width, height: Math.min(400, rect.height) });
+      }
     };
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
   }, []);
 
   return (
-    <div className={cn("relative flex flex-col gap-2", className, isFullscreen && "fixed inset-0 z-50 bg-background")}>
-      <div 
+    <div
+      className={cn(
+        "relative flex flex-col gap-2",
+        className,
+        isFullscreen && "fixed inset-0 z-50 bg-background"
+      )}
+    >
+      <div
         ref={containerRef}
         className={cn(
-          "relative border-2 border-dashed border-border bg-background/50 overflow-hidden",
-          isFullscreen ? "w-full h-full border-0" : "min-h-[300px]"
+          "relative overflow-hidden border-2 border-dashed border-border bg-background/50",
+          isFullscreen ? "h-full w-full border-0" : "min-h-[300px]"
         )}
       >
         <svg
@@ -766,20 +1216,66 @@ export function HockeyGame({ className }: { className?: string }) {
           width={dimensions.width}
           height={dimensions.height}
           className="block w-full touch-none"
-          style={{ imageRendering: "pixelated" }}
+          style={{ imageRendering: "pixelated", touchAction: "none" }}
           viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={clearPointerTarget}
+          onLostPointerCapture={clearPointerTarget}
         >
-
           <rect
             width={dimensions.width}
             height={dimensions.height}
             fill="var(--background)"
           />
-          
-          {/* center divider */}
+
+          <rect
+            x={0}
+            y={0}
+            width={boardStroke}
+            height={goalTop}
+            fill="var(--border)"
+          />
+          <rect
+            x={0}
+            y={goalBottom}
+            width={boardStroke}
+            height={dimensions.height - goalBottom}
+            fill="var(--border)"
+          />
+          <rect
+            x={dimensions.width - boardStroke}
+            y={0}
+            width={boardStroke}
+            height={goalTop}
+            fill="var(--border)"
+          />
+          <rect
+            x={dimensions.width - boardStroke}
+            y={goalBottom}
+            width={boardStroke}
+            height={dimensions.height - goalBottom}
+            fill="var(--border)"
+          />
+
+          <rect
+            x={0}
+            y={goalTop}
+            width={goalPocketWidth}
+            height={goalHeight}
+            fill="var(--primary)"
+            opacity="0.18"
+          />
+          <rect
+            x={dimensions.width - goalPocketWidth}
+            y={goalTop}
+            width={goalPocketWidth}
+            height={goalHeight}
+            fill="var(--primary)"
+            opacity="0.18"
+          />
+
           <line
             x1={dimensions.width / 2}
             y1={0}
@@ -789,52 +1285,35 @@ export function HockeyGame({ className }: { className?: string }) {
             strokeWidth="2"
             strokeDasharray="5 5"
           />
-          
-          {/* left goal zone */}
-          <rect
-            x={0}
-            y={dimensions.height / 2 - 40}
-            width={20}
-            height={80}
-            fill="var(--primary)"
-            opacity="0.3"
+
+          <PixelHollowCircle
+            cx={dimensions.width / 2}
+            cy={dimensions.height / 2}
+            radius={28 * entityScale}
+            color="var(--border)"
           />
-          
-          {/* right goal zone */}
-          <rect
-            x={dimensions.width - 20}
-            y={dimensions.height / 2 - 40}
-            width={20}
-            height={80}
-            fill="var(--primary)"
-            opacity="0.3"
-          />
-          
-          {/* player paddle */}
+
           <PixelHollowCircle
             cx={gameState.playerPaddle.x}
             cy={gameState.playerPaddle.y}
             radius={gameState.playerPaddle.radius}
             color="var(--primary)"
           />
-          
-          {/* AI paddle */}
+
           <PixelHollowCircle
             cx={gameState.aiPaddle.x}
             cy={gameState.aiPaddle.y}
             radius={gameState.aiPaddle.radius}
             color="var(--primary)"
           />
-          
-          {/* puck */}
+
           <PixelSolidCircle
             cx={gameState.puck.x}
             cy={gameState.puck.y}
             radius={gameState.puck.radius}
             color="var(--foreground)"
           />
-          
-          {/* player score */}
+
           <text
             x={dimensions.width / 4}
             y={30}
@@ -846,8 +1325,7 @@ export function HockeyGame({ className }: { className?: string }) {
           >
             {score.player}
           </text>
-          
-          {/* AI score */}
+
           <text
             x={(dimensions.width / 4) * 3}
             y={30}
@@ -860,37 +1338,34 @@ export function HockeyGame({ className }: { className?: string }) {
             {score.ai}
           </text>
         </svg>
-        
-        {/* starting screen overlay */}
+
         {!hasStarted && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/95 gap-6">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-background/95">
             <p className="retro text-xl uppercase tracking-widest text-primary">
               AIR HOCKEY
             </p>
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-2 text-center">
               <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground">
-                W / ↑ &nbsp; MOVE UP &nbsp; · &nbsp; S / ↓ &nbsp; MOVE DOWN
+                WASD / ARROWS TO MOVE
               </p>
               <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground">
-                A / ← &nbsp; MOVE LEFT &nbsp; · &nbsp; D / → &nbsp; MOVE RIGHT
+                CLICK + DRAG OR TOUCH + DRAG FOR DIRECT CONTROL
               </p>
-              <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
-                TOUCH / DRAG ON MOBILE
+              <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground">
+                SCORE THROUGH THE OPEN GOAL MOUTH
               </p>
             </div>
             <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground">
               FIRST TO {WINNING_SCORE} WINS
             </p>
-            {blinkVisible && (
-              <p className="retro text-sm uppercase tracking-widest text-primary">
-                PRESS START
-              </p>
-            )}
-            {!blinkVisible && (
-              <p className="retro text-sm uppercase tracking-widest text-primary invisible">
-                PRESS START
-              </p>
-            )}
+            <p
+              className={cn(
+                "retro text-sm uppercase tracking-widest text-primary",
+                !blinkVisible && "invisible"
+              )}
+            >
+              PRESS START
+            </p>
             <Button
               onClick={startGame}
               variant="outline"
@@ -901,10 +1376,11 @@ export function HockeyGame({ className }: { className?: string }) {
           </div>
         )}
 
-        {/* pause overlay */}
         {hasStarted && isPaused && !gameOver && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/80">
-            <p className="retro text-lg uppercase tracking-widest text-primary">PAUSED</p>
+            <p className="retro text-lg uppercase tracking-widest text-primary">
+              PAUSED
+            </p>
             <Button
               onClick={() => setIsPaused(false)}
               variant="outline"
@@ -915,29 +1391,27 @@ export function HockeyGame({ className }: { className?: string }) {
           </div>
         )}
 
-        {/* fullscreen: floating pause/resume + exit buttons */}
         {isFullscreen && hasStarted && !gameOver && (
-          <div className="absolute top-2 right-2 flex gap-2 z-10">
+          <div className="absolute right-2 top-2 z-10 flex gap-2">
             <Button
-              onClick={() => setIsPaused(!isPaused)}
+              onClick={() => setIsPaused((current) => !current)}
               variant="outline"
-              className="retro h-9 px-4 text-xs uppercase tracking-widest bg-background/90"
+              className="retro h-9 bg-background/90 px-4 text-xs uppercase tracking-widest"
             >
               {isPaused ? "RESUME" : "PAUSE"}
             </Button>
             <Button
               onClick={toggleFullscreen}
               variant="outline"
-              className="retro h-9 px-4 text-xs uppercase tracking-widest bg-background/90"
+              className="retro h-9 bg-background/90 px-4 text-xs uppercase tracking-widest"
             >
               EXIT FULLSCREEN
             </Button>
           </div>
         )}
 
-        {/* game over overlay */}
         {gameOver && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/90 gap-4">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/90">
             <p className="retro text-xl uppercase tracking-widest text-primary">
               {score.player >= WINNING_SCORE ? "PLAYER WINS!" : "AI WINS!"}
             </p>
@@ -955,75 +1429,125 @@ export function HockeyGame({ className }: { className?: string }) {
         )}
       </div>
 
-      {/* bottom controls: only show after game starts */}
       {hasStarted && (
         <div className="flex flex-col gap-2">
-          {/* mobile D-pad: up/down and left/right buttons */}
           <div className="flex flex-col gap-2 sm:hidden">
-            <div className="flex gap-2 justify-center">
+            <div className="flex justify-center gap-2">
               <Button
-                onTouchStart={() => { gameStateRef.current.keys.up = true; }}
-                onTouchEnd={() => { gameStateRef.current.keys.up = false; }}
-                onMouseDown={() => { gameStateRef.current.keys.up = true; }}
-                onMouseUp={() => { gameStateRef.current.keys.up = false; }}
-                onMouseLeave={() => { gameStateRef.current.keys.up = false; }}
+                onTouchStart={() => {
+                  gameStateRef.current.keys.up = true;
+                }}
+                onTouchEnd={() => {
+                  gameStateRef.current.keys.up = false;
+                }}
+                onTouchCancel={() => {
+                  gameStateRef.current.keys.up = false;
+                }}
+                onMouseDown={() => {
+                  gameStateRef.current.keys.up = true;
+                }}
+                onMouseUp={() => {
+                  gameStateRef.current.keys.up = false;
+                }}
+                onMouseLeave={() => {
+                  gameStateRef.current.keys.up = false;
+                }}
                 variant="outline"
-                className="retro w-14 h-12 text-lg uppercase tracking-widest select-none"
+                className="retro h-12 w-14 select-none text-lg uppercase tracking-widest"
               >
                 ▲
               </Button>
             </div>
-            <div className="flex gap-2 justify-center">
+            <div className="flex justify-center gap-2">
               <Button
-                onTouchStart={() => { gameStateRef.current.keys.left = true; }}
-                onTouchEnd={() => { gameStateRef.current.keys.left = false; }}
-                onMouseDown={() => { gameStateRef.current.keys.left = true; }}
-                onMouseUp={() => { gameStateRef.current.keys.left = false; }}
-                onMouseLeave={() => { gameStateRef.current.keys.left = false; }}
+                onTouchStart={() => {
+                  gameStateRef.current.keys.left = true;
+                }}
+                onTouchEnd={() => {
+                  gameStateRef.current.keys.left = false;
+                }}
+                onTouchCancel={() => {
+                  gameStateRef.current.keys.left = false;
+                }}
+                onMouseDown={() => {
+                  gameStateRef.current.keys.left = true;
+                }}
+                onMouseUp={() => {
+                  gameStateRef.current.keys.left = false;
+                }}
+                onMouseLeave={() => {
+                  gameStateRef.current.keys.left = false;
+                }}
                 variant="outline"
-                className="retro flex-1 h-12 text-lg uppercase tracking-widest select-none"
+                className="retro h-12 flex-1 select-none text-lg uppercase tracking-widest"
               >
                 ◀
               </Button>
               <Button
-                onTouchStart={() => { gameStateRef.current.keys.right = true; }}
-                onTouchEnd={() => { gameStateRef.current.keys.right = false; }}
-                onMouseDown={() => { gameStateRef.current.keys.right = true; }}
-                onMouseUp={() => { gameStateRef.current.keys.right = false; }}
-                onMouseLeave={() => { gameStateRef.current.keys.right = false; }}
+                onTouchStart={() => {
+                  gameStateRef.current.keys.right = true;
+                }}
+                onTouchEnd={() => {
+                  gameStateRef.current.keys.right = false;
+                }}
+                onTouchCancel={() => {
+                  gameStateRef.current.keys.right = false;
+                }}
+                onMouseDown={() => {
+                  gameStateRef.current.keys.right = true;
+                }}
+                onMouseUp={() => {
+                  gameStateRef.current.keys.right = false;
+                }}
+                onMouseLeave={() => {
+                  gameStateRef.current.keys.right = false;
+                }}
                 variant="outline"
-                className="retro flex-1 h-12 text-lg uppercase tracking-widest select-none"
+                className="retro h-12 flex-1 select-none text-lg uppercase tracking-widest"
               >
                 ▶
               </Button>
             </div>
-            <div className="flex gap-2 justify-center">
+            <div className="flex justify-center gap-2">
               <Button
-                onTouchStart={() => { gameStateRef.current.keys.down = true; }}
-                onTouchEnd={() => { gameStateRef.current.keys.down = false; }}
-                onMouseDown={() => { gameStateRef.current.keys.down = true; }}
-                onMouseUp={() => { gameStateRef.current.keys.down = false; }}
-                onMouseLeave={() => { gameStateRef.current.keys.down = false; }}
+                onTouchStart={() => {
+                  gameStateRef.current.keys.down = true;
+                }}
+                onTouchEnd={() => {
+                  gameStateRef.current.keys.down = false;
+                }}
+                onTouchCancel={() => {
+                  gameStateRef.current.keys.down = false;
+                }}
+                onMouseDown={() => {
+                  gameStateRef.current.keys.down = true;
+                }}
+                onMouseUp={() => {
+                  gameStateRef.current.keys.down = false;
+                }}
+                onMouseLeave={() => {
+                  gameStateRef.current.keys.down = false;
+                }}
                 variant="outline"
-                className="retro w-14 h-12 text-lg uppercase tracking-widest select-none"
+                className="retro h-12 w-14 select-none text-lg uppercase tracking-widest"
               >
                 ▼
               </Button>
             </div>
           </div>
-          {/* pause + fullscreen row */}
+
           <div className="flex gap-2">
             <Button
-              onClick={() => setIsPaused(!isPaused)}
+              onClick={() => setIsPaused((current) => !current)}
               variant="outline"
-              className="retro flex-1 h-8 text-xs uppercase tracking-widest"
+              className="retro h-8 flex-1 text-xs uppercase tracking-widest"
             >
               {isPaused ? "RESUME" : "PAUSE"}
             </Button>
             <Button
               onClick={toggleFullscreen}
               variant="outline"
-              className="retro flex-1 h-8 text-xs uppercase tracking-widest"
+              className="retro h-8 flex-1 text-xs uppercase tracking-widest"
             >
               {isFullscreen ? "EXIT FULLSCREEN" : "FULLSCREEN"}
             </Button>

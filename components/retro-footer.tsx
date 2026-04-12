@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { SiGithub, SiFacebook, SiLinkedin } from "react-icons/si";
+import { Linkedin } from "lucide-react";
+import { SiGithub, SiFacebook } from "react-icons/si";
 
 const socialLinks = [
   {
@@ -15,7 +16,7 @@ const socialLinks = [
   },
   {
     name: "LinkedIn",
-    icon: SiLinkedin,
+    icon: Linkedin,
     url: "https://www.linkedin.com/in/fyke-tonel-906663228/",
   },
 ];
@@ -64,4 +65,3 @@ export default function RetroFooter() {
     </footer>
   );
 }
-
