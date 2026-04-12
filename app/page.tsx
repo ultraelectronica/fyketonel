@@ -20,7 +20,8 @@ import AchievementWall from "@/components/achievement-wall";
 import InventorySystem from "@/components/inventory-system";
 import SkillTree from "@/components/skill-tree";
 import ResumeArchive from "@/components/resume-archive";
-import { HockeyGame } from "@/components/hockey-game";
+import WorkExperienceContainer from "@/components/work-experience-container";
+import { ArcadeCenter } from "@/components/arcade-center";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -177,10 +178,10 @@ export default function Home() {
                </div>
             </div>
 
-            {/* Hockey Game */}
+            {/* Arcade Cabinet */}
             <div className={panelBaseClass}>
-              <h2 className={headerClass}>ARCADE_HOCKEY</h2>
-              <HockeyGame className="w-full" />
+              <h2 className={headerClass}>ARCADE_CABINET</h2>
+              <ArcadeCenter className="w-full" />
             </div>
 
           </div>
@@ -286,7 +287,12 @@ export default function Home() {
 
              {/* Skill Tree */}
              <div className="border-none lg:col-span-12">
-                 <SkillTree />
+                  <SkillTree />
+             </div>
+
+             {/* Work Experience */}
+             <div className="border-none lg:col-span-12">
+                <WorkExperienceContainer />
              </div>
 
              {/* Resume Archive */}
