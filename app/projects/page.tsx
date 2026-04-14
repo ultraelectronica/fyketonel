@@ -362,81 +362,127 @@ const projects: ProjectEntry[] = [
   },
   {
     id: "locker-app",
-    title: "LockerApp",
-    tagline: "Secure media vault",
+    title: "Locker",
+    tagline: "Private Android media vault with layered security",
     description:
-      "Locker is a secure, simple media-hiding application built with Flutter.",
+      "A secure, private media vault for Android that hides sensitive photos, videos, and documents behind biometric auth, optional encryption, and stealth-focused protections.",
     detail:
-      "Protects photos, videos, and documents behind a password-protected screen.",
-    tech: ["Flutter", "Dart"],
-    classification: {
-      tier: "C",
-      codename: "Vault Specimen",
-      status: "Shipped v1 • Steady guardian build",
-      priority: getTierPriority("C"),
-    },
-    highlights: [
-      "Encrypts media behind a pin guard.",
-      "Keeps the UI intentionally minimal for stealth usage.",
-      "Focused on privacy for images, videos, and docs.",
-    ],
-    images: [
-      {
-        src: "/ProjectPictures/Locker/Screenshot_20251122-013936.png",
-        alt: "Locker app lock screen",
-      },
-      {
-        src: "/ProjectPictures/Locker/Screenshot_20251122-013947.png",
-        alt: "Locker app gallery view",
-      },
-      {
-        src: "/ProjectPictures/Locker/Screenshot_20251122-014038.png",
-        alt: "Locker app media detail",
-      },
-    ],
-  },
-  {
-    id: "flick",
-    title: "Flick",
-    tagline: "Flutter music player with Rust-powered native-grade audio",
-    description:
-      "A Flutter-based music player that pairs a high-performance Rust backend with a custom USB Audio Class 2.0 (UAC 2.0) driver for low-latency, native-grade playback.",
-    detail:
-      "Boot sequence initializes the Rust bridge, opens the local database, sets up a gapless just_audio engine, requests notification permissions, restores the last session, then launches a tabbed UI shell (Menu • Songs • Settings) with an ambient background tied to the current track and a unified mini-player + navigation bar.",
+      "Built with Flutter and Riverpod, with biometric unlock, optional AES-256 encryption, decoy mode, secure delete, local backup/restore, and an auto-kill feature that clears the app from recents when you leave. It now sits inside the broader Moss open-source ecosystem alongside Flick Player.",
     tech: [
       "Flutter",
       "Dart",
-      "Rust",
-      "FFI",
-      "just_audio",
-      "UAC 2.0",
-      "SQLite",
+      "Riverpod",
+      "Kotlin",
+      "AES-256",
       "Android",
     ],
     classification: {
       tier: "A",
-      codename: "Signal Furnace",
-      status: "Active high-performance audio lab in development",
+      codename: "Vault Specimen",
+      status: "Public open-source privacy app in active use",
       priority: getTierPriority("A"),
     },
     highlights: [
-      "Custom Rust UAC 2.0 driver for native audio output and low-latency playback.",
-      "Gapless playback with queueing, shuffle/loop modes, crossfade, and playback speed control (Rust engine when available).",
-      "Library folder management with scan/diff progress UI, favorites + recent-play tracking, sleep timer, and Android notification controls.",
-      "Dual-mode equalizer: 10-band graphic + 5-band parametric with presets and live visualization.",
+      "Hides media and documents with PIN, password, and biometric authentication.",
+      "Optional AES-256 encryption, secure delete, decoy mode, and auto-kill push the privacy model beyond a basic vault.",
+      "Includes album organization, tags, favorites, search, backup/restore, and built-in media/document viewers.",
+      "Part of the growing Moss ecosystem of free and open-source Android apps.",
     ],
     images: [
       {
-        src: "/ProjectPictures/Flick/flick1.png",
-        alt: "Flick player main screen",
+        src: "/ProjectPictures/Locker/locker_1.png",
+        alt: "Locker unlock screen",
       },
       {
-        src: "/ProjectPictures/Flick/flick2.png",
-        alt: "Flick library and folder management",
+        src: "/ProjectPictures/Locker/locker_4.png",
+        alt: "Locker media vault overview",
       },
       {
-        src: "/ProjectPictures/Flick/flick3.png",
-        alt: "Flick equalizer controls",
+        src: "/ProjectPictures/Locker/locker_8.png",
+        alt: "Locker settings and security tools",
+      },
+    ],
+  },
+  {
+    id: "mochi",
+    title: "Mochi",
+    tagline: "One shared AI pet for your family",
+    description:
+      "A family-shared AI companion pet app where one creature lives on a shared server, grows with your family, remembers moments, reacts to moods, and evolves through life stages.",
+    detail:
+      "Flutter clients connect to a Node.js + Express backend over HTTPS/WebSocket, with SQLite for pet state and memories, TinyLlama via llama.cpp for local inference, and Gemini fallback when the home server is unavailable.",
+    tech: [
+      "Flutter",
+      "Dart",
+      "Node.js",
+      "Express",
+      "SQLite",
+      "llama.cpp",
+      "TinyLlama",
+      "Gemini API",
+      "WebSocket",
+      "Cloudflare Tunnel",
+    ],
+    classification: {
+      tier: "A",
+      codename: "Bond Engine",
+      status: "Shared AI companion system in active design",
+      priority: getTierPriority("A"),
+    },
+    highlights: [
+      "One singular pet is shared across the whole family, while each member keeps their own identity and affection score.",
+      "The pet is designed as a companion, not an assistant: short warm replies, mood-reactive behavior, and long-term memory snippets shape its personality.",
+      "Architecture is built around always-on home hosting, live updates, fallback inference, and visible pet growth over time.",
+    ],
+    placeholder: {
+      title: "Mochi is still off-camera.",
+      caption: "No screenshot yet, but the companion system is mapped out.",
+    },
+  },
+  {
+    id: "flick",
+    title: "Flick Player",
+    tagline: "Audiophile music player with Flutter and Rust",
+    description:
+      "A high-performance music player built for audiophiles who want bit-perfect playback through external DACs and amplifiers.",
+    detail:
+      "Combines a custom Rust audio engine with USB Audio Class 2.0 support, `just_audio` fallback playback, EQ preset import/export, gapless playback, crossfade, library scanning, and Android-focused audio processing. It anchors the new Moss ecosystem and is published at `flick-player.site`.",
+    link: "https://flick-player.site",
+    tech: [
+      "Flutter",
+      "Dart",
+      "Rust",
+      "flutter_rust_bridge",
+      "just_audio",
+      "UAC 2.0",
+      "Isar",
+      "Android",
+    ],
+    classification: {
+      tier: "S",
+      codename: "Signal Furnace",
+      status: "Public open-source audio platform with the Moss ecosystem",
+      priority: getTierPriority("S"),
+    },
+    highlights: [
+      "Custom Rust engine handles USB DAC/AMP detection and bit-perfect UAC 2.0 playback for supported devices.",
+      "Falls back to `just_audio` on devices without USB audio support so playback stays broadly usable.",
+      "Includes gapless playback, crossfade, playback speed control, waveform seeking, and a 10-band EQ with import/exportable presets.",
+      "Built around a Flutter UI with Rust-backed decoding, audio processing, and device communication through `flutter_rust_bridge`.",
+      "Now part of the public-facing Moss ecosystem with its own website and open-source distribution.",
+    ],
+    images: [
+      {
+        src: "/ProjectPictures/Flick/flick_1.png",
+        alt: "Flick Player now playing screen",
+      },
+      {
+        src: "/ProjectPictures/Flick/flick_5.png",
+        alt: "Flick Player library browser",
+      },
+      {
+        src: "/ProjectPictures/Flick/flick_9.png",
+        alt: "Flick Player equalizer and audio controls",
       },
     ],
   },
@@ -561,15 +607,15 @@ const projects: ProjectEntry[] = [
     ],
     images: [
       {
-        src: "/ProjectPictures/Revo/revo_screenshot_1.png",
+        src: "/ProjectPictures/Revo/revo_1.png",
         alt: "Revo calendar dashboard with aurora background",
       },
       {
-        src: "/ProjectPictures/Revo/revo_screenshot_2.png",
+        src: "/ProjectPictures/Revo/revo_2.png",
         alt: "Revo event management and productivity tools",
       },
       {
-        src: "/ProjectPictures/Revo/revo_screenshot_3.png",
+        src: "/ProjectPictures/Revo/revo_3.png",
         alt: "Revo notes and focus timer features",
       },
     ],
@@ -713,19 +759,19 @@ const classificationLegend: {
   {
     tier: "S",
     label: "Prime Directive",
-    description: "Mission-critical Pasada platforms powering commuters.",
+    description: "Flagship systems with the highest impact, scope, and polish.",
     gradient: "from-yellow-600 via-orange-600 to-red-700",
   },
   {
     tier: "A",
     label: "Field Ops",
-    description: "Operational layers that keep Pasada visible and synced.",
+    description: "Serious public-facing products and actively used platforms.",
     gradient: "from-lime-600 via-emerald-600 to-green-700",
   },
   {
     tier: "B",
     label: "Living Exhibit",
-    description: "Active builds you're currently exploring.",
+    description: "Strong active builds, experiments, and production-grade side systems.",
     gradient: "from-sky-600 via-cyan-600 to-blue-700",
   },
   {
@@ -1526,6 +1572,8 @@ const ProjectDependenciesGraph = ({
     return "stroke-purple-500";
   };
 
+  const formatPercent = (value: number) => value.toFixed(4);
+
   return (
     <div className={cn(panelClass, "overflow-hidden")}>
       <div className="space-y-4">
@@ -1628,14 +1676,18 @@ const ProjectDependenciesGraph = ({
               const y1 = centerY + radius * Math.sin(angleFrom);
               const x2 = centerX + radius * Math.cos(angleTo);
               const y2 = centerY + radius * Math.sin(angleTo);
+              const x1Formatted = formatPercent(x1);
+              const y1Formatted = formatPercent(y1);
+              const x2Formatted = formatPercent(x2);
+              const y2Formatted = formatPercent(y2);
 
               return (
                 <g key={`${rel.from}-${rel.to}-${i}`}>
                   <motion.line
-                    x1={`${x1}%`}
-                    y1={`${y1}%`}
-                    x2={`${x2}%`}
-                    y2={`${y2}%`}
+                    x1={`${x1Formatted}%`}
+                    y1={`${y1Formatted}%`}
+                    x2={`${x2Formatted}%`}
+                    y2={`${y2Formatted}%`}
                     strokeWidth={isActive ? 3 : 2}
                     className={cn(
                       "transition-all duration-300",
@@ -1668,6 +1720,8 @@ const ProjectDependenciesGraph = ({
               const centerY = 50;
               const x = centerX + radius * Math.cos(angle);
               const y = centerY + radius * Math.sin(angle);
+              const xFormatted = formatPercent(x);
+              const yFormatted = formatPercent(y);
               const isActive = activeProject === project.id;
               const isConnected = connectedProjects.has(project.id);
               const gradient = getNodeColor(project);
@@ -1684,8 +1738,8 @@ const ProjectDependenciesGraph = ({
                         : "border-muted-foreground/40 bg-muted-foreground/20",
                   )}
                   style={{
-                    left: `calc(${x}% - 8px)`,
-                    top: `calc(${y}% - 8px)`,
+                    left: `calc(${xFormatted}% - 8px)`,
+                    top: `calc(${yFormatted}% - 8px)`,
                     backgroundImage: isActive
                       ? undefined
                       : `linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to))`,
