@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { tryReserveContactSend, undoContactReserve } from "@/lib/contact-rate-limit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
+  let slotReservedForEmail: string | undefined;
   try {
     const body = await request.json();
     const { email, message, to } = body;
@@ -14,6 +16,23 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    const rate = tryReserveContactSend(email);
+    if (!rate.ok) {
+      const retryAfterSec = Math.ceil(rate.retryAfterMs / 1000);
+      return NextResponse.json(
+        {
+          error: "Too many messages. You can send up to 3 emails every 5 hours.",
+          retryAfterSeconds: retryAfterSec,
+        },
+        {
+          status: 429,
+          headers: { "Retry-After": String(retryAfterSec) },
+        }
+      );
+    }
+
+    slotReservedForEmail = email;
 
     const { data, error } = await resend.emails.send({
       from: "Contact Form <onboarding@resend.dev>", // You'll need to update this with your verified domain
@@ -36,8 +55,12 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("Resend error:", error);
+      undoContactReserve(email);
+      slotReservedForEmail = undefined;
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    slotReservedForEmail = undefined;
 
     return NextResponse.json(
       { message: "Email sent successfully", data },
@@ -45,6 +68,7 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("Error sending email:", error);
+    if (slotReservedForEmail) undoContactReserve(slotReservedForEmail);
     return NextResponse.json(
       { error: "Failed to send email" },
       { status: 500 }
