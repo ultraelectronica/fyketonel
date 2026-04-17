@@ -2,21 +2,31 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/8bit/button";
-import { Input } from "@/components/ui/8bit/input";
 import { Textarea } from "@/components/ui/8bit/textarea";
+import { getOrCreateContactDeviceId } from "@/lib/contact-device-id";
 
 export default function ContactForm() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error" | "rateLimited">("idle");
+  const [rateLimitRetryMinutes, setRateLimitRetryMinutes] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus("idle");
+    setRateLimitRetryMinutes(null);
 
     try {
+      let deviceId: string;
+      try {
+        deviceId = getOrCreateContactDeviceId();
+      } catch {
+        setSubmitStatus("error");
+        return;
+      }
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
@@ -25,6 +35,7 @@ export default function ContactForm() {
         body: JSON.stringify({
           email,
           message,
+          deviceId,
           to: "athrundiscinity@protonmail.com",
         }),
       });
@@ -33,6 +44,15 @@ export default function ContactForm() {
         setSubmitStatus("success");
         setEmail("");
         setMessage("");
+      } else if (response.status === 429) {
+        const payload = (await response.json().catch(() => null)) as {
+          retryAfterSeconds?: number;
+        } | null;
+        const sec = payload?.retryAfterSeconds;
+        setRateLimitRetryMinutes(
+          typeof sec === "number" ? Math.max(1, Math.ceil(sec / 60)) : null,
+        );
+        setSubmitStatus("rateLimited");
       } else {
         setSubmitStatus("error");
       }
@@ -108,6 +128,15 @@ export default function ContactForm() {
       {submitStatus === "success" && (
         <div className="retro rounded-none border-2 border-green-500 bg-green-500/10 p-3 text-center text-[0.5rem] uppercase tracking-[0.15em] text-green-500 sm:border-3 sm:p-3.5 sm:text-xs sm:tracking-[0.18em] md:border-4 md:p-4 md:text-sm md:tracking-[0.2em]">
           Message sent successfully!
+        </div>
+      )}
+
+      {submitStatus === "rateLimited" && (
+        <div className="retro rounded-none border-2 border-amber-600 bg-amber-600/10 p-3 text-center text-[0.5rem] uppercase tracking-[0.15em] text-amber-700 dark:text-amber-500 sm:border-3 sm:p-3.5 sm:text-xs sm:tracking-[0.18em] md:border-4 md:p-4 md:text-sm md:tracking-[0.2em]">
+          Limit reached: up to 3 messages per 5 hours per device.
+          {rateLimitRetryMinutes != null
+            ? ` Try again in about ${rateLimitRetryMinutes} minute${rateLimitRetryMinutes === 1 ? "" : "s"}.`
+            : " Please try again later."}
         </div>
       )}
 

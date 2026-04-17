@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { isValidContactDeviceId } from "@/lib/contact-device-id";
+import { tryReserveContactSend, undoContactReserve } from "@/lib/contact-rate-limit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
+  let slotReservedForDevice: string | undefined;
   try {
     const body = await request.json();
-    const { email, message, to } = body;
+    const { email, message, to, deviceId } = body;
 
     if (!email || !message) {
       return NextResponse.json(
@@ -14,6 +17,30 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    if (!isValidContactDeviceId(deviceId)) {
+      return NextResponse.json(
+        { error: "Invalid or missing device id" },
+        { status: 400 }
+      );
+    }
+
+    const rate = tryReserveContactSend(deviceId);
+    if (!rate.ok) {
+      const retryAfterSec = Math.ceil(rate.retryAfterMs / 1000);
+      return NextResponse.json(
+        {
+          error: "Too many messages. You can send up to 3 emails every 5 hours from this device.",
+          retryAfterSeconds: retryAfterSec,
+        },
+        {
+          status: 429,
+          headers: { "Retry-After": String(retryAfterSec) },
+        }
+      );
+    }
+
+    slotReservedForDevice = deviceId;
 
     const { data, error } = await resend.emails.send({
       from: "Contact Form <onboarding@resend.dev>", // You'll need to update this with your verified domain
@@ -36,8 +63,12 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("Resend error:", error);
+      undoContactReserve(deviceId);
+      slotReservedForDevice = undefined;
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    slotReservedForDevice = undefined;
 
     return NextResponse.json(
       { message: "Email sent successfully", data },
@@ -45,10 +76,10 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("Error sending email:", error);
+    if (slotReservedForDevice) undoContactReserve(slotReservedForDevice);
     return NextResponse.json(
       { error: "Failed to send email" },
       { status: 500 }
     );
   }
 }
-
