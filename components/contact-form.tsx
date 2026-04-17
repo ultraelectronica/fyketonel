@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/8bit/button";
-import { Input } from "@/components/ui/8bit/input";
 import { Textarea } from "@/components/ui/8bit/textarea";
+import { getOrCreateContactDeviceId } from "@/lib/contact-device-id";
 
 export default function ContactForm() {
   const [email, setEmail] = useState("");
@@ -19,6 +19,14 @@ export default function ContactForm() {
     setRateLimitRetryMinutes(null);
 
     try {
+      let deviceId: string;
+      try {
+        deviceId = getOrCreateContactDeviceId();
+      } catch {
+        setSubmitStatus("error");
+        return;
+      }
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
@@ -27,6 +35,7 @@ export default function ContactForm() {
         body: JSON.stringify({
           email,
           message,
+          deviceId,
           to: "athrundiscinity@protonmail.com",
         }),
       });
@@ -124,7 +133,7 @@ export default function ContactForm() {
 
       {submitStatus === "rateLimited" && (
         <div className="retro rounded-none border-2 border-amber-600 bg-amber-600/10 p-3 text-center text-[0.5rem] uppercase tracking-[0.15em] text-amber-700 dark:text-amber-500 sm:border-3 sm:p-3.5 sm:text-xs sm:tracking-[0.18em] md:border-4 md:p-4 md:text-sm md:tracking-[0.2em]">
-          Limit reached: up to 3 messages per 5 hours per email address.
+          Limit reached: up to 3 messages per 5 hours per device.
           {rateLimitRetryMinutes != null
             ? ` Try again in about ${rateLimitRetryMinutes} minute${rateLimitRetryMinutes === 1 ? "" : "s"}.`
             : " Please try again later."}
