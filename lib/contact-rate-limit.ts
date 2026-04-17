@@ -3,17 +3,17 @@ const MAX_SENDS = 3;
 
 const buckets = new Map<string, number[]>();
 
-function normalizeEmail(email: string): string {
-  return email.toLowerCase().trim();
+function normalizeDeviceId(deviceId: string): string {
+  return deviceId.trim().toLowerCase();
 }
 
 /**
  * Reserves one send in the sliding window. Call undoContactReserve if the email fails to send.
  */
 export function tryReserveContactSend(
-  email: string,
+  deviceId: string,
 ): { ok: true } | { ok: false; retryAfterMs: number } {
-  const key = normalizeEmail(email);
+  const key = normalizeDeviceId(deviceId);
   const now = Date.now();
   const cutoff = now - WINDOW_MS;
   const timestamps = (buckets.get(key) ?? []).filter((t) => t > cutoff);
@@ -29,8 +29,8 @@ export function tryReserveContactSend(
   return { ok: true };
 }
 
-export function undoContactReserve(email: string): void {
-  const key = normalizeEmail(email);
+export function undoContactReserve(deviceId: string): void {
+  const key = normalizeDeviceId(deviceId);
   const timestamps = buckets.get(key);
   if (!timestamps?.length) return;
   timestamps.pop();
