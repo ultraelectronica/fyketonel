@@ -1,14 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ChessGame } from "@/components/chess-game";
 import { HockeyGame } from "@/components/hockey-game";
 import { MinesweeperGame } from "@/components/minesweeper-game";
 import { OthelloGame } from "@/components/othello-game";
 import { SnakeGame } from "@/components/snake-game";
+import { SudokuGame } from "@/components/sudoku-game";
+import { TicTacToeGame } from "@/components/tictactoe-game";
 import { Button } from "@/components/ui/8bit/button";
 import { cn } from "@/lib/utils";
 
-type ArcadeGameId = "hockey" | "minesweeper" | "snake" | "othello";
+type ArcadeGameId = "hockey" | "minesweeper" | "snake" | "othello" | "tictactoe" | "sudoku" | "chess";
 
 const ARCADE_GAMES: Array<{
   id: ArcadeGameId;
@@ -35,11 +38,26 @@ const ARCADE_GAMES: Array<{
     label: "Othello",
     summary: "Flip discs, lock down corners, and outmaneuver the CPU on an 8x8 board.",
   },
+  {
+    id: "tictactoe",
+    label: "TicTacToe",
+    summary: "Challenge the CPU in the classic X and O showdown.",
+  },
+  {
+    id: "sudoku",
+    label: "Sudoku",
+    summary: "Fill the grid so every row, column, and box contains digits 1-9.",
+  },
+  {
+    id: "chess",
+    label: "Chess",
+    summary: "Classic chess battle against the CPU. Checkmate to win.",
+  },
 ];
 
 export function ArcadeCenter({ className }: { className?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [activeGame, setActiveGame] = useState<ArcadeGameId>("hockey");
+  const [activeGame, setActiveGame] = useState<ArcadeGameId>("tictactoe");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const selectedGame =
     ARCADE_GAMES.find((game) => game.id === activeGame) ?? ARCADE_GAMES[0];
@@ -134,6 +152,9 @@ export function ArcadeCenter({ className }: { className?: string }) {
         {activeGame === "minesweeper" && <MinesweeperGame isFullscreen={isFullscreen} />}
         {activeGame === "snake" && <SnakeGame isFullscreen={isFullscreen} />}
         {activeGame === "othello" && <OthelloGame isFullscreen={isFullscreen} />}
+        {activeGame === "tictactoe" && <TicTacToeGame isFullscreen={isFullscreen} />}
+        {activeGame === "sudoku" && <SudokuGame isFullscreen={isFullscreen} />}
+        {activeGame === "chess" && <ChessGame isFullscreen={isFullscreen} />}
       </div>
     </div>
   );
