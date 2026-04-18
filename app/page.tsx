@@ -119,7 +119,7 @@ export default function Home() {
                 Fyke&#39;s Workspace
                 </h1>
                 <p className="retro mt-2 text-xs text-muted-foreground sm:text-sm leading-relaxed">
-                Level 60 Full-Stack Developer • Class: Guardian of Chaotic Plans
+                Level 75 Full-Stack Developer • Class: Guardian of Chaotic Plans
                 </p>
             </div>
             <div className="flex items-center gap-4">
@@ -146,7 +146,7 @@ export default function Home() {
                   playerName="Fyke"
                   avatarSrc="/assets/minippix.png"
                   avatarFallback="FY"
-                  level={60}
+                  level={75}
                   playerClass="Guardian of Chaotic Plans"
                   stats={{
                     health: { current: 92, max: 100 },

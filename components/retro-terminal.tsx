@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { kevlarEval, isKevlarError } from "@/lib/kevlar/types";
 import { Terminal, Minimize2, Maximize2, X } from "lucide-react";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 import { crtOpenVariant } from "@/components/ui/8bit/motion-utils";
 
 interface TerminalLine {
@@ -17,8 +18,78 @@ interface TerminalLine {
 interface Command {
   name: string;
   description: string;
-  execute: (args: string[]) => TerminalLine[];
+  execute: (args: string[], pipeInput?: string) => TerminalLine[];
 }
+
+interface VirtualNode {
+  type: "file" | "dir";
+  content?: string;
+  children?: Record<string, VirtualNode>;
+}
+
+const INITIAL_FS: VirtualNode = {
+  type: "dir",
+  children: {
+    home: {
+      type: "dir",
+      children: {
+        orpheus: {
+          type: "dir",
+          children: {
+            "about.txt": {
+              type: "file",
+              content: "Fyke Simon V. Tonel\nFull-Stack Developer\nMetro Manila, Philippines\nGuardian of Chaotic Plans",
+            },
+            projects: {
+              type: "dir",
+              children: {
+                "pasada.txt": { type: "file", content: "Pasada - Transit companion app with live tracking" },
+                "flick.txt": { type: "file", content: "Flick - Audio player with Rust engine and UAC 2.0" },
+                "building-blocks.txt": { type: "file", content: "Building Blocks - Modular component library" },
+                "revo.txt": { type: "file", content: "Revo - Revolutionary design system" },
+              },
+            },
+            skills: {
+              type: "dir",
+              children: {
+                "frontend.kv": { type: "file", content: "React, Next.js, Remix, Flutter, Tailwind CSS, Three.js" },
+                "backend.kv": { type: "file", content: "Node.js, Express.js, Bun" },
+                "devops.kv": { type: "file", content: "Docker, Git, GitHub, GitLab, GCP, Cloudflare" },
+              },
+            },
+            "contact.txt": { type: "file", content: "GitHub: github.com/ultraelectronica\nEmail: Available on contact form" },
+            kevlar: {
+              type: "dir",
+              children: {
+                "README.kv": { type: "file", content: "╔══════════════════════════════════════╗\n║          Kevlar Expression Shell       ║\n╚══════════════════════════════════════╝\n\nKevlar is the built-in expression language for Hazmat Shell.\nIt supports math, logic, comparisons, and variable assignments.\n\nType 'kevlar' to evaluate expressions.\nType 'cat kevlar/syntax.kv' for syntax reference.\nType 'cat kevlar/math.kv' for math functions.\nType 'cat kevlar/examples.kv' for examples." },
+                "syntax.kv": { type: "file", content: "Kevlar Syntax Reference\n───────────────────────\n\nArithmetic:    + - * / % **\nComparison:    == != < > <= >=\nLogical:       && || !\nAssignment:    = += -= *= /= %=\nGrouping:      ( )\nTypes:         int, float, bool, string\nVariables:     x = 10\nConstants:     PI, E, PHI, TAU, LN2, LN10, SQRT2" },
+                "math.kv": { type: "file", content: "Kevlar Math Functions\n──────────────────────\n\nBasic:     sqrt(), abs(), ceil(), floor(), round(), sign(), trunc()\nTrig:      sin(), cos(), tan(), asin(), acos(), atan(), atan2()\nExp/Log:   exp(), log(), log2(), log10(), pow(), cbrt()\nAggregate: min(), max(), hypot()\n\nUsage: kevlar sqrt(16)       → 4\n       kevlar pow(2, 10)     → 1024\n       kevlar sin(PI / 2)    → 1" },
+                "examples.kv": { type: "file", content: "Kevlar Examples\n────────────────\n\nkevlar 2 + 3 * 4          → 14\nkevlar sqrt(144)           → 12\nkevlar PI                  → 3.14159...\nkevlar x = 42             → 42\nkevlar x += 8             → 50\nkevlar 10 > 5 && 3 < 7    → true\nkevlar pow(2, 8)          → 256\nkevlar 'hello' + ' world'  → hello world" },
+              },
+            },
+          },
+        },
+      },
+    },
+    etc: {
+      type: "dir",
+      children: {
+        "orpheus.conf": { type: "file", content: "VERSION=2.0.0\nSHELL=Hazmat\nTHEME=default\nAUTHOR=Fyke\nMAX_LINES=70" },
+      },
+    },
+    var: {
+      type: "dir",
+      children: {
+        log: {
+          type: "dir",
+          children: {
+            "terminal.log": { type: "file", content: "Hazmat Shell initialized\nSystem ready\nAwaiting commands..." },
+          },
+        },
+      },
+    },
+  },
+};
 
 // Theme configurations
 const themes = {
@@ -502,7 +573,7 @@ export function RetroTerminal() {
     },
     {
       type: "success",
-      content: "║       TERMINAL ORPHEUS v1.0.0                  ║",
+      content: "║       HAZMAT SHELL v1.0.0                  ║",
     },
     {
       type: "success",
@@ -532,6 +603,9 @@ export function RetroTerminal() {
   const [isMounted, setIsMounted] = useState(false);
   const [multiLineBuffer, setMultiLineBuffer] = useState<string[]>([]);
   const [isMultiLine, setIsMultiLine] = useState(false);
+  const [fileSystem, setFileSystem] = useState<VirtualNode>(INITIAL_FS);
+  const [currentDir, setCurrentDir] = useState("/home/orpheus");
+  const [aliases, setAliases] = useState<Record<string, string>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const outputRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
@@ -634,6 +708,70 @@ export function RetroTerminal() {
     }
   }, [currentTheme, simonThemeMode, resolvedTheme]);
 
+  // --- Virtual filesystem helpers ---
+  const resolvePath = (path: string): string => {
+    if (path.startsWith("/")) return path.replace(/\/+/g, "/").replace(/\/$/, "") || "/";
+    const parts = currentDir.split("/").filter(Boolean);
+    for (const seg of path.split("/")) {
+      if (seg === "..") parts.pop();
+      else if (seg !== ".") parts.push(seg);
+    }
+    return "/" + parts.join("/") || "/";
+  };
+
+  const getNode = (path: string): VirtualNode | null => {
+    const resolved = resolvePath(path);
+    if (resolved === "/") return fileSystem;
+    const parts = resolved.split("/").filter(Boolean);
+    let node: VirtualNode = fileSystem;
+    for (const part of parts) {
+      if (node.type !== "dir" || !node.children?.[part]) return null;
+      node = node.children[part];
+    }
+    return node;
+  };
+
+  const setNode = (path: string, node: VirtualNode): boolean => {
+    const resolved = resolvePath(path);
+    if (resolved === "/") return false;
+    const parts = resolved.split("/").filter(Boolean);
+    const name = parts.pop()!;
+    let current = fileSystem;
+    for (const part of parts) {
+      if (current.type !== "dir" || !current.children?.[part]) return false;
+      current = current.children[part];
+    }
+    if (current.type !== "dir" || !current.children) return false;
+    current.children[name] = node;
+    setFileSystem({ ...fileSystem });
+    return true;
+  };
+
+  const removeNode = (path: string): VirtualNode | null => {
+    const resolved = resolvePath(path);
+    if (resolved === "/" || resolved === "/home/orpheus") return null;
+    const parts = resolved.split("/").filter(Boolean);
+    const name = parts.pop()!;
+    let current = fileSystem;
+    for (const part of parts) {
+      if (current.type !== "dir" || !current.children?.[part]) return null;
+      current = current.children[part];
+    }
+    if (current.type !== "dir" || !current.children?.[name]) return null;
+    const removed = current.children[name];
+    delete current.children[name];
+    setFileSystem({ ...fileSystem });
+    return removed;
+  };
+
+  const resolveAlias = (input: string): string => {
+    const parts = input.match(/^(\S+)(.*)/);
+    if (!parts) return input;
+    const [, cmd, rest] = parts;
+    if (aliases[cmd]) return aliases[cmd] + rest;
+    return input;
+  };
+
   // Commands definition (with access to state via closures)
   const commands: Record<string, Command> = {
     help: {
@@ -645,7 +783,20 @@ export function RetroTerminal() {
         { type: "output", content: "╚════════════════════════════════════════════════╝" },
         { type: "output", content: "" },
         { type: "output", content: "  help              - Show this help message" },
-        { type: "output", content: "  ls                - List portfolio sections" },
+        { type: "output", content: "  ls [-la] [path]   - List files and directories" },
+        { type: "output", content: "  cd [path]         - Change directory" },
+        { type: "output", content: "  pwd               - Print working directory" },
+        { type: "output", content: "  cat <file>        - Display file contents" },
+        { type: "output", content: "  mkdir <dir>       - Create directory" },
+        { type: "output", content: "  rmdir <dir>       - Remove empty directory" },
+        { type: "output", content: "  rm [-r] <path>    - Remove file or directory" },
+        { type: "output", content: "  touch <file>      - Create empty file" },
+        { type: "output", content: "  echo <text>       - Display text" },
+        { type: "output", content: "  grep <pattern>    - Filter lines matching pattern" },
+        { type: "output", content: "  head [-N] [file]  - Display first N lines" },
+        { type: "output", content: "  tail [-N] [file]  - Display last N lines" },
+        { type: "output", content: "  alias [name=val]  - Create or list command aliases" },
+        { type: "output", content: "  unalias <name>    - Remove a command alias" },
         { type: "output", content: "  projects          - Show all projects" },
         { type: "output", content: "  whoami [flags]    - Display portfolio owner info" },
         { type: "output", content: "                      --name, --location, --school, --age" },
@@ -657,33 +808,27 @@ export function RetroTerminal() {
         { type: "output", content: "  theme [name]      - Change color theme" },
         { type: "output", content: "                      default/atari/nintendo/vhs/" },
         { type: "output", content: "                      gameboy/softpop/ally" },
-        { type: "output", content: "  shout [expr]      - Evaluate expressions with full support:" },
+        { type: "output", content: "  kevlar [expr]     - Evaluate expressions:" },
         { type: "output", content: "                      Math: +, -, *, /, %, ** (power)" },
         { type: "output", content: "                      Comparison: ==, !=, <, >, <=, >=" },
         { type: "output", content: "                      Logical: &&, ||, !" },
         { type: "output", content: "                      Assignment: =, +=, -=, *=, /=, %=" },
+        { type: "output", content: "                      Functions: sqrt, sin, cos, tan, log," },
+        { type: "output", content: "                      pow, abs, ceil, floor, round, min, max" },
+        { type: "output", content: "                      Constants: PI, E, PHI, TAU, SQRT2" },
         { type: "output", content: "                      Types: int, float, bool, string" },
         { type: "output", content: "  date              - Display current date/time" },
         { type: "output", content: "  fastfetch         - Display system information" },
+        { type: "output", content: "" },
+        { type: "output", content: "  Pipes: cmd1 | cmd2    Redirect: cmd > file" },
+        { type: "output", content: "  Chain: cmd1 && cmd2    Or: cmd1 || cmd2" },
+        { type: "output", content: "  Sequential: cmd1 ; cmd2" },
         { type: "output", content: "" },
         { type: "success", content: "Use ↑/↓ arrows to navigate command history" },
         { type: "success", content: "Press Tab for autocomplete" },
         { type: "success", content: "Shift+Enter or \\ at end for multi-line input" },
         { type: "success", content: "Press Esc to cancel multi-line input" },
-      ],
-    },
-    ls: {
-      name: "ls",
-      description: "List portfolio sections",
-      execute: () => [
-        { type: "output", content: "Portfolio Sections:" },
-        { type: "output", content: "" },
-        { type: "output", content: "  📂 Projects/        - Lab Archive Citadel" },
-        { type: "output", content: "  📂 Plans/           - Future experiments" },
-        { type: "output", content: "  📂 Skills/          - Tech stack inventory" },
-        { type: "output", content: "  📂 Contact/         - Communication channels" },
-        { type: "output", content: "" },
-        { type: "success", content: "4 sections available" },
+        { type: "success", content: "Ctrl+Shift+C to copy terminal output to clipboard" },
       ],
     },
     projects: {
@@ -887,511 +1032,30 @@ export function RetroTerminal() {
         }
       },
     },
-    shout: {
-      name: "shout",
-      description: "Shout back the text with data type, arithmetic, logical, and assignment support",
+    kevlar: {
+      name: "kevlar",
+      description: "Evaluate expressions: math, logic, comparisons, variables, and string ops",
       execute: (args) => {
         if (args.length === 0) {
-          return [
-            {
-              type: "output",
-              content: "",
-            },
-          ];
+          return [{ type: "output", content: "" }];
         }
 
         const input = args.join(" ");
-        const output: TerminalLine[] = [];
+        const result = kevlarEval(input);
 
-        // Variable storage for assignments (scoped to this execution context)
-        // Using a ref-like pattern to persist between evaluations
-        const getVariables = (): Record<string, number | boolean | string> => {
-          if (typeof window !== "undefined") {
-            if (!(window as unknown as Record<string, unknown>).__shoutVars) {
-              (window as unknown as Record<string, Record<string, number | boolean | string>>).__shoutVars = {};
-            }
-            return (window as unknown as Record<string, Record<string, number | boolean | string>>).__shoutVars;
-          }
-          return {};
-        };
-
-        // Tokenizer for expression parsing
-        const tokenize = (expr: string): string[] => {
-          const tokens: string[] = [];
-          let i = 0;
-          while (i < expr.length) {
-            // Skip whitespace
-            if (/\s/.test(expr[i])) {
-              i++;
-              continue;
-            }
-            
-            // Multi-character operators
-            if (i + 1 < expr.length) {
-              const twoChar = expr.slice(i, i + 2);
-              if (["==", "!=", "<=", ">=", "&&", "||", "+=", "-=", "*=", "/=", "%=", "**"].includes(twoChar)) {
-                tokens.push(twoChar);
-                i += 2;
-                continue;
-              }
-            }
-            
-            // Single character operators and parentheses
-            if (["+", "-", "*", "/", "%", "(", ")", "<", ">", "=", "!"].includes(expr[i])) {
-              tokens.push(expr[i]);
-              i++;
-              continue;
-            }
-            
-            // String literals (single or double quotes)
-            if (expr[i] === '"' || expr[i] === "'") {
-              const quote = expr[i];
-              let str = quote;
-              i++;
-              while (i < expr.length && expr[i] !== quote) {
-                // Handle escape sequences
-                if (expr[i] === '\\' && i + 1 < expr.length) {
-                  str += expr[i] + expr[i + 1];
-                  i += 2;
-                } else {
-                  str += expr[i];
-                  i++;
-                }
-              }
-              if (i < expr.length) {
-                str += expr[i]; // Include closing quote
-                i++;
-              }
-              tokens.push(str);
-              continue;
-            }
-            
-            // Numbers (including decimals and negatives handled by unary)
-            if (/\d/.test(expr[i]) || (expr[i] === "." && i + 1 < expr.length && /\d/.test(expr[i + 1]))) {
-              let num = "";
-              while (i < expr.length && (/\d/.test(expr[i]) || expr[i] === ".")) {
-                num += expr[i];
-                i++;
-              }
-              tokens.push(num);
-              continue;
-            }
-            
-            // Identifiers (variables, true, false)
-            if (/[a-zA-Z_]/.test(expr[i])) {
-              let ident = "";
-              while (i < expr.length && /[a-zA-Z0-9_]/.test(expr[i])) {
-                ident += expr[i];
-                i++;
-              }
-              tokens.push(ident);
-              continue;
-            }
-            
-            // Unknown character, skip
-            i++;
-          }
-          return tokens;
-        };
-
-        // Expression parser with operator precedence (function-based to avoid inline class)
-        // Precedence (lowest to highest):
-        // 1. Assignment: =, +=, -=, *=, /=, %=
-        // 2. Logical OR: ||
-        // 3. Logical AND: &&
-        // 4. Equality: ==, !=
-        // 5. Comparison: <, >, <=, >=
-        // 6. Addition/Subtraction: +, -
-        // 7. Multiplication/Division/Modulo: *, /, %
-        // 8. Power: **
-        // 9. Unary: !, - (negative)
-        // 10. Parentheses: ()
-
-        const parseExpression = (
-          tokens: string[],
-          variables: Record<string, number | boolean | string>
-        ): number | boolean | string => {
-          let pos = 0;
-
-          const peek = (): string | null => pos < tokens.length ? tokens[pos] : null;
-          const consume = (): string | null => pos < tokens.length ? tokens[pos++] : null;
-
-          const parsePrimary = (): number | boolean | string => {
-            const token = peek();
-            
-            if (token === null) {
-              throw new Error("Unexpected end of expression");
-            }
-            
-            // Parentheses
-            if (token === "(") {
-              consume();
-              const result = parseAssignment();
-              if (peek() !== ")") {
-                throw new Error("Missing closing parenthesis");
-              }
-              consume();
-              return result;
-            }
-            
-            // Number
-            if (/^-?\d+\.?\d*$/.test(token) || /^\.\d+$/.test(token)) {
-              consume();
-              return parseFloat(token);
-            }
-            
-            // Boolean literals
-            if (token.toLowerCase() === "true") {
-              consume();
-              return true;
-            }
-            if (token.toLowerCase() === "false") {
-              consume();
-              return false;
-            }
-            
-            // String literals (single or double quotes)
-            if ((token.startsWith('"') && token.endsWith('"')) || 
-                (token.startsWith("'") && token.endsWith("'"))) {
-              consume();
-              // Remove quotes and handle escape sequences
-              let str = token.slice(1, -1);
-              str = str.replace(/\\n/g, '\n');
-              str = str.replace(/\\t/g, '\t');
-              str = str.replace(/\\"/g, '"');
-              str = str.replace(/\\'/g, "'");
-              str = str.replace(/\\\\/g, '\\');
-              return str;
-            }
-            
-            // Variable
-            if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(token)) {
-              consume();
-              if (token in variables) {
-                return variables[token];
-              }
-              // Return 0 for undefined variables (common in shells)
-              return 0;
-            }
-            
-            throw new Error(`Unexpected token: ${token}`);
-          };
-
-          const parseUnary = (): number | boolean | string => {
-            if (peek() === "!") {
-              consume();
-              const operand = parseUnary();
-              return !Boolean(operand);
-            }
-            
-            if (peek() === "-") {
-              consume();
-              const operand = parseUnary();
-              const numOperand = typeof operand === "number" ? operand : parseFloat(String(operand)) || 0;
-              return -numOperand;
-            }
-            
-            return parsePrimary();
-          };
-
-          const parsePower = (): number | boolean | string => {
-            let left = parseUnary();
-            
-            while (peek() === "**") {
-              consume();
-              const right = parseUnary(); // right-associative
-              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
-              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
-              left = Math.pow(numLeft, numRight);
-            }
-            
-            return left;
-          };
-
-          const parseMultiplicative = (): number | boolean | string => {
-            let left = parsePower();
-            
-            while (peek() === "*" || peek() === "/" || peek() === "%") {
-              const op = consume();
-              const right = parsePower();
-              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
-              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
-              
-              if (op === "*") {
-                left = numLeft * numRight;
-              } else if (op === "/") {
-                if (numRight === 0) throw new Error("Division by zero");
-                left = numLeft / numRight;
-              } else {
-                if (numRight === 0) throw new Error("Modulo by zero");
-                left = numLeft % numRight;
-              }
-            }
-            
-            return left;
-          };
-
-          const parseAdditive = (): number | boolean | string => {
-            let left = parseMultiplicative();
-            
-            while (peek() === "+" || peek() === "-") {
-              const op = consume();
-              const right = parseMultiplicative();
-              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
-              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
-              
-              if (op === "+") {
-                left = numLeft + numRight;
-              } else {
-                left = numLeft - numRight;
-              }
-            }
-            
-            return left;
-          };
-
-          const parseComparison = (): number | boolean | string => {
-            let left = parseAdditive();
-            
-            while (["<", ">", "<=", ">="].includes(peek() || "")) {
-              const op = consume();
-              const right = parseAdditive();
-              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
-              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
-              
-              switch (op) {
-                case "<": left = numLeft < numRight; break;
-                case ">": left = numLeft > numRight; break;
-                case "<=": left = numLeft <= numRight; break;
-                case ">=": left = numLeft >= numRight; break;
-              }
-            }
-            
-            return left;
-          };
-
-          const parseEquality = (): number | boolean | string => {
-            let left = parseComparison();
-            
-            while (peek() === "==" || peek() === "!=") {
-              const op = consume();
-              const right = parseComparison();
-              if (op === "==") {
-                left = left === right;
-              } else {
-                left = left !== right;
-              }
-            }
-            
-            return left;
-          };
-
-          const parseLogicalAnd = (): number | boolean | string => {
-            let left = parseEquality();
-            
-            while (peek() === "&&") {
-              consume();
-              const right = parseEquality();
-              left = Boolean(left) && Boolean(right);
-            }
-            
-            return left;
-          };
-
-          const parseLogicalOr = (): number | boolean | string => {
-            let left = parseLogicalAnd();
-            
-            while (peek() === "||") {
-              consume();
-              const right = parseLogicalAnd();
-              left = Boolean(left) || Boolean(right);
-            }
-            
-            return left;
-          };
-
-          const parseAssignment = (): number | boolean | string => {
-            // Check if this is an assignment
-            if (pos + 1 < tokens.length) {
-              const varName = tokens[pos];
-              const op = tokens[pos + 1];
-              
-              if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName) && ["=", "+=", "-=", "*=", "/=", "%="].includes(op)) {
-                pos += 2; // consume variable name and operator
-                const value = parseAssignment(); // right-associative
-                
-                let finalValue: number | boolean | string;
-                if (op === "=") {
-                  finalValue = value;
-                } else {
-                  const currentValue = variables[varName];
-                  const numCurrent = typeof currentValue === "number" ? currentValue : 0;
-                  const numValue = typeof value === "number" ? value : parseFloat(String(value)) || 0;
-                  
-                  switch (op) {
-                    case "+=": finalValue = numCurrent + numValue; break;
-                    case "-=": finalValue = numCurrent - numValue; break;
-                    case "*=": finalValue = numCurrent * numValue; break;
-                    case "/=": 
-                      if (numValue === 0) throw new Error("Division by zero");
-                      finalValue = numCurrent / numValue; 
-                      break;
-                    case "%=": 
-                      if (numValue === 0) throw new Error("Modulo by zero");
-                      finalValue = numCurrent % numValue; 
-                      break;
-                    default: finalValue = value;
-                  }
-                }
-                
-                variables[varName] = finalValue;
-                return finalValue;
-              }
-            }
-            
-            return parseLogicalOr();
-          };
-
-          return parseAssignment();
-        };
-
-        // Try to evaluate as an expression
-        const tokens = tokenize(input);
-        
-        // Check if input looks like an expression (has operators, numbers, quoted strings, or assignments)
-        // Otherwise treat as plain text string
-        const hasOperators = /[+\-*/%<>=!&|]/.test(input);
-        const isNumber = /^-?\d+\.?\d*$/.test(input.trim());
-        const isQuotedString = /^["'].*["']$/.test(input.trim());
-        const isBooleanLiteral = /^(true|false)$/i.test(input.trim());
-        const isAssignment = /^[a-zA-Z_][a-zA-Z0-9_]*\s*[+\-*/%]?=/.test(input);
-        const looksLikeExpression = hasOperators || isNumber || isQuotedString || isBooleanLiteral || isAssignment;
-        
-        if (tokens.length > 0 && looksLikeExpression) {
-          try {
-            const variables = getVariables();
-            const result = parseExpression(tokens, variables);
-            
-            // Determine result type
-            let resultType: string;
-            if (typeof result === "boolean") {
-              resultType = "bool";
-            } else if (typeof result === "number") {
-              resultType = Number.isInteger(result) ? "int" : "float";
-            } else {
-              resultType = "string";
-            }
-            
-            // Check if it was an assignment
-            const assignmentMatch = input.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*([+\-*/%]?=)\s*/);
-            if (assignmentMatch) {
-              const varName = assignmentMatch[1];
-              const op = assignmentMatch[2];
-              output.push({
-                type: "success",
-                content: `${varName} ${op} ${result} (${resultType})`,
-              });
-            } else if (resultType === "string") {
-              // For strings, just show the value without the "= result" format
-              output.push({
-                type: "output",
-                content: `${result} (${resultType})`,
-              });
-            } else {
-              output.push({
-                type: "output",
-                content: `${input} = ${result} (${resultType})`,
-              });
-            }
-            
-            return output;
-          } catch (error) {
-            // If expression parsing fails, fall through to type detection
-            if (error instanceof Error && (
-              error.message.includes("Division by zero") || 
-              error.message.includes("Modulo by zero")
-            )) {
-              output.push({
-                type: "error",
-                content: error.message,
-              });
-              return output;
-            }
-            // Continue to type detection for non-expression inputs
-          }
-        }
-        
-        // Plain text without operators/expressions - treat as string
-        if (!looksLikeExpression && tokens.length > 0) {
-          output.push({
-            type: "output",
-            content: `${input} (string)`,
-          });
-          return output;
+        if (isKevlarError(result)) {
+          return [{ type: "error", content: result.message }];
         }
 
-        // Try to detect and format data types (fallback for non-expressions)
-        // Check for boolean
-        if (input.toLowerCase() === "true" || input.toLowerCase() === "false") {
-          const boolValue = input.toLowerCase() === "true";
-          output.push({
-            type: "output",
-            content: `${input} (bool: ${boolValue})`,
-          });
-        }
-        // Check for integer
-        else if (/^-?\d+$/.test(input)) {
-          const intValue = parseInt(input, 10);
-          output.push({
-            type: "output",
-            content: `${input} (int: ${intValue})`,
-          });
-        }
-        // Check for float/double
-        else if (/^-?\d+\.\d+$/.test(input)) {
-          const floatValue = parseFloat(input);
-          output.push({
-            type: "output",
-            content: `${input} (float: ${floatValue})`,
-          });
-        }
-        // Check for null
-        else if (input.toLowerCase() === "null") {
-          output.push({
-            type: "output",
-            content: `${input} (null)`,
-          });
-        }
-        // Check for undefined
-        else if (input.toLowerCase() === "undefined") {
-          output.push({
-            type: "output",
-            content: `${input} (undefined)`,
-          });
-        }
-        // Check for array-like syntax [item1, item2, ...]
-        else if (/^\[.*\]$/.test(input)) {
-          output.push({
-            type: "output",
-            content: `${input} (array)`,
-          });
-        }
-        // Check for object-like syntax {key: value, ...}
-        else if (/^\{.*\}$/.test(input)) {
-          output.push({
-            type: "output",
-            content: `${input} (object)`,
-          });
-        }
-        // Default: treat as string
-        else {
-          output.push({
-            type: "output",
-            content: `${input} (string)`,
-          });
+        if (result.isAssignment) {
+          return [{ type: "success", content: `${result.varName} ${result.varOp} ${result.value} (${result.type})` }];
         }
 
-        return output;
+        if (result.type === "string") {
+          return [{ type: "output", content: `${result.value} (${result.type})` }];
+        }
+
+        return [{ type: "output", content: `${result.input} = ${result.value} (${result.type})` }];
       },
     },
     date: {
@@ -1472,22 +1136,304 @@ export function RetroTerminal() {
         output.push({ type: "output", content: "║          TERMINAL INFO                        ║" });
         output.push({ type: "output", content: "╚════════════════════════════════════════════════╝" });
         output.push({ type: "output", content: "" });
-        output.push({ type: "output", content: `  Terminal    TERMINAL ORPHEUS v1.0.0` });
+        output.push({ type: "output", content: `  Terminal    HAZMAT SHELL v1.0.0` });
         output.push({ type: "output", content: `  Theme       ${themes[currentTheme as keyof typeof themes].name}` });
+        output.push({ type: "output", content: `  Cwd         ${currentDir}` });
         output.push({ type: "output", content: `  Lines       ${lines.length}` });
         output.push({ type: "output", content: `  History     ${history.length} commands` });
+        output.push({ type: "output", content: `  Aliases     ${Object.keys(aliases).length}` });
         output.push({ type: "output", content: "" });
         output.push({ type: "success", content: "System information retrieved successfully" });
         
         return output;
       },
     },
+    pwd: {
+      name: "pwd",
+      description: "Print working directory",
+      execute: () => [{ type: "output", content: currentDir }],
+    },
+    cd: {
+      name: "cd",
+      description: "Change directory",
+      execute: (args) => {
+        if (!args[0] || args[0] === "~") {
+          setCurrentDir("/home/orpheus");
+          return [{ type: "success", content: "Changed to /home/orpheus" }];
+        }
+        const target = resolvePath(args[0]);
+        const node = getNode(target);
+        if (!node) return [{ type: "error", content: `cd: no such directory: ${args[0]}` }];
+        if (node.type !== "dir") return [{ type: "error", content: `cd: not a directory: ${args[0]}` }];
+        setCurrentDir(target);
+        return [];
+      },
+    },
+    mkdir: {
+      name: "mkdir",
+      description: "Create a directory",
+      execute: (args) => {
+        if (!args[0]) return [{ type: "error", content: "mkdir: missing operand" }];
+        const results: TerminalLine[] = [];
+        for (const arg of args) {
+          const target = resolvePath(arg);
+          if (getNode(target)) {
+            results.push({ type: "error", content: `mkdir: already exists: ${arg}` });
+            continue;
+          }
+          const ok = setNode(arg, { type: "dir", children: {} });
+          results.push(ok
+            ? { type: "success", content: `Created directory: ${arg}` }
+            : { type: "error", content: `mkdir: cannot create '${arg}': parent path not found` });
+        }
+        return results;
+      },
+    },
+    cat: {
+      name: "cat",
+      description: "Display file contents",
+      execute: (args, pipeInput) => {
+        if (pipeInput) return [{ type: "output", content: pipeInput }];
+        if (!args[0]) return [{ type: "error", content: "cat: missing file operand" }];
+        const node = getNode(resolvePath(args[0]));
+        if (!node) return [{ type: "error", content: `cat: ${args[0]}: No such file` }];
+        if (node.type === "dir") return [{ type: "error", content: `cat: ${args[0]}: Is a directory` }];
+        return (node.content ?? "").split("\n").map(line => ({ type: "output" as const, content: line }));
+      },
+    },
+    rm: {
+      name: "rm",
+      description: "Remove files or directories (use -r for dirs)",
+      execute: (args) => {
+        const recursive = args.includes("-r") || args.includes("-R") || args.includes("-rf");
+        const targets = args.filter(a => !a.startsWith("-"));
+        if (!targets.length) return [{ type: "error", content: "rm: missing operand" }];
+        const results: TerminalLine[] = [];
+        for (const t of targets) {
+          const node = getNode(resolvePath(t));
+          if (!node) { results.push({ type: "error", content: `rm: cannot remove '${t}': No such file or directory` }); continue; }
+          if (node.type === "dir" && !recursive) { results.push({ type: "error", content: `rm: cannot remove '${t}': Is a directory (use -r)` }); continue; }
+          const removed = removeNode(t);
+          results.push(removed ? { type: "success", content: `Removed: ${t}` } : { type: "error", content: `rm: cannot remove '${t}'` });
+        }
+        return results;
+      },
+    },
+    rmdir: {
+      name: "rmdir",
+      description: "Remove empty directory",
+      execute: (args) => {
+        if (!args[0]) return [{ type: "error", content: "rmdir: missing operand" }];
+        const node = getNode(resolvePath(args[0]));
+        if (!node) return [{ type: "error", content: `rmdir: '${args[0]}': No such directory` }];
+        if (node.type !== "dir") return [{ type: "error", content: `rmdir: '${args[0]}': Not a directory` }];
+        if (node.children && Object.keys(node.children).length > 0) return [{ type: "error", content: `rmdir: '${args[0]}': Directory not empty` }];
+        const removed = removeNode(args[0]);
+        return removed ? [{ type: "success", content: `Removed directory: ${args[0]}` }] : [{ type: "error", content: `rmdir: failed to remove '${args[0]}'` }];
+      },
+    },
+    touch: {
+      name: "touch",
+      description: "Create an empty file",
+      execute: (args) => {
+        if (!args[0]) return [{ type: "error", content: "touch: missing operand" }];
+        const target = resolvePath(args[0]);
+        if (getNode(target)) return [];
+        const ok = setNode(args[0], { type: "file", content: "" });
+        return ok ? [{ type: "success", content: `Created: ${args[0]}` }] : [{ type: "error", content: `touch: cannot create '${args[0]}'` }];
+      },
+    },
+    echo: {
+      name: "echo",
+      description: "Display text or pipe output",
+      execute: (args, pipeInput) => {
+        if (pipeInput) return [{ type: "output", content: pipeInput }];
+        return [{ type: "output", content: args.join(" ") }];
+      },
+    },
+    grep: {
+      name: "grep",
+      description: "Filter lines matching a pattern",
+      execute: (args, pipeInput) => {
+        if (!args[0]) return [{ type: "error", content: "grep: missing pattern" }];
+        const text = pipeInput ?? "";
+        if (!text) return [{ type: "error", content: "grep: no input (pipe data or use with ls)" }];
+        const pattern = args[0];
+        const caseInsensitive = args.includes("-i");
+        try {
+          const regex = new RegExp(pattern, caseInsensitive ? "i" : "");
+          const matches = text.split("\n").filter(l => regex.test(l));
+          if (matches.length === 0) return [{ type: "output", content: "(no matches)" }];
+          return matches.map(l => ({ type: "output" as const, content: l }));
+        } catch {
+          const filtered = text.split("\n").filter(l => caseInsensitive ? l.toLowerCase().includes(pattern.toLowerCase()) : l.includes(pattern));
+          if (filtered.length === 0) return [{ type: "output", content: "(no matches)" }];
+          return filtered.map(l => ({ type: "output" as const, content: l }));
+        }
+      },
+    },
+    head: {
+      name: "head",
+      description: "Display first N lines (default 10)",
+      execute: (args, pipeInput) => {
+        let n = 10;
+        const numArg = args.find(a => a.startsWith("-"));
+        if (numArg) n = parseInt(numArg.slice(1), 10) || 10;
+        const filePath = args.find(a => !a.startsWith("-"));
+
+        let text: string;
+        if (pipeInput) {
+          text = pipeInput;
+        } else if (filePath) {
+          const node = getNode(resolvePath(filePath));
+          if (!node || node.type === "dir") return [{ type: "error", content: `head: cannot read '${filePath}'` }];
+          text = node.content ?? "";
+        } else {
+          return [{ type: "error", content: "head: no input" }];
+        }
+
+        return text.split("\n").slice(0, n).map(l => ({ type: "output" as const, content: l }));
+      },
+    },
+    tail: {
+      name: "tail",
+      description: "Display last N lines (default 10)",
+      execute: (args, pipeInput) => {
+        let n = 10;
+        const numArg = args.find(a => a.startsWith("-"));
+        if (numArg) n = parseInt(numArg.slice(1), 10) || 10;
+        const filePath = args.find(a => !a.startsWith("-"));
+
+        let text: string;
+        if (pipeInput) {
+          text = pipeInput;
+        } else if (filePath) {
+          const node = getNode(resolvePath(filePath));
+          if (!node || node.type === "dir") return [{ type: "error", content: `tail: cannot read '${filePath}'` }];
+          text = node.content ?? "";
+        } else {
+          return [{ type: "error", content: "tail: no input" }];
+        }
+
+        const lines = text.split("\n");
+        return lines.slice(-n).map(l => ({ type: "output" as const, content: l }));
+      },
+    },
+    alias: {
+      name: "alias",
+      description: "Create or list command aliases",
+      execute: (args) => {
+        if (args.length === 0) {
+          const entries = Object.entries(aliases);
+          if (entries.length === 0) return [{ type: "output", content: "No aliases defined. Use: alias name=command" }];
+          return [
+            { type: "output", content: "╔════════════════════════════════════════════════╗" },
+            { type: "output", content: "║          DEFINED ALIASES                      ║" },
+            { type: "output", content: "╚════════════════════════════════════════════════╝" },
+            ...entries.map(([k, v]) => ({ type: "output" as const, content: `  ${k} = '${v}'` })),
+          ];
+        }
+        const joined = args.join(" ");
+        const eqIndex = joined.indexOf("=");
+        if (eqIndex === -1) {
+          const name = args[0];
+          if (aliases[name]) return [{ type: "output", content: `alias ${name}='${aliases[name]}'` }];
+          return [{ type: "error", content: `alias: '${name}' not found` }];
+        }
+        const name = joined.slice(0, eqIndex).trim();
+        const value = joined.slice(eqIndex + 1).trim();
+        if (!name) return [{ type: "error", content: "alias: name required" }];
+        setAliases(prev => ({ ...prev, [name]: value }));
+        return [{ type: "success", content: `Alias set: ${name} = '${value}'` }];
+      },
+    },
+    unalias: {
+      name: "unalias",
+      description: "Remove a command alias",
+      execute: (args) => {
+        if (!args[0]) return [{ type: "error", content: "unalias: name required" }];
+        if (!(args[0] in aliases)) return [{ type: "error", content: `unalias: '${args[0]}' not found` }];
+        setAliases(prev => {
+          const next = { ...prev };
+          delete next[args[0]];
+          return next;
+        });
+        return [{ type: "success", content: `Alias removed: ${args[0]}` }];
+      },
+    },
+    ls: {
+      name: "ls",
+      description: "List files and directories",
+      execute: (args) => {
+        const showLong = args.includes("-l") || args.includes("-la") || args.includes("-al");
+        const showAll = args.includes("-a") || args.includes("-la") || args.includes("-al");
+        const targetPath = args.find(a => !a.startsWith("-")) || currentDir;
+        const node = getNode(resolvePath(targetPath));
+        if (!node) return [{ type: "error", content: `ls: cannot access '${targetPath}': No such file or directory` }];
+        if (node.type === "file") return [{ type: "output", content: targetPath }];
+
+        const entries = Object.keys(node.children ?? {});
+        if (entries.length === 0) return [{ type: "output", content: "(empty directory)" }];
+
+        const displayEntries = showAll ? [".", "..", ...entries] : entries;
+        if (showLong) {
+          return [
+            { type: "output", content: `total ${entries.length}` },
+            ...displayEntries.map(name => {
+              if (name === "." || name === "..") return { type: "output" as const, content: `drwxr-xr-x  -  ${name}` };
+              const child = (node.children ?? {})[name];
+              if (!child) return { type: "output" as const, content: `??????????  -  ${name}` };
+              if (child.type === "dir") return { type: "output" as const, content: `drwxr-xr-x  -  ${name}/` };
+              const size = (child.content ?? "").length;
+              return { type: "output" as const, content: `-rw-r--r--  ${size}  ${name}` };
+            }),
+          ];
+        }
+        return [
+          { type: "output", content: `Contents of ${resolvePath(targetPath)}:` },
+          { type: "output", content: "" },
+          ...entries.map(name => {
+            const child = (node.children ?? {})[name];
+            return { type: "output" as const, content: child?.type === "dir" ? `  📂 ${name}/` : `  📄 ${name}` };
+          }),
+        ];
+      },
+    },
   };
 
   // Helper function to execute a single command and return success status
-  const executeSingleCommand = (commandString: string): boolean => {
-    const trimmed = commandString.trim();
-    if (!trimmed) return true;
+  const executeSingleCommand = (commandString: string, pipeInput?: string): { success: boolean; textOutput: string } => {
+    let trimmed = commandString.trim();
+    if (!trimmed) return { success: true, textOutput: "" };
+
+    // Resolve aliases
+    trimmed = resolveAlias(trimmed);
+
+    // Handle output redirection: command > file
+    const redirMatch = trimmed.match(/^(.+?)\s*>\s*(\S+)\s*$/);
+    let redirectPath: string | null = null;
+    if (redirMatch) {
+      trimmed = redirMatch[1].trim();
+      redirectPath = redirMatch[2];
+    }
+
+    // Handle pipe: cmd1 | cmd2
+    const pipeParts = trimmed.split(/\s*\|\s*/);
+    if (pipeParts.length > 1) {
+      let currentPipeInput = pipeInput ?? "";
+      let success = true;
+      for (let i = 0; i < pipeParts.length; i++) {
+        const result = executeSingleCommand(pipeParts[i].trim(), currentPipeInput);
+        success = result.success;
+        currentPipeInput = result.textOutput;
+      }
+      if (redirectPath) {
+        const ok = setNode(redirectPath, { type: "file", content: currentPipeInput });
+        if (ok) addLines([{ type: "success", content: `Output written to ${redirectPath}` }]);
+        else addLines([{ type: "error", content: `Cannot write to ${redirectPath}` }]);
+      }
+      return { success, textOutput: currentPipeInput };
+    }
 
     // Parse command and arguments
     const parts = trimmed.split(/\s+/);
@@ -1497,22 +1443,24 @@ export function RetroTerminal() {
     // Execute command
     const command = commands[commandName];
     if (command) {
-      const output = command.execute(args);
-      addLines(output);
-      // Command succeeded if no error lines in output
-      return !output.some(line => line.type === "error");
+      const output = command.execute(args, pipeInput);
+      if (!redirectPath) {
+        addLines(output);
+      } else {
+        const textContent = output.map(l => l.content).join("\n");
+        const ok = setNode(redirectPath, { type: "file", content: textContent });
+        if (ok) addLines([{ type: "success", content: `Output written to ${redirectPath}` }]);
+        else addLines(output);
+      }
+      const textOutput = output.map(l => l.content).join("\n");
+      const success = !output.some(line => line.type === "error");
+      return { success, textOutput };
     } else {
       addLines([
-        {
-          type: "error",
-          content: `Command not found: ${commandName}`,
-        },
-        {
-          type: "output",
-          content: "Type 'help' to see available commands.",
-        },
+        { type: "error", content: `Command not found: ${commandName}` },
+        { type: "output", content: "Type 'help' to see available commands." },
       ]);
-      return false; // Command failed
+      return { success: false, textOutput: "" };
     }
   };
 
@@ -1527,9 +1475,9 @@ export function RetroTerminal() {
     // Add input line
     addLines([{ type: "input", content: `$ ${trimmed}`, timestamp: new Date() }]);
 
-    // Special-case: allow full logical/assignment expressions inside shout without splitting on && or ||
+    // Special-case: allow full logical/assignment expressions inside kevlar without splitting on && or ||
     const firstToken = trimmed.split(/\s+/)[0]?.toLowerCase();
-    if (firstToken === "shout") {
+    if (firstToken === "kevlar") {
       executeSingleCommand(trimmed);
       setInput("");
       return;
@@ -1618,7 +1566,7 @@ export function RetroTerminal() {
 
       // Execute command if conditions are met
       if (shouldExecute && part.command) {
-        lastSuccess = executeSingleCommand(part.command);
+        lastSuccess = executeSingleCommand(part.command).success;
       } else if (part.command) {
         // Command skipped due to operator logic
         lastSuccess = false;
@@ -1637,9 +1585,9 @@ export function RetroTerminal() {
     setHistory((prev) => [...prev, trimmed]);
     setHistoryIndex(-1);
 
-    // Special-case: allow full logical/assignment expressions inside shout without splitting on && or ||
+    // Special-case: allow full logical/assignment expressions inside kevlar without splitting on && or ||
     const firstToken = trimmed.split(/\s+/)[0]?.toLowerCase();
-    if (firstToken === "shout") {
+    if (firstToken === "kevlar") {
       executeSingleCommand(trimmed);
       return;
     }
@@ -1705,7 +1653,7 @@ export function RetroTerminal() {
       }
 
       if (shouldExecute && part.command) {
-        lastSuccess = executeSingleCommand(part.command);
+        lastSuccess = executeSingleCommand(part.command).success;
       } else if (part.command) {
         lastSuccess = false;
       }
@@ -1785,14 +1733,18 @@ export function RetroTerminal() {
       }
     } else if (e.key === "Tab") {
       e.preventDefault();
-      // Simple autocomplete (only on first line)
       const firstLine = input.split("\n")[0];
       if (firstLine.trim() && !isMultiLine) {
-        const matches = Object.keys(commands).filter((cmd) =>
+        const allCommands = [...Object.keys(commands), ...Object.keys(aliases)];
+        const matches = allCommands.filter((cmd) =>
           cmd.startsWith(firstLine.toLowerCase())
         );
         if (matches.length === 1) {
           setInput(matches[0]);
+        } else if (matches.length > 1 && matches.length <= 10) {
+          addLines([
+            { type: "output", content: matches.join("  ") },
+          ]);
         }
       }
     } else if (e.key === "Escape") {
@@ -1802,6 +1754,31 @@ export function RetroTerminal() {
         setIsMultiLine(false);
         setInput("");
         addLines([{ type: "output", content: "^C (multi-line input cancelled)" }]);
+      }
+    } else if (e.key === "c" && e.ctrlKey && e.shiftKey) {
+      // Clipboard - Copy output with Ctrl+Shift+C
+      e.preventDefault();
+      
+      // Get all output lines (excluding the input prompt line)
+      const outputLines = lines
+        .filter(line => line.type !== "input")
+        .map(line => line.content)
+        .join("\n");
+      
+      if (outputLines.trim()) {
+        navigator.clipboard.writeText(outputLines).then(() => {
+          addLines([
+            { type: "success", content: "📋 Copied terminal output to clipboard" }
+          ]);
+        }).catch(() => {
+          addLines([
+            { type: "error", content: "❌ Failed to copy to clipboard" }
+          ]);
+        });
+      } else {
+        addLines([
+          { type: "output", content: "⚠️ No output to copy" }
+        ]);
       }
     }
   };
@@ -1871,7 +1848,7 @@ export function RetroTerminal() {
         <div className="flex items-center gap-3">
           <Terminal className="size-5 text-primary" />
           <span className="retro text-xs uppercase tracking-[0.2em] text-foreground">
-            TERMINAL ORPHEUS
+            HAZMAT SHELL
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -1900,7 +1877,7 @@ export function RetroTerminal() {
               },
               {
                 type: "success",
-                content: "║       TERMINAL ORPHEUS v1.0.0                  ║",
+                content: "║       HAZMAT SHELL v1.0.0                  ║",
               },
               {
                 type: "success",
@@ -1956,6 +1933,11 @@ export function RetroTerminal() {
                 ))}
               </AnimatePresence>
 
+              {/* Current Directory */}
+              <div className="retro mt-2 text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-xs">
+                {currentDir}
+              </div>
+
               {/* Input Line */}
               <div className="mt-2 flex items-start gap-2">
                 <span className="retro text-xs text-primary">{isMultiLine || multiLineBuffer.length > 0 ? ">" : "$"}</span>
@@ -1983,6 +1965,7 @@ export function RetroTerminal() {
             <div className="relative border-t-4 border-border bg-primary/10 px-4 py-2 dark:border-ring">
               <div className="flex items-center justify-between text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-xs">
                 <span className="retro">{isMultiLine || multiLineBuffer.length > 0 ? "Multi-line" : "Ready"}</span>
+                <span className="retro">{currentDir}</span>
                 <span className="retro">Theme: {isMounted ? themes[currentTheme as keyof typeof themes].name : "Default"}</span>
                 <span className="retro">Lines: {lines.length}</span>
               </div>

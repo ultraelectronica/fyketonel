@@ -94,7 +94,7 @@ export default function PlansPage() {
                   Current Status
                 </p>
                 <p className="retro text-base font-bold tracking-[0.15em] text-primary sm:text-lg sm:tracking-[0.2em] md:text-xl md:tracking-[0.25em]">
-                  Level 60 Fullstack Developer
+                  Level 75 Fullstack Developer
                 </p>
               </div>
             </div>
