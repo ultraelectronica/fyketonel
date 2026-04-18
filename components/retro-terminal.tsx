@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { kevlarEval, isKevlarError } from "@/lib/kevlar/types";
 import { Terminal, Minimize2, Maximize2, X } from "lucide-react";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 import { crtOpenVariant } from "@/components/ui/8bit/motion-utils";
 
 interface TerminalLine {
@@ -25,42 +26,6 @@ interface VirtualNode {
   content?: string;
   children?: Record<string, VirtualNode>;
 }
-
-const MATH_CONSTANTS: Record<string, number> = {
-  PI: Math.PI,
-  E: Math.E,
-  PHI: 1.618033988749895,
-  TAU: Math.PI * 2,
-  LN2: Math.LN2,
-  LN10: Math.LN10,
-  SQRT2: Math.SQRT2,
-};
-
-const MATH_FUNCTIONS: Record<string, (...args: number[]) => number> = {
-  sqrt: Math.sqrt,
-  sin: Math.sin,
-  cos: Math.cos,
-  tan: Math.tan,
-  log: Math.log,
-  log2: Math.log2,
-  log10: Math.log10,
-  pow: Math.pow,
-  abs: Math.abs,
-  ceil: Math.ceil,
-  floor: Math.floor,
-  round: Math.round,
-  min: Math.min,
-  max: Math.max,
-  exp: Math.exp,
-  asin: Math.asin,
-  acos: Math.acos,
-  atan: Math.atan,
-  atan2: Math.atan2,
-  sign: Math.sign,
-  trunc: Math.trunc,
-  cbrt: Math.cbrt,
-  hypot: Math.hypot,
-};
 
 const INITIAL_FS: VirtualNode = {
   type: "dir",
@@ -87,12 +52,21 @@ const INITIAL_FS: VirtualNode = {
             skills: {
               type: "dir",
               children: {
-                "frontend.ts": { type: "file", content: "React, Next.js, Remix, Flutter, Tailwind CSS, Three.js" },
-                "backend.ts": { type: "file", content: "Node.js, Express.js, Bun" },
-                "devops.ts": { type: "file", content: "Docker, Git, GitHub, GitLab, GCP, Cloudflare" },
+                "frontend.kv": { type: "file", content: "React, Next.js, Remix, Flutter, Tailwind CSS, Three.js" },
+                "backend.kv": { type: "file", content: "Node.js, Express.js, Bun" },
+                "devops.kv": { type: "file", content: "Docker, Git, GitHub, GitLab, GCP, Cloudflare" },
               },
             },
             "contact.txt": { type: "file", content: "GitHub: github.com/ultraelectronica\nEmail: Available on contact form" },
+            kevlar: {
+              type: "dir",
+              children: {
+                "README.kv": { type: "file", content: "╔══════════════════════════════════════╗\n║          Kevlar Expression Shell       ║\n╚══════════════════════════════════════╝\n\nKevlar is the built-in expression language for Hazmat Shell.\nIt supports math, logic, comparisons, and variable assignments.\n\nType 'kevlar' to evaluate expressions.\nType 'cat kevlar/syntax.kv' for syntax reference.\nType 'cat kevlar/math.kv' for math functions.\nType 'cat kevlar/examples.kv' for examples." },
+                "syntax.kv": { type: "file", content: "Kevlar Syntax Reference\n───────────────────────\n\nArithmetic:    + - * / % **\nComparison:    == != < > <= >=\nLogical:       && || !\nAssignment:    = += -= *= /= %=\nGrouping:      ( )\nTypes:         int, float, bool, string\nVariables:     x = 10\nConstants:     PI, E, PHI, TAU, LN2, LN10, SQRT2" },
+                "math.kv": { type: "file", content: "Kevlar Math Functions\n──────────────────────\n\nBasic:     sqrt(), abs(), ceil(), floor(), round(), sign(), trunc()\nTrig:      sin(), cos(), tan(), asin(), acos(), atan(), atan2()\nExp/Log:   exp(), log(), log2(), log10(), pow(), cbrt()\nAggregate: min(), max(), hypot()\n\nUsage: kevlar sqrt(16)       → 4\n       kevlar pow(2, 10)     → 1024\n       kevlar sin(PI / 2)    → 1" },
+                "examples.kv": { type: "file", content: "Kevlar Examples\n────────────────\n\nkevlar 2 + 3 * 4          → 14\nkevlar sqrt(144)           → 12\nkevlar PI                  → 3.14159...\nkevlar x = 42             → 42\nkevlar x += 8             → 50\nkevlar 10 > 5 && 3 < 7    → true\nkevlar pow(2, 8)          → 256\nkevlar 'hello' + ' world'  → hello world" },
+              },
+            },
           },
         },
       },
@@ -100,7 +74,7 @@ const INITIAL_FS: VirtualNode = {
     etc: {
       type: "dir",
       children: {
-        "orpheus.conf": { type: "file", content: "VERSION=1.0.0\nTHEME=default\nAUTHOR=Fyke\nMAX_LINES=70" },
+        "orpheus.conf": { type: "file", content: "VERSION=2.0.0\nSHELL=Hazmat\nTHEME=default\nAUTHOR=Fyke\nMAX_LINES=70" },
       },
     },
     var: {
@@ -109,7 +83,7 @@ const INITIAL_FS: VirtualNode = {
         log: {
           type: "dir",
           children: {
-            "terminal.log": { type: "file", content: "Terminal Orpheus initialized\nSystem ready\nAwaiting commands..." },
+            "terminal.log": { type: "file", content: "Hazmat Shell initialized\nSystem ready\nAwaiting commands..." },
           },
         },
       },
@@ -599,7 +573,7 @@ export function RetroTerminal() {
     },
     {
       type: "success",
-      content: "║       TERMINAL ORPHEUS v1.0.0                  ║",
+      content: "║       HAZMAT SHELL v1.0.0                  ║",
     },
     {
       type: "success",
@@ -834,7 +808,7 @@ export function RetroTerminal() {
         { type: "output", content: "  theme [name]      - Change color theme" },
         { type: "output", content: "                      default/atari/nintendo/vhs/" },
         { type: "output", content: "                      gameboy/softpop/ally" },
-        { type: "output", content: "  shout [expr]      - Evaluate expressions:" },
+        { type: "output", content: "  kevlar [expr]     - Evaluate expressions:" },
         { type: "output", content: "                      Math: +, -, *, /, %, ** (power)" },
         { type: "output", content: "                      Comparison: ==, !=, <, >, <=, >=" },
         { type: "output", content: "                      Logical: &&, ||, !" },
@@ -1058,538 +1032,30 @@ export function RetroTerminal() {
         }
       },
     },
-    shout: {
-      name: "shout",
-      description: "Shout back the text with data type, arithmetic, logical, and assignment support",
+    kevlar: {
+      name: "kevlar",
+      description: "Evaluate expressions: math, logic, comparisons, variables, and string ops",
       execute: (args) => {
         if (args.length === 0) {
-          return [
-            {
-              type: "output",
-              content: "",
-            },
-          ];
+          return [{ type: "output", content: "" }];
         }
 
         const input = args.join(" ");
-        const output: TerminalLine[] = [];
+        const result = kevlarEval(input);
 
-        // Variable storage for assignments (scoped to this execution context)
-        // Using a ref-like pattern to persist between evaluations
-        const getVariables = (): Record<string, number | boolean | string> => {
-          if (typeof window !== "undefined") {
-            if (!(window as unknown as Record<string, unknown>).__shoutVars) {
-              (window as unknown as Record<string, Record<string, number | boolean | string>>).__shoutVars = {};
-            }
-            return (window as unknown as Record<string, Record<string, number | boolean | string>>).__shoutVars;
-          }
-          return {};
-        };
-
-        // Tokenizer for expression parsing
-        const tokenize = (expr: string): string[] => {
-          const tokens: string[] = [];
-          let i = 0;
-          while (i < expr.length) {
-            // Skip whitespace
-            if (/\s/.test(expr[i])) {
-              i++;
-              continue;
-            }
-            
-            // Multi-character operators
-            if (i + 1 < expr.length) {
-              const twoChar = expr.slice(i, i + 2);
-              if (["==", "!=", "<=", ">=", "&&", "||", "+=", "-=", "*=", "/=", "%=", "**"].includes(twoChar)) {
-                tokens.push(twoChar);
-                i += 2;
-                continue;
-              }
-            }
-            
-            // Single character operators and parentheses
-            if (["+", "-", "*", "/", "%", "(", ")", "<", ">", "=", "!"].includes(expr[i])) {
-              tokens.push(expr[i]);
-              i++;
-              continue;
-            }
-            
-            // String literals (single or double quotes)
-            if (expr[i] === '"' || expr[i] === "'") {
-              const quote = expr[i];
-              let str = quote;
-              i++;
-              while (i < expr.length && expr[i] !== quote) {
-                // Handle escape sequences
-                if (expr[i] === '\\' && i + 1 < expr.length) {
-                  str += expr[i] + expr[i + 1];
-                  i += 2;
-                } else {
-                  str += expr[i];
-                  i++;
-                }
-              }
-              if (i < expr.length) {
-                str += expr[i]; // Include closing quote
-                i++;
-              }
-              tokens.push(str);
-              continue;
-            }
-            
-            // Numbers (including decimals and negatives handled by unary)
-            if (/\d/.test(expr[i]) || (expr[i] === "." && i + 1 < expr.length && /\d/.test(expr[i + 1]))) {
-              let num = "";
-              while (i < expr.length && (/\d/.test(expr[i]) || expr[i] === ".")) {
-                num += expr[i];
-                i++;
-              }
-              tokens.push(num);
-              continue;
-            }
-            
-            // Identifiers (variables, true, false)
-            if (/[a-zA-Z_]/.test(expr[i])) {
-              let ident = "";
-              while (i < expr.length && /[a-zA-Z0-9_]/.test(expr[i])) {
-                ident += expr[i];
-                i++;
-              }
-              tokens.push(ident);
-              continue;
-            }
-            
-            // Unknown character, skip
-            i++;
-          }
-          return tokens;
-        };
-
-        // Expression parser with operator precedence (function-based to avoid inline class)
-        // Precedence (lowest to highest):
-        // 1. Assignment: =, +=, -=, *=, /=, %=
-        // 2. Logical OR: ||
-        // 3. Logical AND: &&
-        // 4. Equality: ==, !=
-        // 5. Comparison: <, >, <=, >=
-        // 6. Addition/Subtraction: +, -
-        // 7. Multiplication/Division/Modulo: *, /, %
-        // 8. Power: **
-        // 9. Unary: !, - (negative)
-        // 10. Parentheses: ()
-
-        const parseExpression = (
-          tokens: string[],
-          variables: Record<string, number | boolean | string>
-        ): number | boolean | string => {
-          let pos = 0;
-
-          const peek = (): string | null => pos < tokens.length ? tokens[pos] : null;
-          const consume = (): string | null => pos < tokens.length ? tokens[pos++] : null;
-
-          const parsePrimary = (): number | boolean | string => {
-            const token = peek();
-            
-            if (token === null) {
-              throw new Error("Unexpected end of expression");
-            }
-            
-            // Parentheses
-            if (token === "(") {
-              consume();
-              const result = parseAssignment();
-              if (peek() !== ")") {
-                throw new Error("Missing closing parenthesis");
-              }
-              consume();
-              return result;
-            }
-            
-            // Number
-            if (/^-?\d+\.?\d*$/.test(token) || /^\.\d+$/.test(token)) {
-              consume();
-              return parseFloat(token);
-            }
-            
-            // Boolean literals
-            if (token.toLowerCase() === "true") {
-              consume();
-              return true;
-            }
-            if (token.toLowerCase() === "false") {
-              consume();
-              return false;
-            }
-            
-            // String literals (single or double quotes)
-            if ((token.startsWith('"') && token.endsWith('"')) || 
-                (token.startsWith("'") && token.endsWith("'"))) {
-              consume();
-              // Remove quotes and handle escape sequences
-              let str = token.slice(1, -1);
-              str = str.replace(/\\n/g, '\n');
-              str = str.replace(/\\t/g, '\t');
-              str = str.replace(/\\"/g, '"');
-              str = str.replace(/\\'/g, "'");
-              str = str.replace(/\\\\/g, '\\');
-              return str;
-            }
-            
-            // Math constants and function calls
-            if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(token)) {
-              // Check for function call: name(args)
-              if (token in MATH_FUNCTIONS && pos + 1 < tokens.length && tokens[pos + 1] === "(") {
-                consume(); // consume function name
-                consume(); // consume "("
-                const args: (number | boolean | string)[] = [];
-                if (peek() !== ")") {
-                  args.push(parseAssignment());
-                  while (peek() === ",") {
-                    consume(); // consume ","
-                    args.push(parseAssignment());
-                  }
-                }
-                if (peek() !== ")") {
-                  throw new Error(`Missing closing parenthesis for ${token}()`);
-                }
-                consume(); // consume ")"
-                const numArgs = args.map(a => typeof a === "number" ? a : parseFloat(String(a)) || 0);
-                const fn = MATH_FUNCTIONS[token];
-                return fn(...numArgs);
-              }
-
-              // Math constants
-              if (token in MATH_CONSTANTS) {
-                consume();
-                return MATH_CONSTANTS[token];
-              }
-
-              // Variable
-              consume();
-              if (token in variables) {
-                return variables[token];
-              }
-              return 0;
-            }
-            
-            throw new Error(`Unexpected token: ${token}`);
-          };
-
-          const parseUnary = (): number | boolean | string => {
-            if (peek() === "!") {
-              consume();
-              const operand = parseUnary();
-              return !Boolean(operand);
-            }
-            
-            if (peek() === "-") {
-              consume();
-              const operand = parseUnary();
-              const numOperand = typeof operand === "number" ? operand : parseFloat(String(operand)) || 0;
-              return -numOperand;
-            }
-            
-            return parsePrimary();
-          };
-
-          const parsePower = (): number | boolean | string => {
-            let left = parseUnary();
-            
-            while (peek() === "**") {
-              consume();
-              const right = parseUnary(); // right-associative
-              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
-              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
-              left = Math.pow(numLeft, numRight);
-            }
-            
-            return left;
-          };
-
-          const parseMultiplicative = (): number | boolean | string => {
-            let left = parsePower();
-            
-            while (peek() === "*" || peek() === "/" || peek() === "%") {
-              const op = consume();
-              const right = parsePower();
-              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
-              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
-              
-              if (op === "*") {
-                left = numLeft * numRight;
-              } else if (op === "/") {
-                if (numRight === 0) throw new Error("Division by zero");
-                left = numLeft / numRight;
-              } else {
-                if (numRight === 0) throw new Error("Modulo by zero");
-                left = numLeft % numRight;
-              }
-            }
-            
-            return left;
-          };
-
-          const parseAdditive = (): number | boolean | string => {
-            let left = parseMultiplicative();
-            
-            while (peek() === "+" || peek() === "-") {
-              const op = consume();
-              const right = parseMultiplicative();
-              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
-              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
-              
-              if (op === "+") {
-                left = numLeft + numRight;
-              } else {
-                left = numLeft - numRight;
-              }
-            }
-            
-            return left;
-          };
-
-          const parseComparison = (): number | boolean | string => {
-            let left = parseAdditive();
-            
-            while (["<", ">", "<=", ">="].includes(peek() || "")) {
-              const op = consume();
-              const right = parseAdditive();
-              const numLeft = typeof left === "number" ? left : parseFloat(String(left)) || 0;
-              const numRight = typeof right === "number" ? right : parseFloat(String(right)) || 0;
-              
-              switch (op) {
-                case "<": left = numLeft < numRight; break;
-                case ">": left = numLeft > numRight; break;
-                case "<=": left = numLeft <= numRight; break;
-                case ">=": left = numLeft >= numRight; break;
-              }
-            }
-            
-            return left;
-          };
-
-          const parseEquality = (): number | boolean | string => {
-            let left = parseComparison();
-            
-            while (peek() === "==" || peek() === "!=") {
-              const op = consume();
-              const right = parseComparison();
-              if (op === "==") {
-                left = left === right;
-              } else {
-                left = left !== right;
-              }
-            }
-            
-            return left;
-          };
-
-          const parseLogicalAnd = (): number | boolean | string => {
-            let left = parseEquality();
-            
-            while (peek() === "&&") {
-              consume();
-              const right = parseEquality();
-              left = Boolean(left) && Boolean(right);
-            }
-            
-            return left;
-          };
-
-          const parseLogicalOr = (): number | boolean | string => {
-            let left = parseLogicalAnd();
-            
-            while (peek() === "||") {
-              consume();
-              const right = parseLogicalAnd();
-              left = Boolean(left) || Boolean(right);
-            }
-            
-            return left;
-          };
-
-          const parseAssignment = (): number | boolean | string => {
-            // Check if this is an assignment
-            if (pos + 1 < tokens.length) {
-              const varName = tokens[pos];
-              const op = tokens[pos + 1];
-              
-              if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName) && ["=", "+=", "-=", "*=", "/=", "%="].includes(op)) {
-                pos += 2; // consume variable name and operator
-                const value = parseAssignment(); // right-associative
-                
-                let finalValue: number | boolean | string;
-                if (op === "=") {
-                  finalValue = value;
-                } else {
-                  const currentValue = variables[varName];
-                  const numCurrent = typeof currentValue === "number" ? currentValue : 0;
-                  const numValue = typeof value === "number" ? value : parseFloat(String(value)) || 0;
-                  
-                  switch (op) {
-                    case "+=": finalValue = numCurrent + numValue; break;
-                    case "-=": finalValue = numCurrent - numValue; break;
-                    case "*=": finalValue = numCurrent * numValue; break;
-                    case "/=": 
-                      if (numValue === 0) throw new Error("Division by zero");
-                      finalValue = numCurrent / numValue; 
-                      break;
-                    case "%=": 
-                      if (numValue === 0) throw new Error("Modulo by zero");
-                      finalValue = numCurrent % numValue; 
-                      break;
-                    default: finalValue = value;
-                  }
-                }
-                
-                variables[varName] = finalValue;
-                return finalValue;
-              }
-            }
-            
-            return parseLogicalOr();
-          };
-
-          return parseAssignment();
-        };
-
-        // Try to evaluate as an expression
-        const tokens = tokenize(input);
-        
-        // Check if input looks like an expression (has operators, numbers, quoted strings, or assignments)
-        // Otherwise treat as plain text string
-        const hasOperators = /[+\-*/%<>=!&|]/.test(input);
-        const isNumber = /^-?\d+\.?\d*$/.test(input.trim());
-        const isQuotedString = /^["'].*["']$/.test(input.trim());
-        const isBooleanLiteral = /^(true|false)$/i.test(input.trim());
-        const isAssignment = /^[a-zA-Z_][a-zA-Z0-9_]*\s*[+\-*/%]?=/.test(input);
-        const looksLikeExpression = hasOperators || isNumber || isQuotedString || isBooleanLiteral || isAssignment;
-        
-        if (tokens.length > 0 && looksLikeExpression) {
-          try {
-            const variables = getVariables();
-            const result = parseExpression(tokens, variables);
-            
-            // Determine result type
-            let resultType: string;
-            if (typeof result === "boolean") {
-              resultType = "bool";
-            } else if (typeof result === "number") {
-              resultType = Number.isInteger(result) ? "int" : "float";
-            } else {
-              resultType = "string";
-            }
-            
-            // Check if it was an assignment
-            const assignmentMatch = input.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*([+\-*/%]?=)\s*/);
-            if (assignmentMatch) {
-              const varName = assignmentMatch[1];
-              const op = assignmentMatch[2];
-              output.push({
-                type: "success",
-                content: `${varName} ${op} ${result} (${resultType})`,
-              });
-            } else if (resultType === "string") {
-              // For strings, just show the value without the "= result" format
-              output.push({
-                type: "output",
-                content: `${result} (${resultType})`,
-              });
-            } else {
-              output.push({
-                type: "output",
-                content: `${input} = ${result} (${resultType})`,
-              });
-            }
-            
-            return output;
-          } catch (error) {
-            // If expression parsing fails, fall through to type detection
-            if (error instanceof Error && (
-              error.message.includes("Division by zero") || 
-              error.message.includes("Modulo by zero")
-            )) {
-              output.push({
-                type: "error",
-                content: error.message,
-              });
-              return output;
-            }
-            // Continue to type detection for non-expression inputs
-          }
-        }
-        
-        // Plain text without operators/expressions - treat as string
-        if (!looksLikeExpression && tokens.length > 0) {
-          output.push({
-            type: "output",
-            content: `${input} (string)`,
-          });
-          return output;
+        if (isKevlarError(result)) {
+          return [{ type: "error", content: result.message }];
         }
 
-        // Try to detect and format data types (fallback for non-expressions)
-        // Check for boolean
-        if (input.toLowerCase() === "true" || input.toLowerCase() === "false") {
-          const boolValue = input.toLowerCase() === "true";
-          output.push({
-            type: "output",
-            content: `${input} (bool: ${boolValue})`,
-          });
-        }
-        // Check for integer
-        else if (/^-?\d+$/.test(input)) {
-          const intValue = parseInt(input, 10);
-          output.push({
-            type: "output",
-            content: `${input} (int: ${intValue})`,
-          });
-        }
-        // Check for float/double
-        else if (/^-?\d+\.\d+$/.test(input)) {
-          const floatValue = parseFloat(input);
-          output.push({
-            type: "output",
-            content: `${input} (float: ${floatValue})`,
-          });
-        }
-        // Check for null
-        else if (input.toLowerCase() === "null") {
-          output.push({
-            type: "output",
-            content: `${input} (null)`,
-          });
-        }
-        // Check for undefined
-        else if (input.toLowerCase() === "undefined") {
-          output.push({
-            type: "output",
-            content: `${input} (undefined)`,
-          });
-        }
-        // Check for array-like syntax [item1, item2, ...]
-        else if (/^\[.*\]$/.test(input)) {
-          output.push({
-            type: "output",
-            content: `${input} (array)`,
-          });
-        }
-        // Check for object-like syntax {key: value, ...}
-        else if (/^\{.*\}$/.test(input)) {
-          output.push({
-            type: "output",
-            content: `${input} (object)`,
-          });
-        }
-        // Default: treat as string
-        else {
-          output.push({
-            type: "output",
-            content: `${input} (string)`,
-          });
+        if (result.isAssignment) {
+          return [{ type: "success", content: `${result.varName} ${result.varOp} ${result.value} (${result.type})` }];
         }
 
-        return output;
+        if (result.type === "string") {
+          return [{ type: "output", content: `${result.value} (${result.type})` }];
+        }
+
+        return [{ type: "output", content: `${result.input} = ${result.value} (${result.type})` }];
       },
     },
     date: {
@@ -1670,7 +1136,7 @@ export function RetroTerminal() {
         output.push({ type: "output", content: "║          TERMINAL INFO                        ║" });
         output.push({ type: "output", content: "╚════════════════════════════════════════════════╝" });
         output.push({ type: "output", content: "" });
-        output.push({ type: "output", content: `  Terminal    TERMINAL ORPHEUS v1.0.0` });
+        output.push({ type: "output", content: `  Terminal    HAZMAT SHELL v1.0.0` });
         output.push({ type: "output", content: `  Theme       ${themes[currentTheme as keyof typeof themes].name}` });
         output.push({ type: "output", content: `  Cwd         ${currentDir}` });
         output.push({ type: "output", content: `  Lines       ${lines.length}` });
@@ -2009,9 +1475,9 @@ export function RetroTerminal() {
     // Add input line
     addLines([{ type: "input", content: `$ ${trimmed}`, timestamp: new Date() }]);
 
-    // Special-case: allow full logical/assignment expressions inside shout without splitting on && or ||
+    // Special-case: allow full logical/assignment expressions inside kevlar without splitting on && or ||
     const firstToken = trimmed.split(/\s+/)[0]?.toLowerCase();
-    if (firstToken === "shout") {
+    if (firstToken === "kevlar") {
       executeSingleCommand(trimmed);
       setInput("");
       return;
@@ -2119,9 +1585,9 @@ export function RetroTerminal() {
     setHistory((prev) => [...prev, trimmed]);
     setHistoryIndex(-1);
 
-    // Special-case: allow full logical/assignment expressions inside shout without splitting on && or ||
+    // Special-case: allow full logical/assignment expressions inside kevlar without splitting on && or ||
     const firstToken = trimmed.split(/\s+/)[0]?.toLowerCase();
-    if (firstToken === "shout") {
+    if (firstToken === "kevlar") {
       executeSingleCommand(trimmed);
       return;
     }
@@ -2382,7 +1848,7 @@ export function RetroTerminal() {
         <div className="flex items-center gap-3">
           <Terminal className="size-5 text-primary" />
           <span className="retro text-xs uppercase tracking-[0.2em] text-foreground">
-            TERMINAL ORPHEUS
+            HAZMAT SHELL
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -2411,7 +1877,7 @@ export function RetroTerminal() {
               },
               {
                 type: "success",
-                content: "║       TERMINAL ORPHEUS v1.0.0                  ║",
+                content: "║       HAZMAT SHELL v1.0.0                  ║",
               },
               {
                 type: "success",
