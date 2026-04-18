@@ -213,7 +213,9 @@ export function RetroBackground({
           style={{
             background: "linear-gradient(to bottom, #E0F7FA 0%, #FFB6D9 100%)",
           }}
-        />
+        >
+          <SakuraLeaves />
+        </div>
       ) : (
         // Circuit Board Background (Default for Dark Mode)
         <div
@@ -393,6 +395,85 @@ const MarioClouds = () => {
           </>
     )
 }
+
+const SakuraLeaves = () => {
+  const randomFromSeed = (seed: number) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
+  const leaves = useMemo(() => {
+    const leafImages = [
+      "/assets/sakura_leaf.png",
+      "/assets/flower_petal_one.png",
+      "/assets/flower_petal_two.png",
+    ];
+    return Array.from({ length: 20 }, (_, index) => {
+      const baseSeed = index + 500;
+      return {
+        id: `sakura-${index}`,
+        left: `${randomFromSeed(baseSeed) * 100}%`,
+        duration: `${6 + randomFromSeed(baseSeed * 2) * 10}s`,
+        delay: `${randomFromSeed(baseSeed * 3) * 10}s`,
+        size: 20 + randomFromSeed(baseSeed * 4) * 20,
+        rotation: randomFromSeed(baseSeed * 5) * 360,
+        swayAmount: 30 + randomFromSeed(baseSeed * 6) * 60,
+        image: leafImages[Math.floor(randomFromSeed(baseSeed * 7) * leafImages.length)],
+      };
+    });
+  }, []);
+
+  return (
+    <>
+      {leaves.map((leaf) => (
+        <div
+          key={leaf.id}
+          className="absolute"
+          style={{
+            left: leaf.left,
+            top: "-40px",
+            "--sway": `${leaf.swayAmount}px`,
+            animationDelay: leaf.delay,
+            animationDuration: leaf.duration,
+            animation: `sakura-fall ${leaf.duration} linear infinite`,
+          } as React.CSSProperties}
+        >
+          <div
+            style={{
+              width: `${leaf.size}px`,
+              height: `${leaf.size}px`,
+              animation: `sakura-sway ${leaf.duration} ease-in-out infinite`,
+              transform: `rotate(${leaf.rotation}deg)`,
+            }}
+          >
+            <img
+              src={leaf.image}
+              alt=""
+              style={{
+                width: "100%",
+                height: "100%",
+                imageRendering: "pixelated",
+                display: "block",
+              }}
+            />
+          </div>
+        </div>
+      ))}
+      <style jsx>{`
+        @keyframes sakura-fall {
+          0% { transform: translateY(-40px); }
+          100% { transform: translateY(calc(100vh + 40px)); }
+        }
+        @keyframes sakura-sway {
+          0%, 100% { transform: translateX(0) rotate(0deg); }
+          25% { transform: translateX(var(--sway, 30px)) rotate(15deg); }
+          50% { transform: translateX(calc(var(--sway, 30px) * -0.7)) rotate(-10deg); }
+          75% { transform: translateX(calc(var(--sway, 30px) * 0.8)) rotate(10deg); }
+        }
+      `}</style>
+    </>
+  );
+};
 
 export default RetroBackground;
 
