@@ -144,11 +144,11 @@ export default function Home() {
               <ItemTitle className="retro text-xs sm:text-[0.55rem] uppercase tracking-wider group-hover:text-primary">
                 {item.title}
               </ItemTitle>
-              <div className="mt-0.5 flex items-center justify-between gap-3">
-                <span className="retro max-w-[70%] truncate text-[0.65rem] text-muted-foreground sm:text-[0.5rem]">
+              <div className="mt-0.5 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                <span className="retro text-[0.65rem] text-muted-foreground sm:text-[0.5rem] line-clamp-2">
                   {item.description}
                 </span>
-                <span className="retro text-[0.7rem] font-bold text-primary sm:text-[0.55rem]">
+                <span className="retro shrink-0 text-[0.7rem] font-bold text-primary sm:text-[0.55rem]">
                   {item.price}
                 </span>
               </div>
@@ -308,7 +308,9 @@ export default function Home() {
 
               <div id="wishlist" className={panelBaseClass}>
                 <h2 className={headerClass}>MERCHANT_WISHLIST</h2>
-                {wishlistContent}
+                <div className="-mx-3 overflow-x-auto px-3">
+                  {wishlistContent}
+                </div>
               </div>
 
               <div className={panelBaseClass}>

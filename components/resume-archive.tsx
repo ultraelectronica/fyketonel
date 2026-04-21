@@ -429,7 +429,7 @@ export function ResumeArchive({ className }: { className?: string }) {
         {/* Particle burst */}
         <ParticleBurst isActive={showParticles} />
 
-        <div className="relative z-0 mx-auto grid max-w-5xl gap-8 lg:grid-cols-[minmax(0,280px)_1fr] lg:items-start lg:justify-center">
+        <div className="relative z-0 mx-auto grid max-w-5xl gap-8 overflow-x-auto lg:grid-cols-[minmax(0,280px)_1fr] lg:items-start lg:justify-center">
           {/* Document preview column */}
           <div className="flex w-full flex-col items-stretch justify-center lg:mx-0">
             <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[300px] lg:mx-0 lg:max-w-none">
@@ -561,7 +561,7 @@ export function ResumeArchive({ className }: { className?: string }) {
               </div>
 
               {/* File stats */}
-              <div className="mt-3 grid grid-cols-3 gap-2 border-2 border-border bg-muted/20 p-2 shadow-[4px_4px_0_var(--border)]">
+              <div className="mt-3 grid grid-cols-[repeat(3,minmax(0,1fr))] gap-2 border-2 border-border bg-muted/20 p-2 shadow-[4px_4px_0_var(--border)]">
                 <div className="text-center">
                   <p className="retro text-[0.5rem] uppercase tracking-[0.14em] text-muted-foreground sm:text-[0.55rem]">
                     Date
