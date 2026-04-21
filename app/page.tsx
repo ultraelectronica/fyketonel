@@ -12,7 +12,7 @@ import {
   ItemTitle,
 } from "@/components/ui/8bit/item";
 import GitHubContributions from "@/components/github-contributions";
-import TechnologiesCarousel from "@/components/technologies-carousel";
+import TechStackView from "@/components/tech-stack-view";
 import PlayerProfileCard from "@/components/ui/8bit/blocks/player-profile-card";
 import ContactForm from "@/components/contact-form";
 import PowerPelletHighway from "@/components/power-pellet-highway";
@@ -359,7 +359,7 @@ export default function Home() {
                     </AccordionTrigger>
                     <AccordionContent className="pb-3">
                       <div className="rounded border-2 border-border/30 bg-background/40 p-3 sm:p-4">
-                        <TechnologiesCarousel />
+                        <TechStackView />
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -543,10 +543,10 @@ export default function Home() {
 
               {/* FULL WIDTH SECTIONS - To avoid empty space on the left */}
 
-              {/* Tech Stack Carousel */}
+              {/* Tech Stack View */}
               <div className={cn(panelBaseClass, "lg:col-span-12")}>
                 <h2 className={headerClass}>EQUIPPED_TECHNOLOGIES</h2>
-                <TechnologiesCarousel />
+                <TechStackView />
               </div>
 
               {/* Inventory System */}
