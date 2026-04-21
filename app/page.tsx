@@ -322,8 +322,10 @@ export default function Home() {
                     <AccordionTrigger className="retro py-3 text-[0.65rem] uppercase tracking-[0.18em] hover:no-underline">
                       CONTRIBUTION_LOG
                     </AccordionTrigger>
-                    <AccordionContent className="pb-1">
-                      {contributionContent}
+                    <AccordionContent className="pb-3">
+                      <div className="rounded border-2 border-border/30 bg-background/40 p-3 sm:p-4">
+                        {contributionContent}
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
 
@@ -331,8 +333,10 @@ export default function Home() {
                     <AccordionTrigger className="retro py-3 text-[0.65rem] uppercase tracking-[0.18em] hover:no-underline">
                       TROPHY_ROOM
                     </AccordionTrigger>
-                    <AccordionContent className="pb-1">
-                      <AchievementWall />
+                    <AccordionContent className="pb-3">
+                      <div className="rounded border-2 border-border/30 bg-background/40 p-3 sm:p-4">
+                        <AchievementWall />
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
 
@@ -340,8 +344,10 @@ export default function Home() {
                     <AccordionTrigger className="retro py-3 text-[0.65rem] uppercase tracking-[0.18em] hover:no-underline">
                       ARCADE_CABINET
                     </AccordionTrigger>
-                    <AccordionContent className="pb-1">
-                      <ArcadeCenter className="w-full" />
+                    <AccordionContent className="pb-3">
+                      <div className="rounded border-2 border-border/30 bg-background/40 p-3 sm:p-4">
+                        <ArcadeCenter className="w-full" />
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
 
@@ -349,8 +355,10 @@ export default function Home() {
                     <AccordionTrigger className="retro py-3 text-[0.65rem] uppercase tracking-[0.18em] hover:no-underline">
                       EQUIPPED_TECHNOLOGIES
                     </AccordionTrigger>
-                    <AccordionContent className="pb-1">
-                      <TechnologiesCarousel />
+                    <AccordionContent className="pb-3">
+                      <div className="rounded border-2 border-border/30 bg-background/40 p-3 sm:p-4">
+                        <TechnologiesCarousel />
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
 
@@ -358,9 +366,11 @@ export default function Home() {
                     <AccordionTrigger className="retro py-3 text-[0.65rem] uppercase tracking-[0.18em] hover:no-underline">
                       INVENTORY
                     </AccordionTrigger>
-                    <AccordionContent className="pb-1">
-                      <div className="min-h-[320px]">
-                        <InventorySystem />
+                    <AccordionContent className="pb-3">
+                      <div className="rounded border-2 border-border/30 bg-background/40 p-3 sm:p-4">
+                        <div className="min-h-[320px]">
+                          <InventorySystem />
+                        </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -369,8 +379,10 @@ export default function Home() {
                     <AccordionTrigger className="retro py-3 text-[0.65rem] uppercase tracking-[0.18em] hover:no-underline">
                       SKILL_TREE
                     </AccordionTrigger>
-                    <AccordionContent className="pb-1">
-                      <SkillTree />
+                    <AccordionContent className="pb-3">
+                      <div className="rounded border-2 border-border/30 bg-background/40 p-3 sm:p-4">
+                        <SkillTree />
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
 
@@ -378,8 +390,10 @@ export default function Home() {
                     <AccordionTrigger className="retro py-3 text-[0.65rem] uppercase tracking-[0.18em] hover:no-underline">
                       WORK_EXPERIENCE
                     </AccordionTrigger>
-                    <AccordionContent className="pb-1">
-                      <WorkExperienceContainer />
+                    <AccordionContent className="pb-3">
+                      <div className="rounded border-2 border-border/30 bg-background/40 p-3 sm:p-4">
+                        <WorkExperienceContainer />
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
 
@@ -387,8 +401,10 @@ export default function Home() {
                     <AccordionTrigger className="retro py-3 text-[0.65rem] uppercase tracking-[0.18em] hover:no-underline">
                       RESUME_ARCHIVE
                     </AccordionTrigger>
-                    <AccordionContent className="pb-1">
-                      <ResumeArchive />
+                    <AccordionContent className="pb-3">
+                      <div className="rounded border-2 border-border/30 bg-background/40 p-3 sm:p-4">
+                        <ResumeArchive />
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
