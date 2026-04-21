@@ -109,14 +109,14 @@ export function ArcadeCenter({ className }: { className?: string }) {
         isFullscreen && "h-full min-h-screen bg-background p-4"
       )}
     >
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5 sm:gap-2">
         {ARCADE_GAMES.map((game) => (
           <Button
             key={game.id}
             type="button"
             variant={game.id === activeGame ? "default" : "outline"}
             onClick={() => setActiveGame(game.id)}
-            className="retro h-8 min-w-[110px] px-3 text-[10px] uppercase tracking-widest"
+            className="retro h-8 min-w-[90px] flex-1 px-2 text-[8px] uppercase tracking-wider sm:min-w-[110px] sm:px-3 sm:text-[10px]"
           >
             {game.label}
           </Button>
@@ -129,25 +129,25 @@ export function ArcadeCenter({ className }: { className?: string }) {
             type="button"
             variant="outline"
             onClick={toggleFullscreen}
-            className="retro h-8 px-3 text-[10px] uppercase tracking-widest"
+            className="retro h-8 px-3 text-[8px] uppercase tracking-wider sm:text-[10px]"
           >
             {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           </Button>
         )}
         {!canFullscreen && (
-          <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground">
+          <p className="retro text-[8px] uppercase tracking-wider text-muted-foreground sm:text-[10px]">
             Air Hockey already has its own fullscreen controls.
           </p>
         )}
       </div>
 
       <div className="rounded border border-dashed border-border bg-background/50 px-3 py-2">
-        <p className="retro text-[10px] uppercase tracking-wider text-muted-foreground">
+        <p className="retro text-[8px] uppercase tracking-wider text-muted-foreground sm:text-[10px]">
           {selectedGame.summary}
         </p>
       </div>
 
-      <div className={cn("min-h-[440px]", isFullscreen && "flex-1") }>
+      <div className={cn("min-h-[360px] sm:min-h-[440px]", isFullscreen && "flex-1") }>
         {activeGame === "hockey" && <HockeyGame className="w-full" />}
         {activeGame === "minesweeper" && <MinesweeperGame isFullscreen={isFullscreen} />}
         {activeGame === "snake" && <SnakeGame isFullscreen={isFullscreen} />}
