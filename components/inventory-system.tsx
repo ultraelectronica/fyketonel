@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -8,7 +9,7 @@ interface InventoryItem {
   id: string;
   name: string;
   icon: string;
-  pixelArt: React.ReactNode;
+  pixelArt: ReactNode;
   slot: "head" | "hands" | "weapon" | "accessory" | "tool";
   stats: {
     label: string;
@@ -20,16 +21,53 @@ interface InventoryItem {
   equipped: boolean;
 }
 
-// Pixelated item components
+const rarityConfig: Record<InventoryItem["rarity"], { border: string; bg: string; glow: string; label: string }> = {
+  common: {
+    border: "border-gray-500 dark:border-gray-400",
+    bg: "bg-gray-500/10",
+    glow: "shadow-gray-500/30",
+    label: "COMMON",
+  },
+  uncommon: {
+    border: "border-green-500 dark:border-green-400",
+    bg: "bg-green-500/10",
+    glow: "shadow-green-500/30",
+    label: "UNCOMMON",
+  },
+  rare: {
+    border: "border-blue-500 dark:border-blue-400",
+    bg: "bg-blue-500/10",
+    glow: "shadow-blue-500/30",
+    label: "RARE",
+  },
+  epic: {
+    border: "border-purple-500 dark:border-purple-400",
+    bg: "bg-purple-500/10",
+    glow: "shadow-purple-500/30",
+    label: "EPIC",
+  },
+  legendary: {
+    border: "border-amber-500 dark:border-amber-400",
+    bg: "bg-amber-500/10",
+    glow: "shadow-amber-500/30",
+    label: "LEGENDARY",
+  },
+};
+
+const slotLabels: Record<InventoryItem["slot"], string> = {
+  head: "Head",
+  hands: "Hands",
+  weapon: "Weapon",
+  accessory: "Accessory",
+  tool: "Tool",
+};
+
 const HeadphonesPixel = () => (
   <div className="flex items-center justify-center">
     <div className="relative">
-      {/* Headband */}
       <div className="mx-auto h-1 w-8 bg-foreground sm:h-1.5 sm:w-10 md:h-2 md:w-12" />
       <div className="flex gap-4 sm:gap-5 md:gap-6">
-        {/* Left cup */}
         <div className="h-5 w-5 border-2 border-foreground bg-primary sm:h-6 sm:w-6 sm:border-3 md:h-7 md:w-7 md:border-4" />
-        {/* Right cup */}
         <div className="h-5 w-5 border-2 border-foreground bg-primary sm:h-6 sm:w-6 sm:border-3 md:h-7 md:w-7 md:border-4" />
       </div>
     </div>
@@ -50,11 +88,8 @@ const KeyboardPixel = () => (
 
 const MousePixel = () => (
   <div className="flex flex-col items-center gap-0.5">
-    {/* Mouse body */}
     <div className="relative h-7 w-5 border-2 border-foreground bg-muted sm:h-8 sm:w-6 sm:border-3 md:h-10 md:w-7 md:border-4">
-      {/* Scroll wheel */}
       <div className="absolute left-1/2 top-1 h-2 w-1.5 -translate-x-1/2 border border-foreground bg-primary sm:h-2.5 sm:w-2 md:h-3 md:w-2.5" />
-      {/* Left/right click divider */}
       <div className="absolute left-1/2 top-0 h-4 w-0.5 -translate-x-1/2 bg-foreground sm:h-5 md:h-6" />
     </div>
   </div>
@@ -63,15 +98,12 @@ const MousePixel = () => (
 const BookPixel = () => (
   <div className="flex items-center justify-center">
     <div className="relative">
-      {/* Book cover */}
       <div className="h-8 w-6 border-2 border-foreground bg-amber-600 dark:bg-amber-700 sm:h-10 sm:w-7 sm:border-3 md:h-12 md:w-8 md:border-4">
-        {/* Book lines */}
         <div className="absolute left-1 right-1 top-2 h-0.5 bg-foreground/50 sm:top-2.5" />
         <div className="absolute left-1 right-1 top-3.5 h-0.5 bg-foreground/50 sm:top-4" />
         <div className="absolute left-1 right-1 top-5 h-0.5 bg-foreground/50 sm:top-5.5" />
       </div>
-      {/* Book spine */}
-      <div className="absolute -left-0.5 top-0 bottom-0 w-1 bg-amber-800 dark:bg-amber-900 sm:-left-1 sm:w-1.5" />
+      <div className="absolute bottom-0 top-0 -left-0.5 w-1 bg-amber-800 dark:bg-amber-900 sm:-left-1 sm:w-1.5" />
     </div>
   </div>
 );
@@ -79,18 +111,14 @@ const BookPixel = () => (
 const CoffeeMugPixel = () => (
   <div className="flex items-center justify-center">
     <div className="relative">
-      {/* Steam */}
       <div className="absolute -top-2 left-1/2 flex -translate-x-1/2 gap-0.5 sm:-top-3">
         <div className="h-1.5 w-0.5 bg-muted-foreground/50 sm:h-2 sm:w-1" />
         <div className="h-2 w-0.5 bg-muted-foreground/50 sm:h-2.5 sm:w-1" />
         <div className="h-1.5 w-0.5 bg-muted-foreground/50 sm:h-2 sm:w-1" />
       </div>
-      {/* Mug body */}
       <div className="h-6 w-5 border-2 border-foreground bg-amber-100 dark:bg-amber-950 sm:h-7 sm:w-6 sm:border-3 md:h-8 md:w-7 md:border-4">
-        {/* Coffee inside */}
         <div className="absolute bottom-0.5 left-0.5 right-0.5 h-3 bg-amber-800 dark:bg-amber-900 sm:h-3.5 md:h-4" />
       </div>
-      {/* Handle */}
       <div className="absolute -right-1 top-1 h-4 w-2 rounded-r-full border-2 border-l-0 border-foreground sm:-right-1.5 sm:h-5 sm:w-2.5 sm:border-3 md:-right-2 md:h-6 md:w-3 md:border-4" />
     </div>
   </div>
@@ -99,14 +127,10 @@ const CoffeeMugPixel = () => (
 const DuckPixel = () => (
   <div className="flex items-center justify-center">
     <div className="relative">
-      {/* Duck body */}
       <div className="h-6 w-7 border-2 border-foreground bg-yellow-400 dark:bg-yellow-500 sm:h-7 sm:w-8 sm:border-3 md:h-8 md:w-9 md:border-4" />
-      {/* Duck head */}
       <div className="absolute -top-2 left-1 h-3 w-4 border-2 border-foreground bg-yellow-400 dark:bg-yellow-500 sm:-top-2.5 sm:h-4 sm:w-5 sm:border-3 md:-top-3 md:h-5 md:w-6 md:border-4">
-        {/* Eye */}
         <div className="absolute right-1 top-1 h-1 w-1 bg-foreground sm:h-1.5 sm:w-1.5" />
       </div>
-      {/* Beak */}
       <div className="absolute -top-1 right-0 h-1 w-1.5 bg-orange-500 sm:h-1.5 sm:w-2 md:h-2 md:w-2.5" />
     </div>
   </div>
@@ -199,116 +223,243 @@ const inventoryItems: InventoryItem[] = [
   },
 ];
 
-const emptySlots = 6; // Increased empty slots to fill grid
+const emptySlots = 6;
 
 export function InventorySystem({ className }: { className?: string }) {
   const [selectedItem, setSelectedItem] = useState<string | null>(inventoryItems[0].id);
 
-  const totalStats = inventoryItems
-    .filter((item) => item.equipped)
-    .reduce(
-      (acc, item) => {
-        item.stats.forEach((stat) => {
-          if (!acc[stat.label]) {
-            acc[stat.label] = 0;
-          }
-          acc[stat.label] += stat.value;
-        });
-        return acc;
-      },
-      {} as Record<string, number>
-    );
+  const equippedItems = inventoryItems.filter((item) => item.equipped);
+  const legendaryCount = inventoryItems.filter((item) => item.rarity === "legendary").length;
+  const totalStats = equippedItems.reduce(
+    (acc, item) => {
+      item.stats.forEach((stat) => {
+        if (!acc[stat.label]) {
+          acc[stat.label] = 0;
+        }
 
-  const currentItem = inventoryItems.find((i) => i.id === selectedItem);
+        acc[stat.label] += stat.value;
+      });
+
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
+  const currentItem = inventoryItems.find((item) => item.id === selectedItem);
+  const currentRarity = currentItem ? rarityConfig[currentItem.rarity] : null;
 
   return (
-    <section className={cn("relative h-full", className)}>
-        <div className="flex flex-col gap-3 md:flex-row h-full">
-            {/* Inventory Grid (Left/Top) */}
-            <div className="flex-1 bg-background/50 p-2 border-2 border-dashed border-border/50">
-                <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
-                    {inventoryItems.map((item) => (
-                    <InventorySlot
-                        key={item.id}
-                        item={item}
-                        isSelected={selectedItem === item.id}
-                        onSelect={() => setSelectedItem(item.id)}
-                    />
-                    ))}
-                    {/* Empty slots */}
-                    {Array.from({ length: emptySlots }).map((_, index) => (
-                    <EmptySlot key={`empty-${index}`} />
-                    ))}
-                </div>
-            </div>
+    <section className={cn("relative h-full space-y-4 overflow-x-hidden", className)}>
+      <div className="grid gap-2 sm:grid-cols-3">
+        <SummaryChip label="Equipped" value={`${equippedItems.length}/${inventoryItems.length}`} helper="active loadout" />
+        <SummaryChip label="Legendary" value={String(legendaryCount)} helper="high-tier relics" />
+        <SummaryChip label="Inspect" value="Tap item" helper="mobile friendly" />
+      </div>
 
-            {/* Info Panel (Right/Bottom) */}
-            <div className="flex-1 flex flex-col gap-3">
-                
-                {/* Selected Item Details */}
-                <div className="flex-1 rounded-none border-2 border-border bg-card/80 p-3 shadow-[2px_2px_0_var(--border)] relative">
-                    {currentItem ? (
-                        <>
-                            <div className="flex items-start justify-between mb-2">
-                                <div>
-                                    <h3 className="retro text-xs uppercase tracking-[0.15em] text-foreground font-bold">
-                                        {currentItem.name}
-                                    </h3>
-                                    <p className="retro text-[0.5rem] uppercase tracking-wider text-muted-foreground mt-0.5">
-                                        {currentItem.rarity} • {currentItem.slot}
-                                    </p>
-                                </div>
-                                <div className="text-xl opacity-80">{currentItem.icon}</div>
-                            </div>
-                            
-                            <div className="space-y-1 mb-3 border-y border-dashed border-border/50 py-2">
-                                {currentItem.stats.map((stat) => (
-                                    <div key={stat.label} className="flex justify-between items-center text-[0.55rem]">
-                                         <span className="retro uppercase tracking-wider text-muted-foreground">{stat.label}</span>
-                                         <span className={cn(
-                                             "retro font-bold",
-                                             stat.type === "positive" ? "text-green-500" : "text-red-500"
-                                         )}>
-                                             {stat.value > 0 ? "+" : ""}{stat.value}
-                                         </span>
-                                    </div>
-                                ))}
-                            </div>
-                            
-                            <p className="retro text-[0.5rem] leading-relaxed text-muted-foreground">
-                                {currentItem.description}
-                            </p>
-                        </>
-                    ) : (
-                        <div className="h-full flex items-center justify-center text-muted-foreground retro text-[0.6rem] uppercase">
-                            Select an item
-                        </div>
-                    )}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.8fr)]">
+        <div className="min-w-0 space-y-4">
+          <div className="rounded-none border-2 border-border bg-card/80 p-3 shadow-[4px_4px_0_var(--border)] sm:p-4">
+            {currentItem && currentRarity ? (
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,180px)_minmax(0,1fr)] lg:items-start">
+                <div
+                  className={cn(
+                    "relative flex min-h-[180px] items-center justify-center overflow-hidden border-2 p-4 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] sm:min-h-[220px]",
+                    currentRarity.border,
+                    currentRarity.bg,
+                    currentRarity.glow
+                  )}
+                >
+                  <div className="absolute inset-x-3 top-3 flex items-center justify-between">
+                    <span className="retro border border-border/60 bg-background/80 px-2 py-1 text-[0.5rem] uppercase tracking-[0.25em] text-muted-foreground">
+                      {slotLabels[currentItem.slot]}
+                    </span>
+                    <span className="text-xl opacity-80 sm:text-2xl">{currentItem.icon}</span>
+                  </div>
+                  <div className="scale-[1.15] sm:scale-[1.35]">{currentItem.pixelArt}</div>
+                  {currentItem.equipped && (
+                    <span className="retro absolute bottom-3 left-3 border border-primary bg-primary px-2 py-1 text-[0.5rem] uppercase tracking-[0.2em] text-primary-foreground">
+                      Equipped
+                    </span>
+                  )}
                 </div>
 
-                {/* Total Stats Summary - Compact */}
-                <div className="rounded-none border-2 border-border bg-background/80 p-2 shadow-[2px_2px_0_var(--border)]">
-                    <p className="retro mb-1.5 text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground border-b border-border/50 pb-0.5">
-                        Character Stats
-                    </p>
-                    <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
-                        {Object.entries(totalStats).slice(0, 6).map(([label, value]) => (
-                            <div key={label} className="flex items-center justify-between text-[0.5rem]">
-                                <span className="retro uppercase text-muted-foreground truncate mr-2">{label}</span>
-                                <span className={cn(
-                                    "retro font-bold",
-                                    value >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600"
-                                )}>
-                                    {value >= 0 ? "+" : ""}{value}
-                                </span>
-                            </div>
-                        ))}
+                <div className="min-w-0 space-y-4">
+                  <div className="space-y-2 border-b-2 border-dashed border-border/50 pb-3">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <p className="retro text-[0.55rem] uppercase tracking-[0.3em] text-muted-foreground">
+                          Selected Artifact
+                        </p>
+                        <h3 className="retro mt-1 text-sm uppercase tracking-[0.18em] text-foreground sm:text-base">
+                          {currentItem.name}
+                        </h3>
+                      </div>
+                      <span
+                        className={cn(
+                          "retro border px-2 py-1 text-[0.5rem] uppercase tracking-[0.25em]",
+                          currentRarity.border,
+                          currentRarity.bg
+                        )}
+                      >
+                        {currentRarity.label}
+                      </span>
                     </div>
-                </div>
+                    <p className="retro max-w-2xl text-[0.58rem] leading-relaxed text-muted-foreground sm:text-[0.62rem]">
+                      {currentItem.description}
+                    </p>
+                  </div>
 
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {currentItem.stats.map((stat) => (
+                      <div key={stat.label} className="border border-border/60 bg-background/60 px-3 py-2">
+                        <p className="retro text-[0.48rem] uppercase tracking-[0.22em] text-muted-foreground">
+                          {stat.label}
+                        </p>
+                        <p
+                          className={cn(
+                            "retro mt-1 text-sm uppercase tracking-[0.14em]",
+                            stat.type === "positive" ? "text-green-500" : "text-red-500"
+                          )}
+                        >
+                          {stat.value > 0 ? "+" : ""}
+                          {stat.value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="retro flex min-h-[220px] items-center justify-center text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
+                Select an item
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-none border-2 border-dashed border-border/60 bg-background/40 p-3 shadow-[2px_2px_0_var(--border)] sm:p-4">
+            <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground">Storage Grid</p>
+                <h3 className="retro mt-1 text-xs uppercase tracking-[0.18em] text-foreground sm:text-sm">
+                  Browse the toolkit
+                </h3>
+              </div>
+              <p className="retro text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
+                Tap any slot to inspect
+              </p>
             </div>
+
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+              {inventoryItems.map((item) => (
+                <InventorySlot
+                  key={item.id}
+                  item={item}
+                  isSelected={selectedItem === item.id}
+                  onSelect={() => setSelectedItem(item.id)}
+                />
+              ))}
+              {Array.from({ length: emptySlots }).map((_, index) => (
+                <EmptySlot key={`empty-${index}`} />
+              ))}
+            </div>
+          </div>
         </div>
+
+        <div className="min-w-0 space-y-4">
+          <div className="rounded-none border-2 border-border bg-card/80 p-3 shadow-[4px_4px_0_var(--border)] sm:p-4">
+            <div className="mb-3 border-b-2 border-dashed border-border/50 pb-3">
+              <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground">Loadout</p>
+              <h3 className="retro mt-1 text-xs uppercase tracking-[0.18em] text-foreground sm:text-sm">
+                Equipped artifacts
+              </h3>
+            </div>
+
+            <div className="space-y-2">
+              {equippedItems.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setSelectedItem(item.id)}
+                  className={cn(
+                    "w-full border p-3 text-left transition-colors",
+                    selectedItem === item.id
+                      ? "border-primary bg-primary/10"
+                      : "border-border/60 bg-background/50 hover:border-primary/70 hover:bg-primary/5"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        "flex h-11 w-11 shrink-0 items-center justify-center border-2",
+                        rarityConfig[item.rarity].border,
+                        rarityConfig[item.rarity].bg
+                      )}
+                    >
+                      <div className="scale-75">{item.pixelArt}</div>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="retro truncate text-[0.58rem] uppercase tracking-[0.16em] text-foreground">
+                          {item.name}
+                        </p>
+                        <span className="text-sm opacity-80">{item.icon}</span>
+                      </div>
+                      <div className="mt-1 flex items-center justify-between gap-2">
+                        <p className="retro text-[0.45rem] uppercase tracking-[0.22em] text-muted-foreground">
+                          {slotLabels[item.slot]}
+                        </p>
+                        <p className="retro text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground">
+                          {rarityConfig[item.rarity].label}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-none border-2 border-border bg-background/80 p-3 shadow-[4px_4px_0_var(--border)] sm:p-4">
+        <div className="mb-3 border-b-2 border-dashed border-border/50 pb-3">
+          <p className="retro text-[0.5rem] uppercase tracking-[0.3em] text-muted-foreground">Character Stats</p>
+          <h3 className="retro mt-1 text-xs uppercase tracking-[0.18em] text-foreground sm:text-sm">
+            Combined bonuses
+          </h3>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {Object.entries(totalStats).map(([label, value]) => (
+            <div key={label} className="min-w-0 border border-border/60 bg-card/60 px-3 py-2">
+              <span className="retro block truncate text-[0.5rem] uppercase tracking-[0.2em] text-muted-foreground">
+                {label}
+              </span>
+              <span
+                className={cn(
+                  "retro mt-1 block text-[0.7rem] uppercase tracking-[0.14em]",
+                  value >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600"
+                )}
+              >
+                {value >= 0 ? "+" : ""}
+                {value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
+  );
+}
+
+function SummaryChip({ label, value, helper }: { label: string; value: string; helper: string }) {
+  return (
+    <div className="border-2 border-border/70 bg-background/70 px-3 py-2 shadow-[2px_2px_0_var(--border)]">
+      <p className="retro text-[0.45rem] uppercase tracking-[0.28em] text-muted-foreground">{label}</p>
+      <div className="mt-1 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
+        <p className="retro text-sm uppercase tracking-[0.16em] text-foreground sm:text-base">{value}</p>
+        <p className="retro text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground">{helper}</p>
+      </div>
+    </div>
   );
 }
 
@@ -321,65 +472,53 @@ function InventorySlot({
   isSelected: boolean;
   onSelect: () => void;
 }) {
-  const rarityColors = {
-    common: "border-gray-500 dark:border-gray-400",
-    uncommon: "border-green-500 dark:border-green-400",
-    rare: "border-blue-500 dark:border-blue-400",
-    epic: "border-purple-500 dark:border-purple-400",
-    legendary: "border-amber-500 dark:border-amber-400",
-  };
-
-  const rarityBg = {
-    common: "bg-gray-500/10",
-    uncommon: "bg-green-500/10",
-    rare: "bg-blue-500/10",
-    epic: "bg-purple-500/10",
-    legendary: "bg-amber-500/10",
-  };
+  const rarity = rarityConfig[item.rarity];
 
   return (
-    <motion.div
+    <motion.button
+      type="button"
       className={cn(
-        "relative aspect-square cursor-pointer rounded-none border-2 transition-all duration-200",
-        rarityColors[item.rarity],
-        rarityBg[item.rarity],
-        isSelected ? "shadow-[0_0_0_2px_var(--primary)] z-10 scale-105" : "hover:border-primary hover:bg-primary/20"
+        "relative aspect-square rounded-none border-2 transition-all duration-200",
+        rarity.border,
+        rarity.bg,
+        isSelected ? "z-10 scale-[1.02] shadow-[0_0_0_2px_var(--primary)]" : "hover:border-primary hover:bg-primary/20"
       )}
       onClick={onSelect}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.04 }}
+      whileTap={{ scale: 0.97 }}
     >
-        {/* Rarity Corner */}
-        <div className={cn(
-            "absolute top-0 left-0 w-2 h-2 border-b-2 border-r-2",
-            rarityColors[item.rarity]
-        )} />
+      <div className={cn("absolute left-0 top-0 h-2.5 w-2.5 border-b-2 border-r-2", rarity.border)} />
 
-      {/* Item Icon */}
-      <div className="flex h-full items-center justify-center p-1">
-          <div className="scale-75 sm:scale-90">
-            {item.pixelArt}
-          </div>
+      <div className="absolute inset-x-1 top-1 flex items-center justify-between">
+        <span className="retro text-[0.35rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.4rem]">
+          {item.icon}
+        </span>
+        <span className="retro text-[0.35rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.4rem]">
+          {slotLabels[item.slot].slice(0, 2)}
+        </span>
       </div>
-      
-       {item.equipped && (
-          <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground text-[0.3rem] px-1 font-bold">
-              E
-          </div>
-        )}
-    </motion.div>
+
+      <div className="flex h-full items-center justify-center p-2 pt-5">
+        <div className="scale-[0.8] sm:scale-90">{item.pixelArt}</div>
+      </div>
+
+      {item.equipped && (
+        <div className="retro absolute bottom-1 left-1 border border-primary bg-primary px-1.5 py-0.5 text-[0.35rem] uppercase tracking-[0.12em] text-primary-foreground sm:text-[0.4rem]">
+          EQ
+        </div>
+      )}
+    </motion.button>
   );
 }
 
 function EmptySlot() {
   return (
     <div className="relative aspect-square rounded-none border-2 border-dashed border-border/30 bg-background/20">
-       <div className="absolute inset-0 flex items-center justify-center opacity-10">
-           <div className="w-2 h-2 rounded-full bg-foreground" />
-       </div>
+      <div className="absolute inset-0 flex items-center justify-center opacity-20">
+        <div className="retro text-[0.45rem] uppercase tracking-[0.2em] text-muted-foreground">--</div>
+      </div>
     </div>
   );
 }
 
 export default InventorySystem;
-
