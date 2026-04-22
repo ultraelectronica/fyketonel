@@ -381,6 +381,7 @@ export function HockeyGame({ className }: { className?: string }) {
   });
   const [score, setScore] = useState<GameScore>({ player: 0, ai: 0 });
   const [gameOver, setGameOver] = useState(false);
+  const [isAllyTheme, setIsAllyTheme] = useState(false);
 
   const baseDiagonal = magnitude(BASE_WIDTH, BASE_HEIGHT);
   const currentDiagonal = magnitude(dimensions.width, dimensions.height);
@@ -392,7 +393,7 @@ export function HockeyGame({ className }: { className?: string }) {
   const entityScale =
     isFullscreen ? clamp(currentDiagonal / baseDiagonal, 1.15, 2.1) : 1;
   const paddleRadius = BASE_PADDLE_RADIUS * entityScale;
-  const puckRadius = BASE_PUCK_RADIUS * entityScale;
+  const puckRadius = (isAllyTheme ? 14 : BASE_PUCK_RADIUS) * entityScale;
   const lanePadding = 30 * speedScale;
   const boardStroke = Math.max(4, 5 * entityScale);
   const goalPocketWidth = Math.max(18, 24 * entityScale);
@@ -445,6 +446,22 @@ export function HockeyGame({ className }: { className?: string }) {
     } catch {
       // Ignore invalid score snapshots.
     }
+  }, []);
+
+  useEffect(() => {
+    const checkTheme = () => {
+      if (typeof window !== "undefined") {
+        const theme = localStorage.getItem("terminal-theme");
+        setIsAllyTheme(theme === "ally");
+      }
+    };
+    checkTheme();
+    window.addEventListener("themeChanged", checkTheme);
+    const interval = setInterval(checkTheme, 100);
+    return () => {
+      window.removeEventListener("themeChanged", checkTheme);
+      clearInterval(interval);
+    };
   }, []);
 
   useEffect(() => {
@@ -1293,26 +1310,56 @@ export function HockeyGame({ className }: { className?: string }) {
             color="var(--border)"
           />
 
-          <PixelHollowCircle
-            cx={gameState.playerPaddle.x}
-            cy={gameState.playerPaddle.y}
-            radius={gameState.playerPaddle.radius}
-            color="var(--primary)"
-          />
+          {isAllyTheme ? (
+            <image
+              x={gameState.playerPaddle.x - gameState.playerPaddle.radius}
+              y={gameState.playerPaddle.y - gameState.playerPaddle.radius}
+              width={gameState.playerPaddle.radius * 2}
+              height={gameState.playerPaddle.radius * 2}
+              href="/assets/ally_circle.svg"
+            />
+          ) : (
+            <PixelHollowCircle
+              cx={gameState.playerPaddle.x}
+              cy={gameState.playerPaddle.y}
+              radius={gameState.playerPaddle.radius}
+              color="var(--primary)"
+            />
+          )}
 
-          <PixelHollowCircle
-            cx={gameState.aiPaddle.x}
-            cy={gameState.aiPaddle.y}
-            radius={gameState.aiPaddle.radius}
-            color="var(--primary)"
-          />
+          {isAllyTheme ? (
+            <image
+              x={gameState.aiPaddle.x - gameState.aiPaddle.radius}
+              y={gameState.aiPaddle.y - gameState.aiPaddle.radius}
+              width={gameState.aiPaddle.radius * 2}
+              height={gameState.aiPaddle.radius * 2}
+              href="/assets/ally_circle.svg"
+            />
+          ) : (
+            <PixelHollowCircle
+              cx={gameState.aiPaddle.x}
+              cy={gameState.aiPaddle.y}
+              radius={gameState.aiPaddle.radius}
+              color="var(--primary)"
+            />
+          )}
 
-          <PixelSolidCircle
-            cx={gameState.puck.x}
-            cy={gameState.puck.y}
-            radius={gameState.puck.radius}
-            color="var(--foreground)"
-          />
+          {isAllyTheme ? (
+            <image
+              x={gameState.puck.x - gameState.puck.radius}
+              y={gameState.puck.y - gameState.puck.radius}
+              width={gameState.puck.radius * 2}
+              height={gameState.puck.radius * 2}
+              href="/assets/ally_puck.svg"
+            />
+          ) : (
+            <PixelSolidCircle
+              cx={gameState.puck.x}
+              cy={gameState.puck.y}
+              radius={gameState.puck.radius}
+              color="var(--foreground)"
+            />
+          )}
 
           <text
             x={dimensions.width / 4}
