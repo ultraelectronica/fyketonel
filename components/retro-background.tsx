@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useLayoutEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface RetroBackgroundProps {
@@ -23,6 +23,7 @@ export function RetroBackground({
 }: RetroBackgroundProps) {
   const [isMarioMode, setIsMarioMode] = useState(false);
   const [isAllyMode, setIsAllyMode] = useState(false);
+  const [isSimonDarkMode, setIsSimonDarkMode] = useState(false);
   const [, forceUpdate] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -35,9 +36,11 @@ export function RetroBackground({
         const simonMode = localStorage.getItem("terminal-simon-mode");
         const shouldBeMario = theme === "simon" && simonMode === "light";
         const shouldBeAlly = theme === "ally";
+        const shouldBeSimonDark = theme === "simon" && simonMode !== "light";
         
         setIsMarioMode(shouldBeMario);
         setIsAllyMode(shouldBeAlly);
+        setIsSimonDarkMode(shouldBeSimonDark);
         forceUpdate(prev => prev + 1);
       }
     };
@@ -205,6 +208,8 @@ export function RetroBackground({
               />
            </div>
         </div>
+      ) : isSimonDarkMode ? (
+        <NeuralNetwork width={dimensions.width} height={dimensions.height} />
       ) : isAllyMode ? (
         // Ally Garden Background
         <div
@@ -340,7 +345,199 @@ export function RetroBackground({
   );
 }
 
-// Simplified Mario Clouds Component to keep the file cleaner if I removed the old one accidentally
+const NeuralNetwork = ({ width, height }: { width: number; height: number }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useLayoutEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId = 0;
+    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+
+    const resize = () => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      const w = parent.clientWidth || window.innerWidth;
+      const h = parent.clientHeight || window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Generate network structure
+    const rng = (() => {
+      let s = 42;
+      return () => {
+        s |= 0;
+        s = (s + 0x6D2B79F5) | 0;
+        let t = Math.imul(s ^ (s >>> 15), 1 | s);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    })();
+    const rand = () => rng();
+
+    const layers = [4, 6, 5, 6, 4];
+    let W = 0;
+    let H = 0;
+
+    type NNode = { x: number; y: number; active: boolean; phase: number };
+    type NConn = { a: number; b: number; active: boolean; speed: number; phase: number };
+    let nodes: NNode[] = [];
+    let conns: NConn[] = [];
+
+    const build = () => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      W = parent.clientWidth;
+      H = parent.clientHeight;
+      if (W === 0 || H === 0) return;
+
+      nodes = [];
+      conns = [];
+      const mx = Math.floor(W * 0.06);
+      const my = Math.floor(H * 0.08);
+      const uw = W - mx * 2;
+      const uh = H - my * 2;
+      const xs = layers.map((_, i) => Math.floor(mx + (uw / (layers.length - 1)) * i));
+
+      const layerNodes: number[][] = [];
+      layers.forEach((count, li) => {
+        const ys = count > 1 ? uh / (count + 1) : 0;
+        const idxs: number[] = [];
+        for (let n = 0; n < count; n++) {
+          const by = count > 1 ? my + ys * (n + 1) : H / 2;
+          const jx = Math.floor((rand() - 0.5) * (uw / (layers.length - 1)) * 0.2);
+          const jy = Math.floor((rand() - 0.5) * ys * 0.3);
+          const x = xs[li] + jx;
+          const y = Math.floor(by + jy);
+          const active = rand() > 0.25;
+          idxs.push(nodes.length);
+          nodes.push({ x, y, active, phase: rand() * Math.PI * 2 });
+        }
+        layerNodes.push(idxs);
+      });
+
+      for (let li = 0; li < layers.length - 1; li++) {
+        for (const a of layerNodes[li]) {
+          for (const b of layerNodes[li + 1]) {
+            const active = rand() > 0.4;
+            conns.push({ a, b, active, speed: 30 + rand() * 60, phase: rand() * Math.PI * 2 });
+          }
+        }
+      }
+    };
+
+    const gold = "#FFCC00";
+    const dimGold = "#FFAA00";
+    const bg = "#0a0a14";
+    const grid = "#1a1a2e";
+
+    let t = 0;
+    const draw = () => {
+      const parent = canvas.parentElement;
+      if (parent) {
+        const cw = parent.clientWidth || window.innerWidth;
+        const ch = parent.clientHeight || window.innerHeight;
+        if (cw !== W || ch !== H) {
+          resize();
+          build();
+        }
+      }
+
+      if (W === 0 || H === 0) {
+        animId = requestAnimationFrame(draw);
+        return;
+      }
+
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      // 8-bit grid dots
+      const gs = 48;
+      ctx.fillStyle = grid;
+      for (let x = 0; x < W; x += gs) {
+        for (let y = 0; y < H; y += gs) {
+          ctx.fillRect(x, y, 3, 3);
+        }
+      }
+
+      t += 0.016;
+
+      // Connections
+      for (const c of conns) {
+        const na = nodes[c.a];
+        const nb = nodes[c.b];
+        if (!na || !nb) continue;
+
+        ctx.strokeStyle = c.active ? dimGold : "#2a2a4a";
+        ctx.lineWidth = c.active ? 3 : 2;
+        ctx.beginPath();
+        ctx.moveTo(na.x, na.y);
+        ctx.lineTo(nb.x, nb.y);
+        ctx.stroke();
+
+        if (c.active) {
+          const dx = nb.x - na.x;
+          const dy = nb.y - na.y;
+          const len = Math.sqrt(dx * dx + dy * dy);
+          const progress = ((t * c.speed + c.phase) % len) / len;
+          const px = na.x + dx * progress;
+          const py = na.y + dy * progress;
+          ctx.fillStyle = "#FFFFE0";
+          ctx.fillRect(Math.floor(px) - 4, Math.floor(py) - 4, 9, 9);
+        }
+      }
+
+      // Nodes
+      for (const n of nodes) {
+        const pulse = n.active ? 0.9 + 0.1 * Math.sin(t * 3 + n.phase) : 0.6;
+        ctx.fillStyle = n.active ? gold : "#8888aa";
+        ctx.globalAlpha = pulse;
+        const s = n.active ? 10 : 7;
+        ctx.fillRect(Math.floor(n.x - s / 2), Math.floor(n.y - s / 2), s, s);
+        ctx.globalAlpha = 1;
+      }
+
+      animId = requestAnimationFrame(draw);
+    };
+
+    // Defer initial build until after browser layout is computed
+    const start = () => {
+      resize();
+      build();
+      if (W === 0 || H === 0) {
+        animId = requestAnimationFrame(start);
+        return;
+      }
+      draw();
+    };
+    animId = requestAnimationFrame(start);
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <div aria-hidden="true" className="absolute inset-0" style={{ background: "#0a0a14" }}>
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full block"
+        style={{ imageRendering: "pixelated" }}
+      />
+    </div>
+  );
+};
+
 const MarioClouds = () => {
     const randomFromSeed = (seed: number) => {
         const x = Math.sin(seed) * 10000;
