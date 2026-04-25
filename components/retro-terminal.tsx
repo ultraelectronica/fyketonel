@@ -1036,8 +1036,43 @@ export function RetroTerminal() {
       name: "kevlar",
       description: "Evaluate expressions: math, logic, comparisons, variables, and string ops",
       execute: (args) => {
-        if (args.length === 0) {
-          return [{ type: "output", content: "" }];
+        if (args.length === 0 || args[0] === "--help") {
+          return [
+            { type: "output", content: "╔════════════════════════════════════════════════╗" },
+            { type: "output", content: "║          KEVLAR EXPRESSION SHELL               ║" },
+            { type: "output", content: "╚════════════════════════════════════════════════╝" },
+            { type: "output", content: "" },
+            { type: "output", content: "Usage: kevlar <expression>" },
+            { type: "output", content: "" },
+            { type: "output", content: "Arithmetic:    +  -  *  /  %  **" },
+            { type: "output", content: "Comparison:    == != <  >  <= >=" },
+            { type: "output", content: "Logical:       && || !" },
+            { type: "output", content: "Assignment:    =  += -= *= /= %=" },
+            { type: "output", content: "" },
+            { type: "output", content: "Types:  int, float, bool, string" },
+            { type: "output", content: "Vars:   x = 10 (persist per session)" },
+            { type: "output", content: "" },
+            { type: "output", content: "Constants: PI, E, PHI, TAU, LN2, LN10, SQRT2" },
+            { type: "output", content: "" },
+            { type: "output", content: "Math Functions:" },
+            { type: "output", content: "  Basic:   sqrt, abs, ceil, floor, round, sign, trunc" },
+            { type: "output", content: "  Trig:    sin, cos, tan, asin, acos, atan, atan2" },
+            { type: "output", content: "  Exp/Log: exp, log, log2, log10, pow, cbrt" },
+            { type: "output", content: "  Agg:     min, max, hypot" },
+            { type: "output", content: "" },
+            { type: "output", content: "Examples:" },
+            { type: "output", content: "  kevlar 2 + 3 * 4          → 14" },
+            { type: "output", content: "  kevlar sqrt(144)          → 12" },
+            { type: "output", content: "  kevlar x = 42             → 42" },
+            { type: "output", content: "  kevlar x += 8             → 50" },
+            { type: "output", content: "  kevlar pow(2, 8)          → 256" },
+            { type: "output", content: "  kevlar 'hello' + 'world'  → hello world" },
+            { type: "output", content: "" },
+            { type: "success", content: "Use 'cat kevlar/README.kv' for a quick start" },
+            { type: "success", content: "Use 'cat kevlar/syntax.kv' for full syntax reference" },
+            { type: "success", content: "Use 'cat kevlar/math.kv' for math function details" },
+            { type: "success", content: "Use 'cat kevlar/examples.kv' for more examples" },
+          ];
         }
 
         const input = args.join(" ");
