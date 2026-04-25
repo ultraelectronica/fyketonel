@@ -98,7 +98,20 @@ fyketonel/
 ├── lib/
 │   ├── utils.ts                # cn() utility
 │   ├── contact-device-id.ts    # Device fingerprinting
-│   └── contact-rate-limit.ts   # Rate limiting (3 per 5 hours)
+│   ├── contact-rate-limit.ts   # Rate limiting (3 per 5 hours)
+│   ├── contact-validation.ts   # Contact form validation
+│   └── kevlar/
+│       ├── lexer.ts            # Kevlar v2 tokenizer
+│       ├── parser.ts           # Kevlar v2 parser (AST)
+│       ├── evaluator.ts        # Kevlar v2 interpreter
+│       ├── builtins.ts         # Built-in functions & Environment
+│       ├── oxygen.tsx          # O₂ Oxygen code editor component
+│       ├── index.ts            # Kevlar v2 public API
+│       └── types.ts            # Legacy v1 expression evaluator
+│
+├── docs/
+│   ├── KEVLAR.md               # Kevlar language reference
+│   └── SECURITY.md             # Security hardening roadmap
 │
 └── public/assets/              # Pixel art assets
     ├── sakura_leaf.png         # Ally theme particle
@@ -168,12 +181,33 @@ Toggle themes via the sun/moon icon in the navigation.
 6. **TicTacToe** — X and O against CPU
 7. **Sudoku** — Number puzzle with validation
 
+### Hazmat Shell
+
+The portfolio includes a fully functional terminal (Hazmat Shell) with:
+
+- **Kevlar v2** — Built-in programming language with Rust-like syntax and Dart-like simplicity
+  - Variables (`let`, `let mut`, `var`), functions (`fn`), control flow (`if`/`else`, `for`/`in`, `while`, `match`)
+  - List operations, string interpolation, math functions, 30+ built-ins
+  - Guided lesson index at `cat kevlar/lesson.md` plus runnable lessons in `kevlar/lessons/` (open with `oxygen kevlar/lessons/*.kv`)
+  - Backward-compatible with v1 expression mode
+- **Oxygen (O₂)** — Built-in code editor with syntax highlighting, line numbers, and command mode
+  - `:run` / Ctrl+Enter to execute, `:save` / Ctrl+S, `:quit` to exit
+  - Multi-file editing with virtual filesystem persistence
+- **Virtual filesystem** — `ls`, `cd`, `cat`, `mkdir`, `touch`, `rm`, pipes, redirects
+- **8 retro themes** — Default, Atari, Nintendo, VHS, Gameboy, Soft-pop, Ally, Simon
+
 ### Contact Form
 
 - Email and message fields
 - Device ID tracking for rate limiting (3 emails per 5 hours per device)
 - Resend API integration
+- Server-side validation and HTML escaping for submitted content
 - Confirmation and error states
+
+### Security
+
+- Baseline security headers are configured in `next.config.ts`
+- The current hardening roadmap lives in `docs/SECURITY.md`
 
 ---
 

@@ -3,11 +3,46 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { kevlarRun } from "@/lib/kevlar/index";
+import { stringify as kevlarStringify } from "@/lib/kevlar/index";
 import { kevlarEval, isKevlarError } from "@/lib/kevlar/types";
-import { Terminal, Minimize2, Maximize2, X } from "lucide-react";
+import {
+  Terminal,
+  Minimize2,
+  Maximize2,
+  X,
+  MoreHorizontal,
+  Copy,
+  RotateCcw,
+} from "lucide-react";
+import { OxygenEditor } from "@/lib/kevlar/oxygen";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { crtOpenVariant } from "@/components/ui/8bit/motion-utils";
+
+import {
+  kevlarReadmeRaw,
+  kevlarLessonRaw,
+  kevlarSyntaxRaw,
+  kevlarMathRaw,
+  kevlarExamplesRaw,
+  kevlarLesson01Raw,
+  kevlarLesson02Raw,
+  kevlarLesson03Raw,
+  kevlarLesson04Raw,
+  kevlarTutorialRaw,
+  kevlarTutor01Raw,
+  kevlarTutor02Raw,
+  kevlarTutor03Raw,
+  kevlarTutor04Raw,
+  kevlarTutor05Raw,
+  kevlarTutor06Raw,
+  kevlarTutor07Raw,
+  kevlarTutor08Raw,
+  kevlarTutor09Raw,
+  kevlarTutor10Raw,
+  kevlarTutor11Raw,
+} from "@/lib/kevlar/docs-content";
 
 interface TerminalLine {
   type: "input" | "output" | "error" | "success";
@@ -61,10 +96,37 @@ const INITIAL_FS: VirtualNode = {
             kevlar: {
               type: "dir",
               children: {
-                "README.kv": { type: "file", content: "╔══════════════════════════════════════╗\n║          Kevlar Expression Shell       ║\n╚══════════════════════════════════════╝\n\nKevlar is the built-in expression language for Hazmat Shell.\nIt supports math, logic, comparisons, and variable assignments.\n\nType 'kevlar' to evaluate expressions.\nType 'cat kevlar/syntax.kv' for syntax reference.\nType 'cat kevlar/math.kv' for math functions.\nType 'cat kevlar/examples.kv' for examples." },
-                "syntax.kv": { type: "file", content: "Kevlar Syntax Reference\n───────────────────────\n\nArithmetic:    + - * / % **\nComparison:    == != < > <= >=\nLogical:       && || !\nAssignment:    = += -= *= /= %=\nGrouping:      ( )\nTypes:         int, float, bool, string\nVariables:     x = 10\nConstants:     PI, E, PHI, TAU, LN2, LN10, SQRT2" },
-                "math.kv": { type: "file", content: "Kevlar Math Functions\n──────────────────────\n\nBasic:     sqrt(), abs(), ceil(), floor(), round(), sign(), trunc()\nTrig:      sin(), cos(), tan(), asin(), acos(), atan(), atan2()\nExp/Log:   exp(), log(), log2(), log10(), pow(), cbrt()\nAggregate: min(), max(), hypot()\n\nUsage: kevlar sqrt(16)       → 4\n       kevlar pow(2, 10)     → 1024\n       kevlar sin(PI / 2)    → 1" },
-                "examples.kv": { type: "file", content: "Kevlar Examples\n────────────────\n\nkevlar 2 + 3 * 4          → 14\nkevlar sqrt(144)           → 12\nkevlar PI                  → 3.14159...\nkevlar x = 42             → 42\nkevlar x += 8             → 50\nkevlar 10 > 5 && 3 < 7    → true\nkevlar pow(2, 8)          → 256\nkevlar 'hello' + ' world'  → hello world" },
+                "README.md": { type: "file", content: kevlarReadmeRaw },
+                "lesson.md": { type: "file", content: kevlarLessonRaw },
+                lessons: {
+                  type: "dir",
+                  children: {
+                    "01-basics.kv": { type: "file", content: kevlarLesson01Raw },
+                    "02-functions.kv": { type: "file", content: kevlarLesson02Raw },
+                    "03-control-flow.kv": { type: "file", content: kevlarLesson03Raw },
+                    "04-mini-project.kv": { type: "file", content: kevlarLesson04Raw },
+                  },
+                },
+                tutorial: {
+                  type: "dir",
+                  children: {
+                    "TUTORIAL.md": { type: "file", content: kevlarTutorialRaw },
+                    "01-hello-world.kv": { type: "file", content: kevlarTutor01Raw },
+                    "02-variables.kv": { type: "file", content: kevlarTutor02Raw },
+                    "03-operators.kv": { type: "file", content: kevlarTutor03Raw },
+                    "04-functions.kv": { type: "file", content: kevlarTutor04Raw },
+                    "05-control-flow.kv": { type: "file", content: kevlarTutor05Raw },
+                    "06-loops.kv": { type: "file", content: kevlarTutor06Raw },
+                    "07-lists.kv": { type: "file", content: kevlarTutor07Raw },
+                    "08-match.kv": { type: "file", content: kevlarTutor08Raw },
+                    "09-strings.kv": { type: "file", content: kevlarTutor09Raw },
+                    "10-builtins.kv": { type: "file", content: kevlarTutor10Raw },
+                    "11-mini-project.kv": { type: "file", content: kevlarTutor11Raw },
+                  },
+                },
+                "syntax.md": { type: "file", content: kevlarSyntaxRaw },
+                "math.md": { type: "file", content: kevlarMathRaw },
+                "examples.md": { type: "file", content: kevlarExamplesRaw },
               },
             },
           },
@@ -598,6 +660,9 @@ export function RetroTerminal() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [currentTheme, setCurrentTheme] = useState<string>("default");
   const [simonThemeMode, setSimonThemeMode] = useState<"dark" | "light">("dark");
   const [isMounted, setIsMounted] = useState(false);
@@ -606,6 +671,9 @@ export function RetroTerminal() {
   const [fileSystem, setFileSystem] = useState<VirtualNode>(INITIAL_FS);
   const [currentDir, setCurrentDir] = useState("/home/orpheus");
   const [aliases, setAliases] = useState<Record<string, string>>({});
+  const [isInOxygen, setIsInOxygen] = useState(false);
+  const [oxygenFilename, setOxygenFilename] = useState<string>("untitled.kv");
+  const [oxygenCode, setOxygenCode] = useState<string>("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const outputRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
@@ -635,6 +703,17 @@ export function RetroTerminal() {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;
     }
   }, [lines]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Apply theme by directly setting CSS variables
   useEffect(() => {
@@ -808,15 +887,12 @@ export function RetroTerminal() {
         { type: "output", content: "  theme [name]      - Change color theme" },
         { type: "output", content: "                      default/atari/nintendo/vhs/" },
         { type: "output", content: "                      gameboy/softpop/ally" },
-        { type: "output", content: "  kevlar [expr]     - Evaluate expressions:" },
-        { type: "output", content: "                      Math: +, -, *, /, %, ** (power)" },
-        { type: "output", content: "                      Comparison: ==, !=, <, >, <=, >=" },
-        { type: "output", content: "                      Logical: &&, ||, !" },
-        { type: "output", content: "                      Assignment: =, +=, -=, *=, /=, %=" },
-        { type: "output", content: "                      Functions: sqrt, sin, cos, tan, log," },
-        { type: "output", content: "                      pow, abs, ceil, floor, round, min, max" },
-        { type: "output", content: "                      Constants: PI, E, PHI, TAU, SQRT2" },
-        { type: "output", content: "                      Types: int, float, bool, string" },
+        { type: "output", content: "  kevlar [expr]     - Kevlar v2 language:" },
+        { type: "output", content: "                      Rust-like syntax, Dart-like simplicity" },
+        { type: "output", content: "                      let, fn, if, for, while, match" },
+        { type: "output", content: "                      Also supports legacy expressions" },
+        { type: "output", content: "  oxygen [file.kv]  - Open O₂ Oxygen code editor" },
+        { type: "output", content: "                      Multi-line editing + syntax highlight" },
         { type: "output", content: "  date              - Display current date/time" },
         { type: "output", content: "  fastfetch         - Display system information" },
         { type: "output", content: "" },
@@ -1034,28 +1110,182 @@ export function RetroTerminal() {
     },
     kevlar: {
       name: "kevlar",
-      description: "Evaluate expressions: math, logic, comparisons, variables, and string ops",
+      description: "Kevlar v2 — Rust-like syntax, Dart-like simplicity",
       execute: (args) => {
-        if (args.length === 0) {
-          return [{ type: "output", content: "" }];
+        if (args.length === 0 || args[0] === "--help" || args[0] === "docs") {
+          return [
+            { type: "output", content: "╔════════════════════════════════════════════════╗" },
+            { type: "output", content: "║          KEVLAR v2 — EXPRESSION SHELL          ║" },
+            { type: "output", content: "╚════════════════════════════════════════════════╝" },
+            { type: "output", content: "" },
+            { type: "output", content: "  Kevlar v2: Rust-like syntax, Dart simplicity" },
+            { type: "output", content: "" },
+            { type: "output", content: "Variables:" },
+            { type: "output", content: "  let x = 42;         // immutable" },
+            { type: "output", content: "  let mut y = 0;      // mutable" },
+            { type: "output", content: "  var z = 10;         // mutable (Dart-style)" },
+            { type: "output", content: "" },
+            { type: "output", content: "Types (optional):   let x: int = 42;" },
+            { type: "output", content: "Functions:          fn add(a, b) {" },
+            { type: "output", content: "                      a + b;" },
+            { type: "output", content: "                    }" },
+            { type: "output", content: "Arrow functions:    fn double(n) => n * 2;" },
+            { type: "output", content: "Control flow:       if / else if / else" },
+            { type: "output", content: "Loops:              for i in 0..10 {" },
+            { type: "output", content: "                      print(i);" },
+            { type: "output", content: "                    }" },
+            { type: "output", content: "                    while cond {" },
+            { type: "output", content: "                      // ..." },
+            { type: "output", content: "                    }" },
+            { type: "output", content: "Match:              match x {" },
+            { type: "output", content: "                      0 => \"zero\"" },
+            { type: "output", content: "                      _ => \"many\"" },
+            { type: "output", content: "                    }" },
+            { type: "output", content: "Lists:              [1, 2, 3]" },
+            { type: "output", content: "Strings:           \"Hello ${name}!\"" },
+            { type: "output", content: "Print:             print(\"hello\");" },
+            { type: "output", content: "" },
+            { type: "output", content: "Legacy expressions still work:" },
+            { type: "output", content: "  kevlar 2 + 3 * 4;         → 14" },
+            { type: "output", content: "  kevlar sqrt(144);         → 12" },
+            { type: "output", content: "" },
+            { type: "success", content: "Use 'oxygen' to open the code editor" },
+            { type: "success", content: "Use 'cat kevlar/lesson.md' for the lesson index" },
+            { type: "success", content: "Use 'ls kevlar/lessons' to browse guided lessons" },
+            { type: "success", content: "Use 'cat kevlar/README.md' for reference" },
+          ];
         }
 
         const input = args.join(" ");
-        const result = kevlarEval(input);
 
-        if (isKevlarError(result)) {
-          return [{ type: "error", content: result.message }];
+        try {
+          const result = kevlarRun(input);
+          const lines: TerminalLine[] = [];
+
+          if (result.output.length > 0) {
+            for (const line of result.output) {
+              lines.push({ type: "output", content: line });
+            }
+          }
+
+          if (result.value !== null && result.value !== undefined && result.output.length === 0) {
+            const displayVal = kevlarStringify(result.value);
+            lines.push({ type: "output", content: `${displayVal} (${result.type})` });
+          }
+
+          return lines.length > 0 ? lines : [{ type: "output", content: "(done)" }];
+        } catch {
+          const v1Result = kevlarEval(input);
+          if (isKevlarError(v1Result)) {
+            return [{ type: "error", content: v1Result.message }];
+          }
+          if (v1Result.isAssignment) {
+            return [{ type: "success", content: `${v1Result.varName} ${v1Result.varOp} ${v1Result.value} (${v1Result.type})` }];
+          }
+          if (v1Result.type === "string") {
+            return [{ type: "output", content: `${v1Result.value} (${v1Result.type})` }];
+          }
+          return [{ type: "output", content: `${v1Result.input} = ${v1Result.value} (${v1Result.type})` }];
+        }
+      },
+    },
+    oxygen: {
+      name: "oxygen",
+      description: "Open the O₂ Oxygen code editor for Kevlar v2",
+      execute: (args) => {
+        const filename = args[0] ?? "untitled.kv";
+        let initialCode = "";
+
+        if (filename !== "untitled.kv") {
+          const filePath = filename.startsWith("/") ? filename : currentDir + "/" + filename;
+          const node = getNode(resolvePath(filePath));
+          if (node && node.type === "file" && node.content) {
+            initialCode = node.content;
+          }
         }
 
-        if (result.isAssignment) {
-          return [{ type: "success", content: `${result.varName} ${result.varOp} ${result.value} (${result.type})` }];
-        }
-
-        if (result.type === "string") {
-          return [{ type: "output", content: `${result.value} (${result.type})` }];
-        }
-
-        return [{ type: "output", content: `${result.input} = ${result.value} (${result.type})` }];
+        setOxygenFilename(filename);
+        setOxygenCode(initialCode);
+        setIsInOxygen(true);
+        return [];
+      },
+    },
+    docs: {
+      name: "docs",
+      description: "Show Kevlar v2 language documentation",
+      execute: () => {
+        const docs: TerminalLine[] = [
+          { type: "output", content: "╔════════════════════════════════════════════════╗" },
+          { type: "output", content: "║          KEVLAR v2 — LANGUAGE DOCS              ║" },
+          { type: "output", content: "╚════════════════════════════════════════════════╝" },
+          { type: "output", content: "" },
+          { type: "output", content: "VARIABLES" },
+          { type: "output", content: "  let x = 42;         // immutable" },
+          { type: "output", content: "  let mut y = 0;      // mutable" },
+          { type: "output", content: "  var z = 10;         // mutable (Dart-style)" },
+          { type: "output", content: "  let name: string = \"hazmat\";  // typed" },
+          { type: "output", content: "" },
+          { type: "output", content: "FUNCTIONS" },
+          { type: "output", content: "  fn add(a, b) {" },
+          { type: "output", content: "    a + b;" },
+          { type: "output", content: "  }" },
+          { type: "output", content: "  fn double(n) => n * 2;" },
+          { type: "output", content: "  fn greet(name) {" },
+          { type: "output", content: "    print(\"Hello, ${name}!\");" },
+          { type: "output", content: "  }" },
+          { type: "output", content: "" },
+          { type: "output", content: "CONTROL FLOW" },
+          { type: "output", content: "  if x > 10 {" },
+          { type: "output", content: "    print(\"big\");" },
+          { type: "output", content: "  } else if x > 5 {" },
+          { type: "output", content: "    print(\"medium\");" },
+          { type: "output", content: "  } else {" },
+          { type: "output", content: "    print(\"small\");" },
+          { type: "output", content: "  }" },
+          { type: "output", content: "  for i in 0..10 {" },
+          { type: "output", content: "    print(i);" },
+          { type: "output", content: "  }" },
+          { type: "output", content: "  while cond {" },
+          { type: "output", content: "    // ..." },
+          { type: "output", content: "  }" },
+          { type: "output", content: "" },
+          { type: "output", content: "MATCH EXPRESSIONS" },
+          { type: "output", content: "  match x {" },
+          { type: "output", content: "    0 => \"zero\"" },
+          { type: "output", content: "    1 => \"one\"" },
+          { type: "output", content: "    _ => \"many\"" },
+          { type: "output", content: "  }" },
+          { type: "output", content: "" },
+          { type: "output", content: "LISTS" },
+          { type: "output", content: "  [1, 2, 3]  nums[0]  len(nums)  push(nums, 4)" },
+          { type: "output", content: "" },
+          { type: "output", content: "STRINGS" },
+          { type: "output", content: "  \"Hello ${name}!\"    // interpolation" },
+          { type: "output", content: "  'also valid'         // single quotes" },
+          { type: "output", content: "" },
+          { type: "output", content: "OPERATORS" },
+          { type: "output", content: "  + - * / % **   == != < > <= >=   && || !" },
+          { type: "output", content: "  = += -= *= /= %=   .. (range)   => (fat arrow)" },
+          { type: "output", content: "" },
+          { type: "output", content: "BUILT-INS" },
+          { type: "output", content: "  print(x)  len(l)  push(l,v)  pop(l)" },
+          { type: "output", content: "  str(x)  int(x)  float(x)  type(x)" },
+          { type: "output", content: "  sqrt abs ceil floor round sign trunc" },
+          { type: "output", content: "  sin cos tan asin acos atan atan2" },
+          { type: "output", content: "  exp log log2 log10 pow cbrt" },
+          { type: "output", content: "  min max hypot  rand()  rand_int(a,b)" },
+          { type: "output", content: "" },
+          { type: "output", content: "CONSTANTS: PI E PHI TAU LN2 LN10 SQRT2" },
+          { type: "output", content: "" },
+          { type: "output", content: "COMMENTS: // like this" },
+          { type: "output", content: "SEMICOLONS: optional, but recommended" },
+          { type: "output", content: "" },
+          { type: "success", content: "Type 'oxygen' to open the code editor" },
+          { type: "success", content: "Type 'cat kevlar/lesson.md' for the lesson index" },
+          { type: "success", content: "Type 'ls kevlar/lessons' to browse guided lessons" },
+          { type: "success", content: "Type 'cat kevlar/README.md' for quick start" },
+        ];
+        return docs;
       },
     },
     date: {
@@ -1814,7 +2044,70 @@ export function RetroTerminal() {
     };
   }, []);
 
+  const handleReset = () => {
+    setLines([
+      {
+        type: "success",
+        content:
+          "╔════════════════════════════════════════════════╗",
+      },
+      {
+        type: "success",
+        content:
+          "║       HAZMAT SHELL v1.0.0                  ║",
+      },
+      {
+        type: "success",
+        content:
+          "╚════════════════════════════════════════════════╝",
+      },
+      {
+        type: "output",
+        content: "Type 'help' to see available commands.",
+      },
+    ]);
+    setInput("");
+    setMultiLineBuffer([]);
+    setIsMultiLine(false);
+    setShowMenu(false);
+  };
 
+  const handleCopy = async () => {
+    const text = lines.map((l) => l.content).join("\n");
+    try {
+      await navigator.clipboard.writeText(text);
+      addLines([
+        {
+          type: "success",
+          content: "Terminal output copied to clipboard.",
+        },
+      ]);
+    } catch {
+      addLines([
+        { type: "error", content: "Failed to copy to clipboard." },
+      ]);
+    }
+    setShowMenu(false);
+  };
+
+  if (isClosed) {
+    return (
+      <motion.button
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setIsClosed(false)}
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 border-4 border-border bg-card px-4 py-3 shadow-[4px_4px_0_var(--border)] transition-colors hover:bg-primary/10"
+        aria-label="Open terminal"
+      >
+        <Terminal className="size-5 text-primary" />
+        <span className="retro hidden text-xs uppercase tracking-[0.2em] text-foreground sm:inline">
+          HAZMAT SHELL
+        </span>
+      </motion.button>
+    );
+  }
 
   return (
     <motion.div
@@ -1855,43 +2148,72 @@ export function RetroTerminal() {
           <button
             type="button"
             onClick={() => setIsMinimized(!isMinimized)}
-            className="group rounded-none border-2 border-border bg-background p-1.5 shadow-[2px_2px_0_var(--border)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--primary)] active:translate-y-0 active:shadow-[1px_1px_0_var(--border)] dark:border-ring"
-            aria-label="Minimize terminal"
+            title={isMinimized ? "Restore" : "Minimize"}
+            className="group relative rounded-none border-2 border-border bg-background p-2 shadow-[2px_2px_0_var(--border)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--primary)] active:translate-y-0 active:shadow-[1px_1px_0_var(--border)]"
+            aria-label={isMinimized ? "Restore terminal" : "Minimize terminal"}
           >
-            <Minimize2 className="size-3 text-foreground transition-colors group-hover:text-primary" />
+            <Minimize2 className="size-4 text-foreground transition-colors group-hover:text-primary" />
           </button>
           <button
             type="button"
             onClick={() => setIsMaximized(!isMaximized)}
-            className="group rounded-none border-2 border-border bg-background p-1.5 shadow-[2px_2px_0_var(--border)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--primary)] active:translate-y-0 active:shadow-[1px_1px_0_var(--border)] dark:border-ring"
+            title={isMaximized ? "Restore" : "Maximize"}
+            className="group relative rounded-none border-2 border-border bg-background p-2 shadow-[2px_2px_0_var(--border)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--primary)] active:translate-y-0 active:shadow-[1px_1px_0_var(--border)]"
             aria-label={isMaximized ? "Restore terminal" : "Maximize terminal"}
           >
-            <Maximize2 className="size-3 text-foreground transition-colors group-hover:text-primary" />
+            <Maximize2 className="size-4 text-foreground transition-colors group-hover:text-primary" />
           </button>
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setShowMenu(!showMenu)}
+              title="More options"
+              className={cn(
+                "group relative rounded-none border-2 border-border bg-background p-2 shadow-[2px_2px_0_var(--border)] transition-all hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--primary)] active:translate-y-0 active:shadow-[1px_1px_0_var(--border)]",
+                showMenu && "-translate-y-0.5 shadow-[3px_3px_0_var(--primary)]"
+              )}
+              aria-label="More options"
+              aria-expanded={showMenu}
+            >
+              <MoreHorizontal className="size-4 text-foreground transition-colors group-hover:text-primary" />
+            </button>
+            <AnimatePresence>
+              {showMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 top-full z-50 mt-2 w-48 border-2 border-border bg-card shadow-[4px_4px_0_var(--border)]"
+                >
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-foreground transition-colors hover:bg-primary/10"
+                  >
+                    <RotateCcw className="size-4 text-muted-foreground" />
+                    <span className="retro">Reset Terminal</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-foreground transition-colors hover:bg-primary/10"
+                  >
+                    <Copy className="size-4 text-muted-foreground" />
+                    <span className="retro">Copy Output</span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <button
             type="button"
-            onClick={() => setLines([
-              {
-                type: "success",
-                content: "╔════════════════════════════════════════════════╗",
-              },
-              {
-                type: "success",
-                content: "║       HAZMAT SHELL v1.0.0                  ║",
-              },
-              {
-                type: "success",
-                content: "╚════════════════════════════════════════════════╝",
-              },
-              {
-                type: "output",
-                content: "Type 'help' to see available commands.",
-              },
-            ])}
-            className="group rounded-none border-2 border-border bg-background p-1.5 shadow-[2px_2px_0_var(--border)] transition-all hover:-translate-y-0.5 hover:border-red-500 hover:shadow-[3px_3px_0_#ef4444] active:translate-y-0 active:shadow-[1px_1px_0_var(--border)] dark:border-ring"
-            aria-label="Reset terminal"
+            onClick={() => setIsClosed(true)}
+            title="Close"
+            className="group relative rounded-none border-2 border-border bg-background p-2 shadow-[2px_2px_0_var(--border)] transition-all hover:-translate-y-0.5 hover:border-red-500 hover:shadow-[3px_3px_0_#ef4444] active:translate-y-0 active:shadow-[1px_1px_0_var(--border)]"
+            aria-label="Close terminal"
           >
-            <X className="size-3 text-foreground transition-colors group-hover:text-red-500" />
+            <X className="size-4 text-foreground transition-colors group-hover:text-red-500" />
           </button>
         </div>
       </div>
@@ -1906,6 +2228,37 @@ export function RetroTerminal() {
             transition={{ duration: 0.3 }}
             className="relative"
           >
+            {isInOxygen ? (
+              <div className={cn(isMaximized ? "h-[calc(100vh-8rem)]" : "h-96")}>
+                <OxygenEditor
+                  initialCode={oxygenCode}
+                  filename={oxygenFilename}
+                  onRun={(code) => {
+                    try {
+                      const result = kevlarRun(code);
+                      return { output: result.output, value: kevlarStringify(result.value), type: result.type };
+                    } catch (err) {
+                      return {
+                        output: [],
+                        value: "",
+                        type: "error",
+                        error: err instanceof Error ? err.message : String(err),
+                      };
+                    }
+                  }}
+                  onSave={(filename, code) => {
+                    const filePath = filename.startsWith("/") ? filename : currentDir + "/" + filename;
+                    setNode(filePath, { type: "file", content: code });
+                    addLines([{ type: "success", content: `Saved: ${filename}` }]);
+                  }}
+                  onQuit={() => {
+                    setIsInOxygen(false);
+                    addLines([{ type: "success", content: "Exited Oxygen editor" }]);
+                  }}
+                />
+              </div>
+            ) : (
+            <>
             {/* Output Area */}
             <div
               ref={outputRef}
@@ -1970,6 +2323,8 @@ export function RetroTerminal() {
                 <span className="retro">Lines: {lines.length}</span>
               </div>
             </div>
+            </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

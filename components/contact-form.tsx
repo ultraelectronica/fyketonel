@@ -4,6 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/8bit/button";
 import { Textarea } from "@/components/ui/8bit/textarea";
 import { getOrCreateContactDeviceId } from "@/lib/contact-device-id";
+import {
+  CONTACT_EMAIL_MAX_LENGTH,
+  CONTACT_MESSAGE_MAX_LENGTH,
+} from "@/lib/contact-validation";
 
 export default function ContactForm() {
   const [email, setEmail] = useState("");
@@ -36,7 +40,6 @@ export default function ContactForm() {
           email,
           message,
           deviceId,
-          to: "athrundiscinity@protonmail.com",
         }),
       });
 
@@ -83,6 +86,7 @@ export default function ContactForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
+              maxLength={CONTACT_EMAIL_MAX_LENGTH}
               disabled={isSubmitting}
               className="retro relative z-10 w-full h-10 px-3 bg-background text-foreground rounded-none border-0 ring-0 focus:outline-none sm:h-12 sm:px-4 sm:text-sm md:h-14 md:px-6 md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
             />
@@ -110,6 +114,7 @@ export default function ContactForm() {
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Got any goodies? Send me a message.."
             required
+            maxLength={CONTACT_MESSAGE_MAX_LENGTH}
             disabled={isSubmitting}
             rows={8}
             className="w-full resize-none text-xs px-3 py-3 sm:text-sm sm:px-4 sm:py-3 sm:rows-9 md:text-base md:px-6 md:py-4 md:rows-10"
@@ -148,4 +153,3 @@ export default function ContactForm() {
     </form>
   );
 }
-

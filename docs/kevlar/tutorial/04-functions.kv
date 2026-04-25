@@ -1,0 +1,35 @@
+// ============================================
+// Kevlar Tutorial — Chapter 4: Functions
+// ============================================
+// Functions package reusable logic.
+// Two syntaxes: block body { ... } and arrow =>
+
+// --- Arrow function (single expression) ---
+fn double(n) => n * 2
+print(double(5))      // 10
+print(double(100))    // 200
+
+// --- Block function (multiple lines) ---
+fn greet(name) {
+  print("Preparing greeting...")
+  "Welcome back, ${name}!"
+}
+print(greet("Orpheus"))
+
+// --- Functions with multiple parameters ---
+fn add(a, b) => a + b
+print(add(3, 7))      // 10
+
+// --- Functions calling functions ---
+fn triple(n) => n * 3
+fn sixTimes(n) => triple(double(n))
+print(sixTimes(4))    // 24
+
+// --- Type annotations (optional) ---
+fn square(x: int) -> int => x * x
+print(square(9))      // 81
+
+// --- Try it: ---
+// 1. Write fn circleArea(r) that returns PI * r * r
+// 2. Write fn isEven(n) that returns n % 2 == 0
+// 3. Write fn shout(text) that returns text + "!"

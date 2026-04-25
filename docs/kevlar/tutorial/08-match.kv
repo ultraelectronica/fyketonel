@@ -1,0 +1,54 @@
+// ============================================
+// Kevlar Tutorial — Chapter 8: Match Expressions
+// ============================================
+// Match is like a supercharged if/else.
+// It compares a value against multiple patterns.
+
+// --- Basic match ---
+let signal = 2
+let meaning = match signal {
+  0 => "no signal"
+  1 => "weak"
+  2 => "moderate"
+  3 => "strong"
+  _ => "unknown"
+}
+print(meaning)    // "moderate"
+
+// --- The _ wildcard catches everything ---
+let code = 999
+let result = match code {
+  200 => "OK"
+  404 => "Not Found"
+  _ => "Unknown code: ${code}"
+}
+print(result)     // "Unknown code: 999"
+
+// --- Match with calculations ---
+fn describe(hp) {
+  match hp {
+    0 => "offline"
+    1 => "critical"
+    2 => "low"
+    3 | 4 => "OK"     // | means "or"
+    _ => "healthy"
+  }
+}
+print(describe(0))   // "offline"
+print(describe(3))   // "OK"
+print(describe(10))  // "healthy"
+
+// --- Match as expression ---
+// match returns a value, so you can use it inline:
+let level = 3
+print(match level {
+  1 => "Rookie"
+  2 => "Explorer"
+  3 => "Veteran"
+  _ => "Legend"
+})
+
+// --- Try it: ---
+// 1. Write a match that converts 1→"Mon", 2→"Tue", etc.
+// 2. Add a wildcard that says "Invalid day"
+// 3. Use match to return a grade letter for a score

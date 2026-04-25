@@ -1,0 +1,37 @@
+// ============================================
+// Kevlar Tutorial — Chapter 2: Variables
+// ============================================
+// Variables store values for later use.
+// Kevlar has two variable styles: 'let' and 'var'.
+
+// --- Immutable with let ---
+// 'let' is the default. The value cannot change:
+let name = "Orpheus"
+print("Pilot: ${name}")
+
+// --- Mutable with let mut ---
+// Add 'mut' to allow the value to change:
+let mut score = 0
+print(score)
+
+score = 10
+print(score)
+
+score += 5
+print(score)
+
+// --- Mutable with var ---
+// 'var' is mutable by default (Dart-style):
+var fuel = 100
+fuel -= 20
+print(fuel)
+
+// --- Types (optional) ---
+// You can add type annotations too:
+let age: int = 21
+let greeting: string = "hello"
+
+// --- Try it: ---
+// 1. Create a 'let mut' counter starting at 1
+// 2. Add 3 to it and print it
+// 3. Create a 'var' with your favorite number

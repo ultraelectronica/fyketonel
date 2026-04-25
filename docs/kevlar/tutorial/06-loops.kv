@@ -1,0 +1,41 @@
+// ============================================
+// Kevlar Tutorial — Chapter 6: Loops
+// ============================================
+// Loops repeat code. Kevlar has three loop styles.
+
+// --- for over a range ---
+// 0..5 means from 0 to 4 (exclusive end):
+for i in 0..5 {
+  print("Counting: ${i}")
+}
+
+// --- for over a list ---
+let fruits = ["durian", "mango", "rambutan"]
+for fruit in fruits {
+  print("I like ${fruit}")
+}
+
+// --- while loop ---
+let mut count = 3
+while count > 0 {
+  print("T-minus ${count}")
+  count -= 1
+}
+print("Liftoff!")
+
+// --- break and continue ---
+let nums = [1, 3, 5, 7, 9]
+for n in nums {
+  if n == 5 {
+    continue    // skip 5
+  }
+  if n == 7 {
+    break       // stop at 7
+  }
+  print(n)      // prints 1, 3
+}
+
+// --- Try it: ---
+// 1. Loop from 1 to 10 and print each number
+// 2. Use while to count down from 5 to 0
+// 3. Loop over a list of your favorite foods
