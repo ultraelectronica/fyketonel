@@ -100,6 +100,10 @@ fyketonel/
 │   ├── contact-device-id.ts    # Device fingerprinting
 │   └── contact-rate-limit.ts   # Rate limiting (3 per 5 hours)
 │
+├── docs/
+│   ├── KEVLAR.md               # Kevlar language reference
+│   └── SECURITY.md             # Security hardening roadmap
+│
 └── public/assets/              # Pixel art assets
     ├── sakura_leaf.png         # Ally theme particle
     ├── flower_petal_*.png      # Ally theme particles
@@ -173,7 +177,13 @@ Toggle themes via the sun/moon icon in the navigation.
 - Email and message fields
 - Device ID tracking for rate limiting (3 emails per 5 hours per device)
 - Resend API integration
+- Server-side validation and HTML escaping for submitted content
 - Confirmation and error states
+
+### Security
+
+- Baseline security headers are configured in `next.config.ts`
+- The current hardening roadmap lives in `docs/SECURITY.md`
 
 ---
 
