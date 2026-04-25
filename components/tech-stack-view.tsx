@@ -38,10 +38,23 @@ import {
   SiOpenstreetmap,
   SiMaplibre,
 } from "react-icons/si";
-import { TbDatabase, TbBrandVscode, TbBrandWindows, TbBrandPowershell, TbBrandVisualStudio, TbWorld } from "react-icons/tb";
+import {
+  TbDatabase,
+  TbBrandVscode,
+  TbBrandWindows,
+  TbBrandPowershell,
+  TbBrandVisualStudio,
+  TbWorld,
+} from "react-icons/tb";
 import type { IconType } from "react-icons";
 
-type TechCategory = "languages" | "frameworks" | "databases" | "cloud" | "tools" | "platforms";
+type TechCategory =
+  | "languages"
+  | "frameworks"
+  | "databases"
+  | "cloud"
+  | "tools"
+  | "platforms";
 
 type LastUsed = "active" | "2026" | "2025" | "2024" | "2023" | "archived";
 
@@ -52,40 +65,133 @@ interface TechItem {
   lastUsed: LastUsed;
 }
 
-const lastUsedConfig: Record<LastUsed, { label: string; color: string; dotColor: string }> = {
-  active: { label: "Active", color: "text-green-500", dotColor: "bg-green-500" },
-  "2026": { label: "2026", color: "text-emerald-500", dotColor: "bg-emerald-500" },
-  "2025": { label: "2025", color: "text-yellow-500", dotColor: "bg-yellow-500" },
-  "2024": { label: "2024", color: "text-orange-500", dotColor: "bg-orange-500" },
+const lastUsedConfig: Record<
+  LastUsed,
+  { label: string; color: string; dotColor: string }
+> = {
+  active: {
+    label: "Active",
+    color: "text-green-500",
+    dotColor: "bg-green-500",
+  },
+  "2026": {
+    label: "2026",
+    color: "text-emerald-500",
+    dotColor: "bg-emerald-500",
+  },
+  "2025": {
+    label: "2025",
+    color: "text-yellow-500",
+    dotColor: "bg-yellow-500",
+  },
+  "2024": {
+    label: "2024",
+    color: "text-orange-500",
+    dotColor: "bg-orange-500",
+  },
   "2023": { label: "2023", color: "text-red-500", dotColor: "bg-red-500" },
-  archived: { label: "Archived", color: "text-muted-foreground", dotColor: "bg-muted-foreground" },
+  archived: {
+    label: "Archived",
+    color: "text-muted-foreground",
+    dotColor: "bg-muted-foreground",
+  },
 };
 
 const technologies: TechItem[] = [
   { name: "Dart", icon: SiDart, category: "languages", lastUsed: "active" },
-  { name: "TypeScript", icon: SiTypescript, category: "languages", lastUsed: "active" },
-  { name: "JavaScript", icon: SiJavascript, category: "languages", lastUsed: "active" },
+  {
+    name: "TypeScript",
+    icon: SiTypescript,
+    category: "languages",
+    lastUsed: "active",
+  },
+  {
+    name: "JavaScript",
+    icon: SiJavascript,
+    category: "languages",
+    lastUsed: "active",
+  },
   { name: "SQL", icon: TbDatabase, category: "languages", lastUsed: "active" },
   { name: "Bash", icon: SiGnubash, category: "languages", lastUsed: "active" },
-  { name: "PowerShell", icon: TbBrandPowershell, category: "languages", lastUsed: "2025" },
-  { name: "Flutter", icon: SiFlutter, category: "frameworks", lastUsed: "active" },
+  {
+    name: "PowerShell",
+    icon: TbBrandPowershell,
+    category: "languages",
+    lastUsed: "2025",
+  },
+  {
+    name: "Flutter",
+    icon: SiFlutter,
+    category: "frameworks",
+    lastUsed: "active",
+  },
   { name: "React", icon: SiReact, category: "frameworks", lastUsed: "active" },
-  { name: "Next.js", icon: SiNextdotjs, category: "frameworks", lastUsed: "active" },
-  { name: "Express.js", icon: SiExpress, category: "frameworks", lastUsed: "active" },
-  { name: "Node.js", icon: SiNodedotjs, category: "frameworks", lastUsed: "active" },
+  {
+    name: "Next.js",
+    icon: SiNextdotjs,
+    category: "frameworks",
+    lastUsed: "active",
+  },
+  {
+    name: "Express.js",
+    icon: SiExpress,
+    category: "frameworks",
+    lastUsed: "active",
+  },
+  {
+    name: "Node.js",
+    icon: SiNodedotjs,
+    category: "frameworks",
+    lastUsed: "active",
+  },
   { name: "Remix", icon: SiRemix, category: "frameworks", lastUsed: "2025" },
-  { name: "Three.js", icon: SiThreedotjs, category: "frameworks", lastUsed: "2025" },
-  { name: "Tailwind CSS", icon: SiTailwindcss, category: "frameworks", lastUsed: "active" },
-  { name: "MapLibre GL JS", icon: SiMaplibre, category: "frameworks", lastUsed: "2025" },
-  { name: "PostgreSQL", icon: SiPostgresql, category: "databases", lastUsed: "active" },
-  { name: "PL/pgSQL", icon: SiPostgresql, category: "databases", lastUsed: "active" },
+  {
+    name: "Three.js",
+    icon: SiThreedotjs,
+    category: "frameworks",
+    lastUsed: "2025",
+  },
+  {
+    name: "Tailwind CSS",
+    icon: SiTailwindcss,
+    category: "frameworks",
+    lastUsed: "active",
+  },
+  {
+    name: "MapLibre GL JS",
+    icon: SiMaplibre,
+    category: "frameworks",
+    lastUsed: "2025",
+  },
+  {
+    name: "PostgreSQL",
+    icon: SiPostgresql,
+    category: "databases",
+    lastUsed: "active",
+  },
+  {
+    name: "PL/pgSQL",
+    icon: SiPostgresql,
+    category: "databases",
+    lastUsed: "active",
+  },
   { name: "MySQL", icon: SiMysql, category: "databases", lastUsed: "2023" },
   { name: "SQLite", icon: SiSqlite, category: "databases", lastUsed: "2025" },
-  { name: "QuestDB", icon: TbDatabase, category: "databases", lastUsed: "2024" },
+  {
+    name: "QuestDB",
+    icon: TbDatabase,
+    category: "databases",
+    lastUsed: "2024",
+  },
   { name: "Firebase", icon: SiFirebase, category: "cloud", lastUsed: "2025" },
   { name: "Supabase", icon: SiSupabase, category: "cloud", lastUsed: "active" },
   { name: "GCP", icon: SiGooglecloud, category: "cloud", lastUsed: "2025" },
-  { name: "Cloudflare", icon: SiCloudflare, category: "cloud", lastUsed: "active" },
+  {
+    name: "Cloudflare",
+    icon: SiCloudflare,
+    category: "cloud",
+    lastUsed: "active",
+  },
   { name: "Docker", icon: SiDocker, category: "tools", lastUsed: "active" },
   { name: "Git", icon: SiGit, category: "tools", lastUsed: "active" },
   { name: "GitHub", icon: SiGithub, category: "tools", lastUsed: "active" },
@@ -96,18 +202,56 @@ const technologies: TechItem[] = [
   { name: "Bun", icon: SiBun, category: "tools", lastUsed: "active" },
   { name: "Neovim", icon: SiNeovim, category: "tools", lastUsed: "active" },
   { name: "Zed", icon: TbBrandVscode, category: "tools", lastUsed: "active" },
-  { name: "VS Code", icon: TbBrandVscode, category: "tools", lastUsed: "active" },
-  { name: "Android Studio", icon: SiAndroidstudio, category: "tools", lastUsed: "2025" },
-  { name: "Visual Studio", icon: TbBrandVisualStudio, category: "tools", lastUsed: "archived" },
-  { name: "Namecheap", icon: SiNamecheap, category: "tools", lastUsed: "2024" },
-  { name: "Porkbun", icon: TbWorld, category: "tools", lastUsed: "2024" },
+  {
+    name: "VS Code",
+    icon: TbBrandVscode,
+    category: "tools",
+    lastUsed: "active",
+  },
+  {
+    name: "Android Studio",
+    icon: SiAndroidstudio,
+    category: "tools",
+    lastUsed: "2025",
+  },
+  {
+    name: "Visual Studio",
+    icon: TbBrandVisualStudio,
+    category: "tools",
+    lastUsed: "archived",
+  },
+  {
+    name: "Namecheap",
+    icon: SiNamecheap,
+    category: "tools",
+    lastUsed: "active",
+  },
+  { name: "Porkbun", icon: TbWorld, category: "tools", lastUsed: "active" },
   { name: "Linux", icon: SiLinux, category: "platforms", lastUsed: "active" },
-  { name: "ArchLinux", icon: SiArchlinux, category: "platforms", lastUsed: "active" },
-  { name: "Windows", icon: TbBrandWindows, category: "platforms", lastUsed: "active" },
-  { name: "OpenStreetMaps", icon: SiOpenstreetmap, category: "platforms", lastUsed: "2024" },
+  {
+    name: "ArchLinux",
+    icon: SiArchlinux,
+    category: "platforms",
+    lastUsed: "active",
+  },
+  {
+    name: "Windows",
+    icon: TbBrandWindows,
+    category: "platforms",
+    lastUsed: "active",
+  },
+  {
+    name: "OpenStreetMaps",
+    icon: SiOpenstreetmap,
+    category: "platforms",
+    lastUsed: "2024",
+  },
 ];
 
-const categoryConfig: Record<TechCategory, { label: string; color: string; icon: string }> = {
+const categoryConfig: Record<
+  TechCategory,
+  { label: string; color: string; icon: string }
+> = {
   languages: { label: "LANGUAGES", color: "border-cyan-500", icon: "⌨" },
   frameworks: { label: "FRAMEWORKS", color: "border-purple-500", icon: "⚡" },
   databases: { label: "DATABASES", color: "border-amber-500", icon: "🗄" },
@@ -122,7 +266,9 @@ function LastUsedIndicator({ lastUsed }: { lastUsed: LastUsed }) {
   return (
     <div className="flex items-center gap-1.5">
       <div className={`h-1.5 w-1.5 shrink-0 ${config.dotColor}`} />
-      <span className={`retro text-[0.5rem] uppercase tracking-wider ${config.color}`}>
+      <span
+        className={`retro text-[0.5rem] uppercase tracking-wider ${config.color}`}
+      >
         {config.label}
       </span>
     </div>
@@ -180,7 +326,9 @@ function TechCard({ tech, index }: { tech: TechItem; index: number }) {
                   <span className="retro text-[0.45rem] uppercase tracking-wider text-muted-foreground">
                     Last Used
                   </span>
-                  <span className={`retro text-[0.5rem] font-bold uppercase ${lastUsedConfig[tech.lastUsed].color}`}>
+                  <span
+                    className={`retro text-[0.5rem] font-bold uppercase ${lastUsedConfig[tech.lastUsed].color}`}
+                  >
                     {lastUsedConfig[tech.lastUsed].label}
                   </span>
                 </div>
@@ -201,12 +349,20 @@ function TechCard({ tech, index }: { tech: TechItem; index: number }) {
   );
 }
 
-function CategorySection({ category, techs }: { category: TechCategory; techs: TechItem[] }) {
+function CategorySection({
+  category,
+  techs,
+}: {
+  category: TechCategory;
+  techs: TechItem[];
+}) {
   const config = categoryConfig[category];
 
   return (
     <div className="space-y-2">
-      <div className={`flex items-center gap-2 border-l-4 ${config.color} bg-card/50 px-3 py-2`}>
+      <div
+        className={`flex items-center gap-2 border-l-4 ${config.color} bg-card/50 px-3 py-2`}
+      >
         <span className="retro text-[0.6rem]">{config.icon}</span>
         <h3 className="retro text-[0.55rem] uppercase tracking-[0.2em] text-muted-foreground">
           {config.label}
@@ -241,7 +397,7 @@ export default function TechStackView() {
             if (catTechs.length > 0) acc[cat] = catTechs;
             return acc;
           },
-          {} as Record<TechCategory, TechItem[]>
+          {} as Record<TechCategory, TechItem[]>,
         )
       : { [activeFilter]: filteredTechs };
 
@@ -317,9 +473,14 @@ export default function TechStackView() {
         <div className="grid grid-cols-3 gap-2 lg:grid-cols-6">
           {categories.map((cat) => {
             const count = technologies.filter((t) => t.category === cat).length;
-            const activeCount = technologies.filter((t) => t.category === cat && t.lastUsed === "active").length;
+            const activeCount = technologies.filter(
+              (t) => t.category === cat && t.lastUsed === "active",
+            ).length;
             return (
-              <div key={cat} className="border border-dashed border-border/50 bg-background/50 p-2 text-center">
+              <div
+                key={cat}
+                className="border border-dashed border-border/50 bg-background/50 p-2 text-center"
+              >
                 <p className="retro text-[0.45rem] uppercase tracking-wider text-muted-foreground">
                   {categoryConfig[cat].label.split(" ")[0]}
                 </p>
