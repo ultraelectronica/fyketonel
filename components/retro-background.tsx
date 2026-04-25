@@ -24,36 +24,55 @@ export function RetroBackground({
   const [isMarioMode, setIsMarioMode] = useState(false);
   const [isAllyMode, setIsAllyMode] = useState(false);
   const [isSimonDarkMode, setIsSimonDarkMode] = useState(false);
-  const [, forceUpdate] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   // Detect themes
   useEffect(() => {
     const checkTheme = () => {
-      if (typeof window !== "undefined") {
-        const theme = localStorage.getItem("terminal-theme");
-        const simonMode = localStorage.getItem("terminal-simon-mode");
-        const shouldBeMario = theme === "simon" && simonMode === "light";
-        const shouldBeAlly = theme === "ally";
-        const shouldBeSimonDark = theme === "simon" && simonMode !== "light";
-        
-        setIsMarioMode(shouldBeMario);
-        setIsAllyMode(shouldBeAlly);
-        setIsSimonDarkMode(shouldBeSimonDark);
-        forceUpdate(prev => prev + 1);
-      }
+      if (typeof window === "undefined") return;
+
+      const html = document.documentElement;
+      const body = document.body;
+      const savedTheme = localStorage.getItem("terminal-theme");
+      const savedSimonMode = localStorage.getItem("terminal-simon-mode");
+
+      const isSimon =
+        html.classList.contains("theme-simon") ||
+        body.classList.contains("theme-simon") ||
+        savedTheme === "simon";
+      const isSimonLight =
+        html.classList.contains("simon-light") ||
+        body.classList.contains("simon-light") ||
+        savedSimonMode === "light";
+      const isAlly =
+        html.classList.contains("theme-ally") ||
+        body.classList.contains("theme-ally") ||
+        savedTheme === "ally";
+
+      setIsMarioMode(isSimon && isSimonLight);
+      setIsAllyMode(isAlly);
+      setIsSimonDarkMode(isSimon && !isSimonLight);
     };
 
     checkTheme();
     window.addEventListener("themeChanged", checkTheme);
     window.addEventListener("storage", checkTheme);
-    const interval = setInterval(checkTheme, 100);
+
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
 
     return () => {
       window.removeEventListener("themeChanged", checkTheme);
       window.removeEventListener("storage", checkTheme);
-      clearInterval(interval);
+      observer.disconnect();
     };
   }, []);
 
@@ -209,7 +228,7 @@ export function RetroBackground({
            </div>
         </div>
       ) : isSimonDarkMode ? (
-        <NeuralNetwork width={dimensions.width} height={dimensions.height} />
+        <NeuralNetwork />
       ) : isAllyMode ? (
         // Ally Garden Background
         <div
@@ -345,7 +364,7 @@ export function RetroBackground({
   );
 }
 
-const NeuralNetwork = ({ width, height }: { width: number; height: number }) => {
+const NeuralNetwork = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useLayoutEffect(() => {
@@ -372,7 +391,6 @@ const NeuralNetwork = ({ width, height }: { width: number; height: number }) => 
     resize();
     window.addEventListener("resize", resize);
 
-    // Generate network structure
     const rng = (() => {
       let s = 42;
       return () => {
@@ -385,7 +403,7 @@ const NeuralNetwork = ({ width, height }: { width: number; height: number }) => 
     })();
     const rand = () => rng();
 
-    const layers = [4, 6, 5, 6, 4];
+    const layers = [6, 9, 8, 10, 8, 9, 6];
     let W = 0;
     let H = 0;
 
@@ -397,14 +415,14 @@ const NeuralNetwork = ({ width, height }: { width: number; height: number }) => 
     const build = () => {
       const parent = canvas.parentElement;
       if (!parent) return;
-      W = parent.clientWidth;
-      H = parent.clientHeight;
+      W = parent.clientWidth || window.innerWidth;
+      H = parent.clientHeight || window.innerHeight;
       if (W === 0 || H === 0) return;
 
       nodes = [];
       conns = [];
-      const mx = Math.floor(W * 0.06);
-      const my = Math.floor(H * 0.08);
+      const mx = Math.floor(W * 0.04);
+      const my = Math.floor(H * 0.05);
       const uw = W - mx * 2;
       const uh = H - my * 2;
       const xs = layers.map((_, i) => Math.floor(mx + (uw / (layers.length - 1)) * i));
@@ -415,11 +433,11 @@ const NeuralNetwork = ({ width, height }: { width: number; height: number }) => 
         const idxs: number[] = [];
         for (let n = 0; n < count; n++) {
           const by = count > 1 ? my + ys * (n + 1) : H / 2;
-          const jx = Math.floor((rand() - 0.5) * (uw / (layers.length - 1)) * 0.2);
-          const jy = Math.floor((rand() - 0.5) * ys * 0.3);
+          const jx = Math.floor((rand() - 0.5) * (uw / (layers.length - 1)) * 0.15);
+          const jy = Math.floor((rand() - 0.5) * ys * 0.25);
           const x = xs[li] + jx;
           const y = Math.floor(by + jy);
-          const active = rand() > 0.25;
+          const active = rand() > 0.2;
           idxs.push(nodes.length);
           nodes.push({ x, y, active, phase: rand() * Math.PI * 2 });
         }
@@ -429,8 +447,8 @@ const NeuralNetwork = ({ width, height }: { width: number; height: number }) => 
       for (let li = 0; li < layers.length - 1; li++) {
         for (const a of layerNodes[li]) {
           for (const b of layerNodes[li + 1]) {
-            const active = rand() > 0.4;
-            conns.push({ a, b, active, speed: 30 + rand() * 60, phase: rand() * Math.PI * 2 });
+            const active = rand() > 0.35;
+            conns.push({ a, b, active, speed: 25 + rand() * 80, phase: rand() * Math.PI * 2 });
           }
         }
       }
@@ -438,8 +456,7 @@ const NeuralNetwork = ({ width, height }: { width: number; height: number }) => 
 
     const gold = "#FFCC00";
     const dimGold = "#FFAA00";
-    const bg = "#0a0a14";
-    const grid = "#1a1a2e";
+    const bg = "#050510";
 
     let t = 0;
     const draw = () => {
@@ -461,15 +478,6 @@ const NeuralNetwork = ({ width, height }: { width: number; height: number }) => 
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, W, H);
 
-      // 8-bit grid dots
-      const gs = 48;
-      ctx.fillStyle = grid;
-      for (let x = 0; x < W; x += gs) {
-        for (let y = 0; y < H; y += gs) {
-          ctx.fillRect(x, y, 3, 3);
-        }
-      }
-
       t += 0.016;
 
       // Connections
@@ -478,39 +486,72 @@ const NeuralNetwork = ({ width, height }: { width: number; height: number }) => 
         const nb = nodes[c.b];
         if (!na || !nb) continue;
 
-        ctx.strokeStyle = c.active ? dimGold : "#2a2a4a";
-        ctx.lineWidth = c.active ? 3 : 2;
-        ctx.beginPath();
-        ctx.moveTo(na.x, na.y);
-        ctx.lineTo(nb.x, nb.y);
-        ctx.stroke();
-
         if (c.active) {
+          const alpha = 0.55 + 0.45 * Math.sin(t * 2 + c.phase);
+          ctx.strokeStyle = dimGold;
+          ctx.globalAlpha = alpha;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(na.x, na.y);
+          ctx.lineTo(nb.x, nb.y);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+
+          // Signal packet
           const dx = nb.x - na.x;
           const dy = nb.y - na.y;
           const len = Math.sqrt(dx * dx + dy * dy);
-          const progress = ((t * c.speed + c.phase) % len) / len;
-          const px = na.x + dx * progress;
-          const py = na.y + dy * progress;
-          ctx.fillStyle = "#FFFFE0";
-          ctx.fillRect(Math.floor(px) - 4, Math.floor(py) - 4, 9, 9);
+          if (len > 0) {
+            const progress = ((t * c.speed + c.phase) % len) / len;
+            const px = na.x + dx * progress;
+            const py = na.y + dy * progress;
+            const grad = ctx.createRadialGradient(px, py, 0, px, py, 7);
+            grad.addColorStop(0, "rgba(255,255,180,0.9)");
+            grad.addColorStop(0.3, "rgba(255,200,50,0.5)");
+            grad.addColorStop(1, "rgba(255,170,0,0)");
+            ctx.fillStyle = grad;
+            ctx.fillRect(Math.floor(px) - 7, Math.floor(py) - 7, 14, 14);
+          }
+        } else {
+          ctx.strokeStyle = "#303050";
+          ctx.globalAlpha = 0.45;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(na.x, na.y);
+          ctx.lineTo(nb.x, nb.y);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
         }
       }
 
       // Nodes
       for (const n of nodes) {
-        const pulse = n.active ? 0.9 + 0.1 * Math.sin(t * 3 + n.phase) : 0.6;
-        ctx.fillStyle = n.active ? gold : "#8888aa";
-        ctx.globalAlpha = pulse;
-        const s = n.active ? 10 : 7;
-        ctx.fillRect(Math.floor(n.x - s / 2), Math.floor(n.y - s / 2), s, s);
-        ctx.globalAlpha = 1;
+        if (n.active) {
+          const pulse = 0.6 + 0.4 * Math.sin(t * 2.5 + n.phase);
+
+          // Glow halo
+          const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, 14);
+          grad.addColorStop(0, `rgba(255,200,0,${pulse * 0.35})`);
+          grad.addColorStop(1, "rgba(255,170,0,0)");
+          ctx.fillStyle = grad;
+          ctx.fillRect(Math.floor(n.x) - 14, Math.floor(n.y) - 14, 28, 28);
+
+          // Core
+          ctx.globalAlpha = pulse;
+          ctx.fillStyle = gold;
+          ctx.fillRect(Math.floor(n.x) - 5, Math.floor(n.y) - 5, 10, 10);
+          ctx.globalAlpha = 1;
+        } else {
+          ctx.globalAlpha = 0.5;
+          ctx.fillStyle = "#555580";
+          ctx.fillRect(Math.floor(n.x) - 3, Math.floor(n.y) - 3, 6, 6);
+          ctx.globalAlpha = 1;
+        }
       }
 
       animId = requestAnimationFrame(draw);
     };
 
-    // Defer initial build until after browser layout is computed
     const start = () => {
       resize();
       build();
@@ -528,7 +569,7 @@ const NeuralNetwork = ({ width, height }: { width: number; height: number }) => 
   }, []);
 
   return (
-    <div aria-hidden="true" className="absolute inset-0" style={{ background: "#0a0a14" }}>
+    <div aria-hidden="true" className="fixed inset-0 z-0 pointer-events-none" style={{ background: "#050510" }}>
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full block"
@@ -673,5 +714,3 @@ const SakuraLeaves = () => {
 };
 
 export default RetroBackground;
-
-
