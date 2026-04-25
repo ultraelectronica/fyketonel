@@ -1,0 +1,28 @@
+// Kevlar Lesson 2: functions and reuse
+// Open with: oxygen kevlar/lessons/02-functions.kv
+
+print("Lesson 2: functions")
+
+fn double(n) => n * 2
+
+fn badge(name, score) {
+  "Pilot ${name} scored ${score}"
+}
+
+let score = double(7)
+print(score)
+print(badge("Nova", score))
+
+let values = [2, 4, 6]
+for value in values {
+  print(double(value))
+}
+
+// Drill 1:
+// Write fn triple(n) => n * 3 and print(triple(5)).
+
+// Drill 2:
+// Make a fn greet(name) that returns a string.
+
+// Drill 3:
+// Replace "Nova" with your own name.

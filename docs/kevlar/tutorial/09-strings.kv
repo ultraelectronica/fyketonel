@@ -1,0 +1,44 @@
+// ============================================
+// Kevlar Tutorial — Chapter 9: Strings
+// ============================================
+// Strings hold text. Kevlar supports interpolation,
+// concatenation, and escaping.
+
+// --- String interpolation ---
+// Use ${variable} inside a string:
+let pilot = "Orpheus"
+let ship = "Voidrunner"
+print("Pilot ${pilot} aboard ${ship}")
+
+// --- Expressions in interpolation ---
+let a = 5
+let b = 3
+print("Sum: ${a + b}")
+
+// --- Single vs double quotes ---
+print('single quoted string')
+print("double quoted string")
+print("It's a fine day")
+print('She said "hello"')
+
+// --- Concatenation ---
+let first = "Hello"
+let second = "World"
+print(first + " " + second + "!")
+
+// --- Escape sequences ---
+print("Line 1\nLine 2\nLine 3")  // \n = newline
+print("Column A\tColumn B")      // \t = tab
+print("She said \"wow\"")         // \" = literal quote
+print("Backslash: \\")            // \\ = literal backslash
+
+// --- Built-in string functions ---
+// str() converts anything to a string:
+print(str(42))
+print(str(true))
+print(str(3.14159))
+
+// --- Try it: ---
+// 1. Create a string with your name and age using interpolation
+// 2. Print a message with a newline in the middle
+// 3. Convert a number to a string with str() and concatenate

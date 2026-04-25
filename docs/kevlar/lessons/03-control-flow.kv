@@ -1,0 +1,30 @@
+// Kevlar Lesson 3: control flow
+// Open with: oxygen kevlar/lessons/03-control-flow.kv
+
+print("Lesson 3: control flow")
+
+let mut hp = 2
+
+if hp > 2 {
+  print("stable")
+} else {
+  print("repair")
+}
+
+let mut countdown = 3
+while countdown > 0 {
+  print(countdown)
+  countdown -= 1
+}
+print("lift-off")
+
+// Match practice:
+// Uncomment and inspect the result.
+// match hp {
+//   0 => "offline"
+//   1 => "critical"
+//   _ => "ready"
+// }
+
+// Drill:
+// Start hp at 5 and change the countdown length.

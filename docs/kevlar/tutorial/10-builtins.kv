@@ -1,0 +1,47 @@
+// ============================================
+// Kevlar Tutorial — Chapter 10: Built-in Functions
+// ============================================
+// Kevlar comes with many built-in functions for math,
+// type conversion, and randomization.
+
+// --- Math ---
+print(sqrt(16))        // 4
+print(abs(-42))        // 42
+print(ceil(3.1))       // 4
+print(floor(3.9))      // 3
+print(round(3.5))      // 4
+print(pow(2, 10))      // 1024
+print(min(5, 3, 9))    // 3
+print(max(5, 3, 9))    // 9
+
+// --- Trigonometry ---
+print(sin(PI / 2))     // 1
+print(cos(0))          // 1
+
+// --- Logarithms ---
+print(log(E))          // 1
+print(log10(100))      // 2
+
+// --- Type conversion ---
+print(str(42))         // "42"
+print(int("42"))       // 42
+print(float("3.14"))   // 3.14
+print(type(42))        // int
+print(type("hello"))   // string
+print(type(true))      // bool
+
+// --- Random ---
+print(rand())          // random float 0-1
+print(rand_int(1, 6))  // random int between 1 and 6 (inclusive)
+
+// --- Constants ---
+print(PI)              // 3.141592653589793
+print(E)               // 2.718281828459045
+print(TAU)             // 6.283185307179586
+print(SQRT2)           // 1.4142135623730951
+
+// --- Try it: ---
+// 1. Round 7.8 and print it
+// 2. Generate a random number between 1 and 100
+// 3. Use sqrt and pow together to verify sqrt(pow(5,2)) == 5
+// 4. Print PI * 2 and compare it with TAU

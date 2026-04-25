@@ -1,0 +1,55 @@
+// ============================================
+// Kevlar Tutorial — Chapter 11: Mini Project
+// ============================================
+// Let's build a temperature converter and report.
+// You'll use variables, functions, loops, and lists!
+
+print("=== Temperature Scanner v1.0 ===")
+
+// Step 1: Write a converter function
+fn celsiusToFahrenheit(c) => c * 9 / 5 + 32
+fn fahrenheitToCelsius(f) => (f - 32) * 5 / 9
+
+// Step 2: Write a classifier
+fn classify(temp) {
+  if temp > 35 {
+    "HOT! Stay hydrated"
+  } else if temp > 25 {
+    "Warm — nice weather"
+  } else if temp > 15 {
+    "Mild — bring a jacket"
+  } else {
+    "Cold! Bundle up"
+  }
+}
+
+// Step 3: Process a list of readings
+let celsiusReadings = [12, 18, 24, 28, 33, 40]
+
+for reading in celsiusReadings {
+  let f = celsiusToFahrenheit(reading)
+  let label = classify(reading)
+  print("${reading}°C / ${f}°F — ${label}")
+}
+
+// Step 4: Find min and max
+let lowest = min(12, 18, 24, 28, 33, 40)
+let highest = max(12, 18, 24, 28, 33, 40)
+print("")
+print("Range: ${lowest}°C to ${highest}°C")
+print("Readings processed: ${len(celsiusReadings)}")
+
+// --- Try it: ---
+// 1. Add more readings to the list
+// 2. Change the thresholds in classify()
+// 3. Add a function that converts to Kelvin (K = C + 273.15)
+// 4. Save your version as my-scanner.kv with :save
+
+print("")
+print("=== Congratulations! ===")
+print("You've completed the Kevlar tutorial!")
+print("")
+print("Next steps:")
+print("  cat kevlar/syntax.md    — full syntax reference")
+print("  cat kevlar/examples.md  — more examples")
+print("  kevlar let x = 42       — try expressions live")

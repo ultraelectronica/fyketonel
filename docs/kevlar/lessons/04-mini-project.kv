@@ -1,0 +1,25 @@
+// Kevlar Lesson 4: mini project
+// Goal: build a tiny scanner report.
+
+print("Lesson 4: scanner report")
+
+fn classify(temp) {
+  if temp > 80 {
+    "hot"
+  } else if temp > 50 {
+    "warm"
+  } else {
+    "cold"
+  }
+}
+
+let readings = [42, 67, 91]
+for reading in readings {
+  print(classify(reading))
+}
+
+// Mission:
+// 1. Add more readings.
+// 2. Change the thresholds in classify().
+// 3. Print a label before each result.
+// 4. Save your version as scanner-report.kv.

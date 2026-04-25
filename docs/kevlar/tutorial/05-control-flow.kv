@@ -1,0 +1,46 @@
+// ============================================
+// Kevlar Tutorial — Chapter 5: Control Flow
+// ============================================
+// if/else lets your code make decisions.
+
+let fuel = 25
+
+// --- Basic if ---
+if fuel > 20 {
+  print("Fuel is good")
+}
+
+// --- if / else ---
+if fuel > 50 {
+  print("Tank is full")
+} else {
+  print("Tank is getting low")
+}
+
+// --- if / else if / else ---
+let status = 3
+if status == 0 {
+  print("Offline")
+} else if status == 1 {
+  print("Starting up")
+} else if status == 2 {
+  print("Warming up")
+} else {
+  print("Ready!")
+}
+
+// --- Nested if ---
+let mut power = 80
+let shields = 60
+if power > 50 {
+  if shields > 70 {
+    print("All systems optimal")
+  } else {
+    print("Power good, shields low")
+  }
+}
+
+// --- Try it: ---
+// 1. Set fuel to 80 and run again
+// 2. Add a new else if for status == 3
+// 3. Write an if that checks if a number is negative

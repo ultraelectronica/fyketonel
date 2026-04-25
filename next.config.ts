@@ -6,9 +6,9 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
-  "style-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.cdnfonts.com",
   "img-src 'self' data: blob: https://ghchart.rshah.org",
-  "font-src 'self' data:",
+  "font-src 'self' data: https://fonts.gstatic.com https://fonts.cdnfonts.com",
   `connect-src 'self' https://api.github.com https://github-contributions-api.deno.dev${isDevelopment ? " ws: wss: http:" : ""}`,
   "frame-src 'self'",
   "frame-ancestors 'self'",

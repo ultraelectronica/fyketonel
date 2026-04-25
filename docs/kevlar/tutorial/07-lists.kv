@@ -1,0 +1,46 @@
+// ============================================
+// Kevlar Tutorial — Chapter 7: Lists
+// ============================================
+// Lists hold multiple values in order.
+
+// --- Creating lists ---
+let empty = []
+let nums = [10, 20, 30, 40]
+let mixed = [1, "hello", true, 3.14]
+
+// --- Accessing by index (0-based) ---
+print(nums[0])    // 10 (first item)
+print(nums[2])    // 30 (third item)
+
+// --- Length ---
+print(len(nums))  // 4
+
+// --- push() adds to the end ---
+let mut items = ["shield", "sword"]
+push(items, "potion")
+print(items)      // ["shield", "sword", "potion"]
+
+// --- pop() removes and returns the last item ---
+let mut stack = ["A", "B", "C"]
+let top = pop(stack)
+print(top)        // "C"
+print(stack)      // ["A", "B"]
+print(len(stack)) // 2
+
+// --- try_pop() removes and returns last item safely ---
+let mut sparse = [3, 7]
+let result = try_pop(sparse)
+print(result)     // 7
+print(sparse)     // [3]
+
+// --- Looping over lists ---
+let tools = ["hammer", "wrench", "drill"]
+for tool in tools {
+  print("Tool: ${tool}")
+}
+
+// --- Try it: ---
+// 1. Create a list of 5 numbers
+// 2. Push a 6th number and print the list
+// 3. Pop the last item and print both it and the list
+// 4. Loop and print each item multiplied by 2
