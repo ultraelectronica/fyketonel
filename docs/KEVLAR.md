@@ -8,9 +8,9 @@ Kevlar v2 is the built-in programming language for **Hazmat Shell**. It features
 
 ```
 kevlar <expression>
-kevlar 2 + 3 * 4
-kevlar let x = 42
-kevlar fn square(n) => n * n
+kevlar 2 + 3 * 4;
+kevlar let x = 42;
+kevlar fn square(n) => n * n;
 oxygen              # Open the O₂ code editor
 oxygen program.kv   # Open a file in O₂
 ```
@@ -23,7 +23,9 @@ Oxygen is the built-in code editor for Kevlar v2 inside Hazmat Shell.
 
 - **Open**: `oxygen` or `oxygen filename.kv`
 - **Commands**: `:run` (execute), `:save [f]` (save file), `:quit` (exit), `:clear` (clear output), `:help`
-- **Shortcuts**: `Ctrl+Enter` (run), `Ctrl+S` (save), `Escape` (command mode), `Tab` (indent)
+- **Shortcuts**: `Ctrl+Enter` (run), `Ctrl+S` (save), `Escape` (command mode), `Enter` (smart indent), `Tab` (indent)
+
+Statements can end with `;`. Newlines still separate statements too, but the reference examples use semicolons for readability.
 
 ---
 
@@ -31,10 +33,10 @@ Oxygen is the built-in code editor for Kevlar v2 inside Hazmat Shell.
 
 | Syntax | Meaning | Example |
 |--------|---------|---------|
-| `let x = val` | Immutable binding | `let x = 42` |
-| `let mut x = val` | Mutable binding | `let mut y = 0` |
-| `var x = val` | Mutable (Dart shorthand) | `var count = 0` |
-| `let x: type = val` | Typed binding | `let name: string = "hazmat"` |
+| `let x = val;` | Immutable binding | `let x = 42;` |
+| `let mut x = val;` | Mutable binding | `let mut y = 0;` |
+| `var x = val;` | Mutable (Dart shorthand) | `var count = 0;` |
+| `let x: type = val;` | Typed binding | `let name: string = "hazmat";` |
 
 ---
 
@@ -42,18 +44,20 @@ Oxygen is the built-in code editor for Kevlar v2 inside Hazmat Shell.
 
 ```kevlar
 fn add(a, b) {
-    a + b
+    a + b;
 }
 
-fn double(n) => n * 2
+fn double(n) => n * 2;
 
 fn greet(name: string) -> string {
-    "Hello, ${name}!"
+    "Hello, ${name}!";
 }
 
 fn factorial(n) {
-    if n <= 1 { return 1 }
-    n * factorial(n - 1)
+    if n <= 1 {
+        return 1;
+    }
+    n * factorial(n - 1);
 }
 ```
 
@@ -78,11 +82,11 @@ fn factorial(n) {
 
 ```kevlar
 if x > 10 {
-    print("big")
+    print("big");
 } else if x > 5 {
-    print("medium")
+    print("medium");
 } else {
-    print("small")
+    print("small");
 }
 ```
 
@@ -90,11 +94,11 @@ if x > 10 {
 
 ```kevlar
 for i in 0..10 {
-    print(i)
+    print(i);
 }
 
 for item in [1, 2, 3] {
-    print(item)
+    print(item);
 }
 ```
 
@@ -102,7 +106,7 @@ for item in [1, 2, 3] {
 
 ```kevlar
 while count < 5 {
-    count += 1
+    count += 1;
 }
 ```
 
@@ -123,11 +127,11 @@ match x {
 ## Lists
 
 ```kevlar
-let nums = [1, 2, 3]
+let nums = [1, 2, 3];
 nums[0]          // 1
 len(nums)        // 3
-push(nums, 4)    // [1, 2, 3, 4]
-pop(nums)        // removes and returns last
+push(nums, 4);   // [1, 2, 3, 4]
+pop(nums);       // removes and returns last
 ```
 
 ---
@@ -135,8 +139,8 @@ pop(nums)        // removes and returns last
 ## String Interpolation
 
 ```kevlar
-let name = "Hazmat"
-let msg = "Hello, ${name}!"
+let name = "Hazmat";
+let msg = "Hello, ${name}!";
 // Escapes: \n \t \\ \' \"
 ```
 
@@ -241,7 +245,7 @@ let msg = "Hello, ${name}!"
 
 ```kevlar
 // This is a line comment
-let x = 42  // inline comment
+let x = 42;  // inline comment
 ```
 
 ---

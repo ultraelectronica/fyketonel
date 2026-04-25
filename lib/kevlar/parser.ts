@@ -187,13 +187,18 @@ export function parse(source: string): ProgramNode {
   };
 
   const skipNewlines = () => { while (peek().type === TokenType.Newline) advance(); };
+  const skipStatementSeparators = () => {
+    while (peek().type === TokenType.Newline || peek().type === TokenType.Semicolon) {
+      advance();
+    }
+  };
 
   function parseProgram(): ProgramNode {
     const statements: ASTNode[] = [];
-    skipNewlines();
+    skipStatementSeparators();
     while (peek().type !== TokenType.EOF) {
       statements.push(parseStatement());
-      skipNewlines();
+      skipStatementSeparators();
     }
     return { kind: "program", statements };
   }
@@ -591,12 +596,11 @@ export function parse(source: string): ProgramNode {
 
   function parseBlock(): BlockNode {
     expect(TokenType.LBrace);
-    skipNewlines();
+    skipStatementSeparators();
     const statements: ASTNode[] = [];
     while (peek().type !== TokenType.RBrace && peek().type !== TokenType.EOF) {
       statements.push(parseStatement());
-      match(TokenType.Semicolon);
-      skipNewlines();
+      skipStatementSeparators();
     }
     expect(TokenType.RBrace);
     return { kind: "block", statements };

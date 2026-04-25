@@ -31,6 +31,26 @@ const OXYGEN_BUILTINS = [
 
 const OXYGEN_CONSTANTS = ["PI", "E", "PHI", "TAU", "LN2", "LN10", "SQRT2"];
 const OXYGEN_COMPLETIONS = [...OXYGEN_KEYWORDS, ...OXYGEN_BUILTINS, ...OXYGEN_CONSTANTS];
+const OXYGEN_INDENT = "  ";
+
+function getLineIndent(code: string, cursor: number) {
+  const lineStart = code.lastIndexOf("\n", cursor - 1) + 1;
+  return code.slice(lineStart, cursor).match(/^\s*/)?.[0] ?? "";
+}
+
+function getPreviousNonWhitespace(code: string, cursor: number) {
+  for (let i = cursor - 1; i >= 0; i--) {
+    if (!/\s/.test(code[i] ?? "")) return code[i];
+  }
+  return "";
+}
+
+function getNextNonWhitespace(code: string, cursor: number) {
+  for (let i = cursor; i < code.length; i++) {
+    if (!/\s/.test(code[i] ?? "")) return code[i];
+  }
+  return "";
+}
 
 function getCompletionContext(code: string, cursor: number) {
   const match = code.slice(0, cursor).match(/[a-zA-Z_][a-zA-Z0-9_]*$/);
@@ -243,6 +263,33 @@ export function OxygenEditor({ initialCode, onRun, onSave, onQuit, filename: ini
       return;
     }
 
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      const textarea = e.currentTarget;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const currentIndent = getLineIndent(code, start);
+      const previousChar = getPreviousNonWhitespace(code, start);
+      const nextChar = getNextNonWhitespace(code, end);
+      const indent = previousChar === "{" ? currentIndent + OXYGEN_INDENT : currentIndent;
+
+      if (previousChar === "{" && nextChar === "}") {
+        const insert = `\n${indent}\n${currentIndent}`;
+        setCode(code.slice(0, start) + insert + code.slice(end));
+        const cursorPos = start + 1 + indent.length;
+        setSelection({ start: cursorPos, end: cursorPos });
+        focusEditor(cursorPos);
+      } else {
+        const insert = `\n${indent}`;
+        setCode(code.slice(0, start) + insert + code.slice(end));
+        const cursorPos = start + insert.length;
+        setSelection({ start: cursorPos, end: cursorPos });
+        focusEditor(cursorPos);
+      }
+      return;
+    }
+
     if (e.key === "Tab") {
       e.preventDefault();
 
@@ -254,10 +301,11 @@ export function OxygenEditor({ initialCode, onRun, onSave, onQuit, filename: ini
       const textarea = e.currentTarget;
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
-      const newCode = code.substring(0, start) + "  " + code.substring(end);
+      const newCode = code.substring(0, start) + OXYGEN_INDENT + code.substring(end);
       setCode(newCode);
-      setSelection({ start: start + 2, end: start + 2 });
-      focusEditor(start + 2);
+      setSelection({ start: start + OXYGEN_INDENT.length, end: start + OXYGEN_INDENT.length });
+      focusEditor(start + OXYGEN_INDENT.length);
+      return;
     }
   };
 
@@ -328,6 +376,7 @@ export function OxygenEditor({ initialCode, onRun, onSave, onQuit, filename: ini
           "  Ctrl+Enter      Run code",
           "  Ctrl+S           Save file",
           "  Escape           Enter command mode",
+          "  Enter            Smart indent",
           "  Tab              Accept autocomplete or insert 2 spaces",
           "  ↑/↓              Move autocomplete selection",
         ]);
@@ -496,7 +545,7 @@ export function OxygenEditor({ initialCode, onRun, onSave, onQuit, filename: ini
         ) : (
           <div className="flex w-full items-center justify-between">
             <span className="retro text-[0.55rem] uppercase tracking-[0.1em] text-muted-foreground">
-              Esc → command mode | Ctrl+Enter → run | Tab → autocomplete/indent
+              Esc → command mode | Ctrl+Enter → run | Enter → smart indent | Tab → autocomplete/indent
             </span>
             <span className="retro text-[0.55rem] uppercase tracking-[0.1em] text-primary">KEVLAR v2</span>
           </div>
