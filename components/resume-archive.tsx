@@ -52,9 +52,9 @@ const ChestPixel = ({ isGlowing = false }: { isGlowing?: boolean }) => (
   </div>
 );
 
-// New: Golden key pixel art
+// Golden key pixel art
 const KeyPixel = () => (
-  <motion.div 
+  <motion.div
     className="flex items-center"
     animate={{ rotate: [0, -10, 10, 0] }}
     transition={{ duration: 0.6, repeat: 2 }}
@@ -74,14 +74,14 @@ const KeyPixel = () => (
   </motion.div>
 );
 
-// New: Document with animated pages
+// Document with animated pages
 const DocumentPixel = ({ isAnimating = false }: { isAnimating?: boolean }) => (
   <div className="relative">
     {/* Stack effect - back pages */}
     <div className="absolute left-1 top-1 h-10 w-8 border-2 border-foreground/30 bg-gray-200 dark:bg-gray-700 sm:h-12 sm:w-9" />
     <div className="absolute left-0.5 top-0.5 h-10 w-8 border-2 border-foreground/40 bg-gray-100 dark:bg-gray-600 sm:h-12 sm:w-9" />
     {/* Main document */}
-    <motion.div 
+    <motion.div
       className="relative h-10 w-8 border-2 border-foreground bg-white dark:bg-gray-200 sm:h-12 sm:w-9"
       animate={isAnimating ? { y: [-1, 1, -1] } : {}}
       transition={{ duration: 0.5, repeat: Infinity }}
@@ -138,7 +138,7 @@ const ParticleBurst = ({ isActive }: { isActive: boolean }) => (
             key={i}
             className="absolute left-1/2 top-1/2 h-2 w-2 rounded-full"
             style={{
-              background: i % 3 === 0 ? '#fbbf24' : i % 3 === 1 ? '#f97316' : '#22c55e',
+              background: i % 3 === 0 ? "#fbbf24" : i % 3 === 1 ? "#f97316" : "#22c55e",
             }}
             initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
             animate={{
@@ -156,7 +156,15 @@ const ParticleBurst = ({ isActive }: { isActive: boolean }) => (
 );
 
 // Loot drop animation
-const LootDrop = ({ isActive, onComplete }: { isActive: boolean; onComplete: () => void }) => {
+const LootDrop = ({
+  isActive,
+  onComplete,
+  docLabel,
+}: {
+  isActive: boolean;
+  onComplete: () => void;
+  docLabel: string;
+}) => {
   useEffect(() => {
     if (isActive) {
       const timer = setTimeout(onComplete, 1500);
@@ -199,7 +207,7 @@ const LootDrop = ({ isActive, onComplete }: { isActive: boolean; onComplete: () 
               className="text-center"
             >
               <p className="retro text-lg uppercase tracking-[0.3em] text-amber-500 dark:text-amber-400 sm:text-xl">
-                +1 Resume Acquired!
+                +1 {docLabel} Acquired!
               </p>
               <p className="retro mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
                 Item added to inventory
@@ -215,6 +223,49 @@ const LootDrop = ({ isActive, onComplete }: { isActive: boolean; onComplete: () 
 // ============================================
 // DATA
 // ============================================
+
+type DocType = "cv" | "resume";
+
+interface DocumentConfig {
+  id: DocType;
+  label: string;
+  fullLabel: string;
+  previewLabel: string;
+  fileName: string;
+  displayName: string;
+  path: string;
+  downloadName: string;
+  stats: {
+    date: string;
+    size: string;
+    pages: string;
+  };
+}
+
+const documents: Record<DocType, DocumentConfig> = {
+  cv: {
+    id: "cv",
+    label: "CV",
+    fullLabel: "Curriculum Vitae",
+    previewLabel: "CV_PREVIEW",
+    fileName: "CV_FYKE_TONEL.pdf",
+    displayName: "FYKE_TONEL_CV.pdf",
+    path: "/Resume/CV_FYKE_TONEL.pdf",
+    downloadName: "FYKE_TONEL_CV.pdf",
+    stats: { date: "Apr 2026", size: "~153 KB", pages: "4 Pages" },
+  },
+  resume: {
+    id: "resume",
+    label: "Resume",
+    fullLabel: "Resume",
+    previewLabel: "RESUME_PREVIEW",
+    fileName: "RESUME_FYKE_TONEL.pdf",
+    displayName: "FYKE_TONEL_RESUME.pdf",
+    path: "/Resume/RESUME_FYKE_TONEL.pdf",
+    downloadName: "FYKE_TONEL_RESUME.pdf",
+    stats: { date: "Apr 2026", size: "~137 KB", pages: "2 Pages" },
+  },
+};
 
 // Enhanced skills with categories and icons
 const extractedSkills = [
@@ -238,23 +289,13 @@ interface Achievement {
 }
 
 const achievements: Achievement[] = [
-  { id: "document-hunter", title: "Document Hunter", description: "Decrypted the resume", icon: "🔓", points: 15, rarity: "common" },
-  { id: "loot-collector", title: "Loot Collector", description: "Downloaded the resume", icon: "📦", points: 25, rarity: "common" },
+  { id: "document-hunter", title: "Document Hunter", description: "Decrypted a document", icon: "🔓", points: 15, rarity: "common" },
+  { id: "master-decoder", title: "Master Decoder", description: "Decrypted both CV and Resume", icon: "🗝️", points: 50, rarity: "rare" },
+  { id: "loot-collector", title: "Loot Collector", description: "Downloaded a document", icon: "📦", points: 25, rarity: "common" },
+  { id: "hoarder", title: "Hoarder", description: "Downloaded both documents", icon: "💼", points: 50, rarity: "rare" },
   { id: "power-reader", title: "Power Reader", description: "Viewed in full screen", icon: "🔍", points: 10, rarity: "common" },
   { id: "repeat-offender", title: "Repeat Offender", description: "Downloaded 3+ times", icon: "🔄", points: 50, rarity: "rare" },
 ];
-
-// Document metadata
-const documentMetadata = {
-  experienceYears: 5,
-  projectsCount: 12,
-  skillsCount: 18,
-  lastUpdated: "Apr 2026",
-  fileIntegrity: "Verified ✓",
-  archiveDate: "Apr 2026",
-  dataWeight: "~137 KB",
-  scrollLength: "4 Pages",
-};
 
 // Category colors
 const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
@@ -271,56 +312,87 @@ const categoryColors: Record<string, { bg: string; text: string; border: string 
 // ============================================
 
 export function ResumeArchive({ className }: { className?: string }) {
-  const [isDecrypted, setIsDecrypted] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanProgress, setScanProgress] = useState(0);
-  const [showSkills, setShowSkills] = useState(false);
+  const [activeDoc, setActiveDoc] = useState<DocType>("cv");
+
+  // Per-document states
+  const [decryptedDocs, setDecryptedDocs] = useState<Record<DocType, boolean>>({ cv: false, resume: false });
+  const [scanningDocs, setScanningDocs] = useState<Record<DocType, boolean>>({ cv: false, resume: false });
+  const [scanProgress, setScanProgress] = useState<Record<DocType, number>>({ cv: 0, resume: 0 });
+  const [showSkillsDocs, setShowSkillsDocs] = useState<Record<DocType, boolean>>({ cv: false, resume: false });
+
+  // Global states
   const [downloadCount, setDownloadCount] = useState(0);
   const [showParticles, setShowParticles] = useState(false);
   const [showLootDrop, setShowLootDrop] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([]);
   const [showAchievementToast, setShowAchievementToast] = useState<Achievement | null>(null);
   const [viewedFullScreen, setViewedFullScreen] = useState(false);
+  const [downloadedDocs, setDownloadedDocs] = useState<Set<DocType>>(new Set());
+
+  const currentDoc = documents[activeDoc];
+  const isDecrypted = decryptedDocs[activeDoc];
+  const isScanning = scanningDocs[activeDoc];
+  const currentScanProgress = scanProgress[activeDoc];
+  const showSkills = showSkillsDocs[activeDoc];
 
   // Unlock achievement helper
-  const unlockAchievement = useCallback((achievementId: string) => {
-    if (!unlockedAchievements.includes(achievementId)) {
-      const achievement = achievements.find(a => a.id === achievementId);
-      if (achievement) {
-        setUnlockedAchievements(prev => [...prev, achievementId]);
-        setShowAchievementToast(achievement);
-        setTimeout(() => setShowAchievementToast(null), 3000);
+  const unlockAchievement = useCallback(
+    (achievementId: string) => {
+      if (!unlockedAchievements.includes(achievementId)) {
+        const achievement = achievements.find((a) => a.id === achievementId);
+        if (achievement) {
+          setUnlockedAchievements((prev) => [...prev, achievementId]);
+          setShowAchievementToast(achievement);
+          setTimeout(() => setShowAchievementToast(null), 3000);
+        }
       }
-    }
-  }, [unlockedAchievements]);
+    },
+    [unlockedAchievements]
+  );
 
   // Handle decrypt animation
   const handleDecrypt = () => {
-    setIsScanning(true);
-    setScanProgress(0);
+    setScanningDocs((prev) => ({ ...prev, [activeDoc]: true }));
+    setScanProgress((prev) => ({ ...prev, [activeDoc]: 0 }));
 
     const interval = setInterval(() => {
       setScanProgress((prev) => {
-        if (prev >= 100) {
+        const current = prev[activeDoc];
+        if (current >= 100) {
           clearInterval(interval);
-          setIsScanning(false);
-          setIsDecrypted(true);
+          setScanningDocs((s) => ({ ...s, [activeDoc]: false }));
+          setDecryptedDocs((d) => ({ ...d, [activeDoc]: true }));
           setShowParticles(true);
           setTimeout(() => setShowParticles(false), 1000);
-          setTimeout(() => setShowSkills(true), 500);
+          setTimeout(() => setShowSkillsDocs((s) => ({ ...s, [activeDoc]: true })), 500);
           unlockAchievement("document-hunter");
-          return 100;
+          return { ...prev, [activeDoc]: 100 };
         }
-        return prev + 5;
+        return { ...prev, [activeDoc]: current + 5 };
       });
     }, 100);
   };
+
+  // Check for multi-document achievements
+  useEffect(() => {
+    const decryptedCount = Object.values(decryptedDocs).filter(Boolean).length;
+    if (decryptedCount >= 2) {
+      unlockAchievement("master-decoder");
+    }
+  }, [decryptedDocs, unlockAchievement]);
+
+  useEffect(() => {
+    if (downloadedDocs.size >= 2) {
+      unlockAchievement("hoarder");
+    }
+  }, [downloadedDocs, unlockAchievement]);
 
   // Handle download with loot drop effect
   const handleDownload = () => {
     setShowLootDrop(true);
     setDownloadCount((prev) => prev + 1);
-    
+    setDownloadedDocs((prev) => new Set(prev).add(activeDoc));
+
     // Unlock achievements
     unlockAchievement("loot-collector");
     if (downloadCount >= 2) {
@@ -329,8 +401,8 @@ export function ResumeArchive({ className }: { className?: string }) {
 
     // Trigger actual download
     const link = document.createElement("a");
-    link.href = "/Resume/CV_FYKE_TONEL.pdf";
-    link.download = "FYKE_TONEL_CV.pdf";
+    link.href = currentDoc.path;
+    link.download = currentDoc.downloadName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -338,27 +410,35 @@ export function ResumeArchive({ className }: { className?: string }) {
 
   // Handle full view
   const handleFullView = () => {
-    window.open("/Resume/CV_FYKE_TONEL.pdf", "_blank");
+    window.open(currentDoc.path, "_blank");
     if (!viewedFullScreen) {
       setViewedFullScreen(true);
       unlockAchievement("power-reader");
     }
   };
 
+  // Switch active document
+  const switchDoc = (doc: DocType) => {
+    if (doc === activeDoc) return;
+    setActiveDoc(doc);
+  };
+
   const totalPoints = unlockedAchievements.reduce((sum, id) => {
-    const achievement = achievements.find(a => a.id === id);
+    const achievement = achievements.find((a) => a.id === id);
     return sum + (achievement?.points || 0);
   }, 0);
+
+  const decryptedCount = Object.values(decryptedDocs).filter(Boolean).length;
 
   return (
     <section
       className={cn(
         "relative overflow-hidden rounded-none border-2 border-border bg-card text-card-foreground shadow-[4px_4px_0_var(--border)]",
-        className,
+        className
       )}
     >
       {/* Loot Drop Overlay */}
-      <LootDrop isActive={showLootDrop} onComplete={() => setShowLootDrop(false)} />
+      <LootDrop isActive={showLootDrop} onComplete={() => setShowLootDrop(false)} docLabel={currentDoc.label} />
 
       {/* Achievement Toast */}
       <AnimatePresence>
@@ -396,7 +476,7 @@ export function ResumeArchive({ className }: { className?: string }) {
               Resume Archive
             </h2>
             <p className="retro mt-1.5 max-w-md text-[0.6rem] uppercase tracking-[0.14em] text-muted-foreground sm:text-[0.65rem]">
-              Encrypted dossier · decrypt to preview, then loot or open full PDF
+              Encrypted dossiers · decrypt to preview, then loot or open full PDF
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2 border-2 border-border bg-background/80 px-3 py-2 shadow-[2px_2px_0_var(--border)]">
@@ -413,13 +493,102 @@ export function ResumeArchive({ className }: { className?: string }) {
         </div>
       </div>
 
+      {/* Document Type Selector */}
+      <div className="border-b-2 border-border bg-muted/20 px-4 py-2">
+        <div className="mx-auto flex max-w-5xl gap-2">
+          {(Object.values(documents) as DocumentConfig[]).map((doc) => {
+            const isActive = activeDoc === doc.id;
+            const isDocDecrypted = decryptedDocs[doc.id];
+            return (
+              <button
+                key={doc.id}
+                onClick={() => switchDoc(doc.id)}
+                className={cn(
+                  "relative flex flex-1 items-center justify-center gap-2 border-2 px-3 py-2 transition-all",
+                  isActive
+                    ? "border-primary bg-primary/10 shadow-[3px_3px_0_var(--primary)]"
+                    : "border-border bg-background/50 shadow-[2px_2px_0_var(--border)] hover:border-primary/50"
+                )}
+              >
+                {/* Document icon */}
+                <div className="flex flex-col items-center">
+                  <div
+                    className={cn(
+                      "relative h-6 w-5 border-2 border-foreground sm:h-7 sm:w-6",
+                      isDocDecrypted ? "bg-white dark:bg-gray-200" : "bg-gray-300 dark:bg-gray-600"
+                    )}
+                  >
+                    {isDocDecrypted && (
+                      <>
+                        <div className="absolute left-0.5 right-0.5 top-0.5 h-0.5 bg-primary/60" />
+                        <div className="absolute left-0.5 right-0.5 top-1.5 h-0.5 bg-foreground/30 sm:top-2" />
+                        <div className="absolute left-0.5 right-1 top-2.5 h-0.5 bg-foreground/20 sm:top-3" />
+                      </>
+                    )}
+                    {!isDocDecrypted && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-[0.5rem] leading-none">🔒</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="text-left">
+                  <p
+                    className={cn(
+                      "retro text-[0.55rem] uppercase tracking-[0.18em] sm:text-[0.6rem]",
+                      isActive ? "text-primary" : "text-foreground"
+                    )}
+                  >
+                    {doc.label}
+                  </p>
+                  <p className="retro text-[0.45rem] uppercase tracking-[0.12em] text-muted-foreground sm:text-[0.5rem]">
+                    {doc.stats.pages} · {doc.stats.size}
+                  </p>
+                </div>
+                {isDocDecrypted && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center border border-primary bg-primary text-[0.4rem] font-bold text-primary-foreground shadow-sm sm:h-5 sm:w-5 sm:text-[0.5rem]"
+                  >
+                    ✓
+                  </motion.span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Vault progress */}
+      <div className="border-b border-dashed border-border bg-muted/10 px-4 py-1.5">
+        <div className="mx-auto flex max-w-5xl items-center justify-between">
+          <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground sm:text-[0.55rem]">
+            Vault Access
+          </p>
+          <div className="flex items-center gap-2">
+            <div className="h-1.5 w-20 overflow-hidden rounded-none border border-border bg-background/80 sm:w-28">
+              <motion.div
+                className="h-full bg-primary"
+                animate={{ width: `${(decryptedCount / 2) * 100}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+            <p className="retro text-[0.5rem] uppercase tracking-[0.1em] text-primary sm:text-[0.55rem]">
+              {decryptedCount}/2
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Main Archive Container */}
       <div className="relative p-4 sm:p-5">
         {/* Animated scanlines overlay */}
         <div
           className="pointer-events-none absolute inset-0 z-10 opacity-[0.03]"
           style={{
-            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)",
+            backgroundImage:
+              "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)",
           }}
         />
 
@@ -436,10 +605,10 @@ export function ResumeArchive({ className }: { className?: string }) {
               {/* Channel label */}
               <div className="mb-2 flex items-center justify-between gap-2 border-2 border-b-0 border-border bg-muted/40 px-2 py-1.5">
                 <span className="retro text-[0.55rem] uppercase tracking-[0.2em] text-primary sm:text-[0.6rem]">
-                  CV_PREVIEW
+                  {currentDoc.previewLabel}
                 </span>
                 <span className="retro truncate text-[0.45rem] uppercase tracking-[0.12em] text-muted-foreground sm:text-[0.5rem]">
-                  FYKE_TONEL.pdf
+                  {currentDoc.displayName}
                 </span>
               </div>
               {/* Document frame */}
@@ -448,28 +617,28 @@ export function ResumeArchive({ className }: { className?: string }) {
                   "relative aspect-[8.5/11] w-full overflow-hidden rounded-none border-2 shadow-[4px_4px_0_var(--border)] transition-all duration-500",
                   isDecrypted
                     ? "border-primary/70 shadow-[4px_4px_0_var(--primary)] ring-1 ring-primary/30"
-                    : "border-border dark:border-ring",
+                    : "border-border dark:border-ring"
                 )}
               >
                 {/* Glowing animated corners */}
                 {isDecrypted && (
                   <>
-                    <motion.div 
+                    <motion.div
                       className="absolute left-0 top-0 h-6 w-6 border-l-2 border-t-2 border-primary sm:h-8 sm:w-8"
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     />
-                    <motion.div 
+                    <motion.div
                       className="absolute right-0 top-0 h-6 w-6 border-r-2 border-t-2 border-primary sm:h-8 sm:w-8"
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
                     />
-                    <motion.div 
+                    <motion.div
                       className="absolute bottom-0 left-0 h-6 w-6 border-b-2 border-l-2 border-primary sm:h-8 sm:w-8"
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 2, repeat: Infinity, delay: 1 }}
                     />
-                    <motion.div 
+                    <motion.div
                       className="absolute bottom-0 right-0 h-6 w-6 border-b-2 border-r-2 border-primary sm:h-8 sm:w-8"
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}
@@ -485,7 +654,7 @@ export function ResumeArchive({ className }: { className?: string }) {
                 <AnimatePresence mode="wait">
                   {!isDecrypted ? (
                     <motion.div
-                      key="locked"
+                      key={`locked-${activeDoc}`}
                       initial={{ opacity: 1 }}
                       exit={{ opacity: 0, scale: 0.95, rotateY: 90 }}
                       transition={{ duration: 0.5 }}
@@ -496,6 +665,9 @@ export function ResumeArchive({ className }: { className?: string }) {
                         <p className="retro text-[0.6rem] uppercase tracking-[0.2em] text-foreground">
                           [ENCRYPTED]
                         </p>
+                        <p className="retro text-[0.5rem] uppercase tracking-[0.15em] text-muted-foreground">
+                          {currentDoc.fullLabel}
+                        </p>
                         {isScanning && (
                           <div className="space-y-1">
                             <div className="mx-auto mt-2 flex items-center justify-center gap-2">
@@ -505,7 +677,7 @@ export function ResumeArchive({ className }: { className?: string }) {
                               <motion.div
                                 className="h-full bg-primary"
                                 initial={{ width: 0 }}
-                                animate={{ width: `${scanProgress}%` }}
+                                animate={{ width: `${currentScanProgress}%` }}
                               />
                             </div>
                           </div>
@@ -514,29 +686,25 @@ export function ResumeArchive({ className }: { className?: string }) {
                     </motion.div>
                   ) : (
                     <motion.div
-                      key="unlocked"
+                      key={`unlocked-${activeDoc}`}
                       initial={{ opacity: 0, scale: 1.05, rotateY: -90 }}
                       animate={{ opacity: 1, scale: 1, rotateY: 0 }}
                       transition={{ duration: 0.5 }}
-                      className="h-full w-full relative"
+                      className="relative h-full w-full"
                     >
                       {/* Holographic shimmer overlay */}
                       <motion.div
                         className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-br from-transparent via-primary/5 to-transparent"
-                        animate={{ 
+                        animate={{
                           background: [
                             "linear-gradient(45deg, transparent 0%, rgba(var(--primary), 0.05) 50%, transparent 100%)",
                             "linear-gradient(45deg, transparent 100%, rgba(var(--primary), 0.05) 50%, transparent 0%)",
-                          ]
+                          ],
                         }}
                         transition={{ duration: 3, repeat: Infinity }}
                       />
                       {/* PDF Preview iframe */}
-                      <iframe
-                        src="/Resume/CV_FYKE_TONEL.pdf"
-                        className="h-full w-full"
-                        title="Resume Preview"
-                      />
+                      <iframe src={currentDoc.path} className="h-full w-full" title={`${currentDoc.label} Preview`} />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -548,14 +716,12 @@ export function ResumeArchive({ className }: { className?: string }) {
                     isDecrypted ? "opacity-0" : "opacity-100"
                   )}
                 >
-                  <motion.div 
+                  <motion.div
                     className="rotate-[-15deg] border-2 border-dashed border-red-500/50 px-2 py-0.5"
                     animate={!isDecrypted ? { scale: [1, 1.02, 1] } : {}}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <p className="retro text-sm uppercase tracking-[0.3em] text-red-500/60">
-                      Classified
-                    </p>
+                    <p className="retro text-sm uppercase tracking-[0.3em] text-red-500/60">Classified</p>
                   </motion.div>
                 </div>
               </div>
@@ -567,7 +733,7 @@ export function ResumeArchive({ className }: { className?: string }) {
                     Date
                   </p>
                   <p className="retro mt-0.5 text-[0.55rem] uppercase tracking-[0.1em] text-foreground sm:text-xs">
-                    {documentMetadata.archiveDate}
+                    {currentDoc.stats.date}
                   </p>
                 </div>
                 <div className="border-x border-dashed border-border text-center">
@@ -575,7 +741,7 @@ export function ResumeArchive({ className }: { className?: string }) {
                     Size
                   </p>
                   <p className="retro mt-0.5 text-[0.55rem] uppercase tracking-[0.1em] text-foreground sm:text-xs">
-                    {documentMetadata.dataWeight}
+                    {currentDoc.stats.size}
                   </p>
                 </div>
                 <div className="text-center">
@@ -583,7 +749,7 @@ export function ResumeArchive({ className }: { className?: string }) {
                     Pages
                   </p>
                   <p className="retro mt-0.5 text-[0.55rem] uppercase tracking-[0.1em] text-foreground sm:text-xs">
-                    {documentMetadata.scrollLength}
+                    {currentDoc.stats.pages}
                   </p>
                 </div>
               </div>
@@ -613,7 +779,7 @@ export function ResumeArchive({ className }: { className?: string }) {
                     ) : (
                       <span className="flex items-center justify-center gap-2">
                         <span aria-hidden>🔓</span>
-                        Decrypt Document
+                        Decrypt {currentDoc.label}
                       </span>
                     )}
                   </Button>
@@ -630,7 +796,7 @@ export function ResumeArchive({ className }: { className?: string }) {
                     <span className="mr-2" aria-hidden>
                       📦
                     </span>
-                    Loot PDF
+                    Loot {currentDoc.label}
                     {downloadCount > 0 && (
                       <motion.span
                         initial={{ scale: 0 }}
@@ -695,7 +861,7 @@ export function ResumeArchive({ className }: { className?: string }) {
                               <span
                                 className={cn(
                                   "retro truncate text-[0.5rem] uppercase tracking-[0.12em] sm:text-[0.55rem]",
-                                  colors.text,
+                                  colors.text
                                 )}
                               >
                                 {skill.name}
