@@ -244,7 +244,7 @@ const technologies: TechItem[] = [
     name: "OpenStreetMaps",
     icon: SiOpenstreetmap,
     category: "platforms",
-    lastUsed: "2024",
+    lastUsed: "2025",
   },
 ];
 
