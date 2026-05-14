@@ -748,6 +748,32 @@ const projects: ProjectEntry[] = [
       caption: "No visual interface—pure signal processing power.",
     },
   },
+  {
+    id: "kevlar",
+    title: "Kevlar",
+    tagline: "Custom programming language & built-in editor",
+    description:
+      "Kevlar v2 is a built-in programming language for the Hazmat Shell featuring Rust-like syntax with Dart-like simplicity.",
+    detail:
+      "A complete runtime written in TypeScript, featuring a lexer, AST parser, and evaluator. It powers the Oxygen (O₂) code editor directly within the web-based retro terminal environment.",
+    tech: ["TypeScript", "React", "AST", "Interpreter"],
+    classification: {
+      tier: "B",
+      codename: "Language Engine",
+      status: "Built-in runtime for Hazmat Shell",
+      priority: getTierPriority("B"),
+    },
+    highlights: [
+      "Custom lexer, parser, and AST evaluator written from scratch in TypeScript.",
+      "Supports control flow, functions, pattern matching, and comprehensive math built-ins.",
+      "Includes Oxygen (O₂), a built-in visual code editor inside the terminal.",
+      "Fully integrated with the retro shell environment, persisting state across sessions.",
+    ],
+    placeholder: {
+      title: "Terminal Access Only",
+      caption: "Boot up the retro terminal and type `oxygen` to explore.",
+    },
+  },
 ];
 
 const classificationLegend: {
