@@ -1052,14 +1052,10 @@ const RetroVisitorCounter = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const NAMESPACE = "fykesimon.vercel.app";
-    const KEY = "visitors";
-
-    // Fetch current count first
-    fetch(`https://api.countapi.xyz/get/${NAMESPACE}/${KEY}`)
+    fetch("/api/visitors")
       .then((res) => res.json())
       .then((data) => {
-        setVisitorCount(data.value ?? 0);
+        setVisitorCount(data.count ?? 0);
         setLoading(false);
       })
       .catch(() => {
@@ -1067,16 +1063,15 @@ const RetroVisitorCounter = () => {
         setLoading(false);
       });
 
-    // Increment only once per browser session
     const hasCounted = sessionStorage.getItem("lab-visitor-counted");
     if (!hasCounted) {
-      fetch(`https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`)
-        .then(() => {
+      fetch("/api/visitors", { method: "POST" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.count) setVisitorCount(data.count);
           sessionStorage.setItem("lab-visitor-counted", "true");
         })
-        .catch(() => {
-          // Counter is best-effort; silently fail
-        });
+        .catch(() => {});
     }
   }, []);
 
