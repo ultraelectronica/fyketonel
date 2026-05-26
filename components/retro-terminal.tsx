@@ -165,68 +165,68 @@ const themes = {
     name: "Atari",
     class: "theme-atari",
     light: {
-      // Classic Atari 2600 inspired - warm wood grain with iconic orange/red
-      "--primary": "oklch(0.6 0.22 35)",           // Atari iconic red-orange
-      "--primary-foreground": "oklch(0.98 0.01 85)", // Warm cream text
-      "--background": "oklch(0.92 0.04 75)",       // Light warm tan (wood grain light)
-      "--foreground": "oklch(0.2 0.04 50)",        // Dark warm brown
-      "--card": "oklch(0.96 0.03 80)",             // Lighter cream card
-      "--card-foreground": "oklch(0.2 0.04 50)",   // Dark warm brown
-      "--popover": "oklch(0.98 0.02 80)",          // Light popover
-      "--popover-foreground": "oklch(0.2 0.04 50)",
-      "--secondary": "oklch(0.72 0.14 55)",        // Warm amber/gold
-      "--secondary-foreground": "oklch(0.15 0.03 50)",
-      "--muted": "oklch(0.88 0.05 70)",            // Muted tan
-      "--muted-foreground": "oklch(0.45 0.06 55)", // Medium brown
-      "--accent": "oklch(0.7 0.18 85)",            // Warm yellow accent
-      "--accent-foreground": "oklch(0.15 0.03 50)",
+      // Atari 2600: warm white arcade bezel, charcoal text, iconic red-orange Fuji logo
+      "--primary": "oklch(0.55 0.22 35)",           // Atari red-orange
+      "--primary-foreground": "oklch(0.98 0.01 85)", // Warm cream
+      "--background": "oklch(0.96 0.01 80)",       // Warm white / manual page
+      "--foreground": "oklch(0.18 0.02 50)",        // Deep charcoal
+      "--card": "oklch(1 0 0)",                    // Pure white card
+      "--card-foreground": "oklch(0.18 0.02 50)",
+      "--popover": "oklch(1 0 0)",
+      "--popover-foreground": "oklch(0.18 0.02 50)",
+      "--secondary": "oklch(0.82 0.06 80)",        // Warm silver / beige
+      "--secondary-foreground": "oklch(0.18 0.02 50)",
+      "--muted": "oklch(0.92 0.02 75)",            // Light beige
+      "--muted-foreground": "oklch(0.50 0.04 60)", // Medium grey-brown
+      "--accent": "oklch(0.75 0.15 85)",           // Warm gold / amber
+      "--accent-foreground": "oklch(0.18 0.02 50)",
       "--destructive": "oklch(0.55 0.22 25)",      // Deep red
       "--destructive-foreground": "oklch(0.98 0.01 85)",
-      "--border": "oklch(0.5 0.12 45)",            // Rich brown border
-      "--input": "oklch(0.5 0.12 45)",
-      "--ring": "oklch(0.6 0.22 35)",              // Atari orange ring
-      "--chart-1": "oklch(0.6 0.22 35)",           // Atari red-orange
-      "--chart-2": "oklch(0.72 0.18 55)",          // Amber
-      "--chart-3": "oklch(0.75 0.2 90)",           // Yellow
-      "--chart-4": "oklch(0.55 0.15 145)",         // Forest green
-      "--chart-5": "oklch(0.5 0.15 250)",          // Deep blue
-      "--visitor-counter": "oklch(0.65 0.2 145)",  // Retro green
-      "--shadow-color": "oklch(0.35 0.08 45 / 0.4)", // Brown shadow
-      "--hover-bg": "oklch(0.6 0.22 35 / 0.15)",
+      "--border": "oklch(0.75 0.05 70)",           // Silver / beige border
+      "--input": "oklch(0.75 0.05 70)",
+      "--ring": "oklch(0.55 0.22 35)",              // Atari red-orange ring
+      "--chart-1": "oklch(0.55 0.22 35)",           // Atari red-orange
+      "--chart-2": "oklch(0.70 0.15 55)",           // Amber
+      "--chart-3": "oklch(0.78 0.15 90)",           // Warm yellow
+      "--chart-4": "oklch(0.60 0.12 145)",          // Muted green
+      "--chart-5": "oklch(0.50 0.15 250)",          // Deep blue
+      "--visitor-counter": "oklch(0.65 0.20 145)",   // Retro green
+      "--shadow-color": "oklch(0.35 0.08 45 / 0.35)", // Warm shadow
+      "--hover-bg": "oklch(0.55 0.22 35 / 0.12)",
       "--hover-text": "oklch(0.55 0.22 35)",
       "--title-shadow": "oklch(0.25 0.06 45)",
     },
     dark: {
-      // Dark mode: rich wood grain brown with glowing orange/amber
-      "--primary": "oklch(0.7 0.2 40)",            // Bright Atari orange
-      "--primary-foreground": "oklch(0.12 0.02 50)", // Near black
-      "--background": "oklch(0.18 0.04 45)",       // Dark wood brown
-      "--foreground": "oklch(0.9 0.06 70)",        // Warm cream text
-      "--card": "oklch(0.24 0.05 50)",             // Slightly lighter wood
-      "--card-foreground": "oklch(0.9 0.06 70)",
-      "--popover": "oklch(0.2 0.04 48)",
-      "--popover-foreground": "oklch(0.9 0.06 70)",
-      "--secondary": "oklch(0.6 0.16 55)",         // Warm amber
-      "--secondary-foreground": "oklch(0.12 0.02 50)",
-      "--muted": "oklch(0.28 0.04 50)",            // Muted dark brown
-      "--muted-foreground": "oklch(0.7 0.06 65)",  // Light tan
-      "--accent": "oklch(0.78 0.18 85)",           // Bright yellow accent
-      "--accent-foreground": "oklch(0.12 0.02 50)",
-      "--destructive": "oklch(0.6 0.24 25)",
-      "--destructive-foreground": "oklch(0.9 0.06 70)",
-      "--border": "oklch(0.7 0.2 40)",             // Orange border (iconic)
-      "--input": "oklch(0.4 0.08 50)",             // Medium brown input
-      "--ring": "oklch(0.7 0.2 40)",
-      "--chart-1": "oklch(0.7 0.2 40)",            // Atari orange
-      "--chart-2": "oklch(0.75 0.18 55)",          // Amber
-      "--chart-3": "oklch(0.8 0.2 90)",            // Yellow
-      "--chart-4": "oklch(0.6 0.18 145)",          // Green
-      "--chart-5": "oklch(0.55 0.18 250)",         // Blue
-      "--visitor-counter": "oklch(0.7 0.22 145)",  // Bright retro green
-      "--shadow-color": "oklch(0.7 0.2 40 / 0.5)", // Orange glow shadow
-      "--hover-bg": "oklch(0.7 0.2 40 / 0.2)",
-      "--hover-text": "oklch(0.75 0.2 40)",
-      "--title-shadow": "oklch(0.6 0.15 45)",      // Warm glow
+      // Dark mode: deep charcoal faceplate with glowing orange-red
+      "--primary": "oklch(0.70 0.20 40)",            // Bright Atari orange-red
+      "--primary-foreground": "oklch(0.10 0.02 50)", // Near black
+      "--background": "oklch(0.14 0.02 45)",       // Deep charcoal
+      "--foreground": "oklch(0.90 0.04 75)",        // Warm cream
+      "--card": "oklch(0.20 0.03 50)",              // Slightly lighter charcoal
+      "--card-foreground": "oklch(0.90 0.04 75)",
+      "--popover": "oklch(0.18 0.03 48)",
+      "--popover-foreground": "oklch(0.90 0.04 75)",
+      "--secondary": "oklch(0.55 0.12 55)",         // Warm amber
+      "--secondary-foreground": "oklch(0.10 0.02 50)",
+      "--muted": "oklch(0.25 0.04 50)",             // Muted dark brown
+      "--muted-foreground": "oklch(0.70 0.06 65)",  // Light tan
+      "--accent": "oklch(0.80 0.18 85)",            // Bright yellow / gold
+      "--accent-foreground": "oklch(0.10 0.02 50)",
+      "--destructive": "oklch(0.60 0.24 25)",
+      "--destructive-foreground": "oklch(0.90 0.04 75)",
+      "--border": "oklch(0.70 0.15 40)",            // Orange border (iconic)
+      "--input": "oklch(0.35 0.06 50)",             // Medium brown input
+      "--ring": "oklch(0.70 0.20 40)",
+      "--chart-1": "oklch(0.70 0.20 40)",           // Atari orange
+      "--chart-2": "oklch(0.75 0.18 55)",           // Amber
+      "--chart-3": "oklch(0.80 0.18 90)",            // Yellow
+      "--chart-4": "oklch(0.60 0.15 145)",           // Green
+      "--chart-5": "oklch(0.55 0.15 250)",          // Blue
+      "--visitor-counter": "oklch(0.70 0.20 145)",  // Bright retro green
+      "--shadow-color": "oklch(0.70 0.20 40 / 0.45)", // Orange glow shadow
+      "--hover-bg": "oklch(0.70 0.20 40 / 0.18)",
+      "--hover-text": "oklch(0.75 0.20 40)",
+      "--title-shadow": "oklch(0.60 0.12 45)",      // Warm glow
     }
   },
   nintendo: {

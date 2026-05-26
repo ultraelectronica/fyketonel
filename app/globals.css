@@ -339,14 +339,26 @@ button:not(:disabled):hover {
 :root.theme-atari,
 html.theme-atari,
 body.theme-atari {
-  --primary: oklch(0.5 0.2 60) !important;
-  --primary-foreground: oklch(0 0 0) !important;
-  --background: oklch(0.7 0 0) !important;
-  --foreground: oklch(0 0 0) !important;
+  --primary: oklch(0.55 0.22 35) !important;
+  --primary-foreground: oklch(0.98 0.01 85) !important;
+  --background: oklch(0.96 0.01 80) !important;
+  --foreground: oklch(0.18 0.02 50) !important;
   --card: oklch(1 0 0) !important;
-  --border: oklch(0.5 0.2 60) !important;
-  --accent: oklch(0.5 0.2 60) !important;
-  --title-shadow: oklch(0.2 0.05 60) !important;
+  --card-foreground: oklch(0.18 0.02 50) !important;
+  --popover: oklch(1 0 0) !important;
+  --popover-foreground: oklch(0.18 0.02 50) !important;
+  --secondary: oklch(0.82 0.06 80) !important;
+  --secondary-foreground: oklch(0.18 0.02 50) !important;
+  --muted: oklch(0.92 0.02 75) !important;
+  --muted-foreground: oklch(0.50 0.04 60) !important;
+  --accent: oklch(0.75 0.15 85) !important;
+  --accent-foreground: oklch(0.18 0.02 50) !important;
+  --destructive: oklch(0.55 0.22 25) !important;
+  --destructive-foreground: oklch(0.98 0.01 85) !important;
+  --border: oklch(0.75 0.05 70) !important;
+  --input: oklch(0.75 0.05 70) !important;
+  --ring: oklch(0.55 0.22 35) !important;
+  --title-shadow: oklch(0.25 0.06 45) !important;
 }
 
 :root.dark.theme-atari,
@@ -355,12 +367,26 @@ body.theme-atari {
 .dark body.theme-atari,
 html.dark.theme-atari,
 body.dark.theme-atari {
-  --primary: oklch(0.4 0.2 60) !important;
-  --background: oklch(0.2 0 0) !important;
-  --foreground: oklch(0.9 0 0) !important;
-  --card: oklch(0.4 0 0) !important;
-  --border: oklch(0.4 0 0) !important;
-  --title-shadow: oklch(0.25 0.04 60) !important;
+  --primary: oklch(0.70 0.20 40) !important;
+  --primary-foreground: oklch(0.10 0.02 50) !important;
+  --background: oklch(0.14 0.02 45) !important;
+  --foreground: oklch(0.90 0.04 75) !important;
+  --card: oklch(0.20 0.03 50) !important;
+  --card-foreground: oklch(0.90 0.04 75) !important;
+  --popover: oklch(0.18 0.03 48) !important;
+  --popover-foreground: oklch(0.90 0.04 75) !important;
+  --secondary: oklch(0.55 0.12 55) !important;
+  --secondary-foreground: oklch(0.10 0.02 50) !important;
+  --muted: oklch(0.25 0.04 50) !important;
+  --muted-foreground: oklch(0.70 0.06 65) !important;
+  --accent: oklch(0.80 0.18 85) !important;
+  --accent-foreground: oklch(0.10 0.02 50) !important;
+  --destructive: oklch(0.60 0.24 25) !important;
+  --destructive-foreground: oklch(0.90 0.04 75) !important;
+  --border: oklch(0.70 0.15 40) !important;
+  --input: oklch(0.35 0.06 50) !important;
+  --ring: oklch(0.70 0.20 40) !important;
+  --title-shadow: oklch(0.60 0.12 45) !important;
 }
 
 /* Nintendo Theme */
