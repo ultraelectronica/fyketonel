@@ -965,7 +965,7 @@ const labNotes = [
   "This one kept me up for 3 days straight.",
   "My obra maestra, a work of art.",
   "Dealing with the UX devil himself.",
-  "My magnum opus 🎨",
+  "My magnum opus.",
   "Fueled entirely by coffee and spite",
   "Started at 3 AM, finished at 3 AM (next day)",
   '"It\'s just a small change" they said... 1st project that worked.',
@@ -975,7 +975,7 @@ const labNotes = [
   "Peak programming flow achieved here",
   "Made me question my career choices",
   "Client loved it. I'm still confused.",
-  "This shouldn't work... but it does 🤷",
+  "This shouldn't work... but it does.",
   "Refactored 6 times. Still not happy.",
   "The documentation is lying",
   "Future me will hate past me for this",
@@ -985,7 +985,7 @@ const labNotes = [
   "Best code I've ever written (no cap)",
   "I was too tired to give up",
   "Worth every hour of sleep I lost",
-  "Client said 'make it pop' 💥",
+  "Client said 'make it pop'.",
 ];
 
 const StickyNote = ({ note, index }: { note: string; index: number }) => {
@@ -1048,66 +1048,39 @@ const StickyNote = ({ note, index }: { note: string; index: number }) => {
 };
 
 const RetroVisitorCounter = () => {
-  const [visitorCount, setVisitorCount] = useState("0000000");
-  const [displayMode, setDisplayMode] = useState<"decimal" | "binary" | "hex">(
-    "decimal",
-  );
+  const [visitorCount, setVisitorCount] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Generate ridiculous numbers that keep incrementing
-    const counterInterval = setInterval(() => {
-      const modes = ["decimal", "binary", "hex"] as const;
-      const randomMode = modes[Math.floor(Math.random() * modes.length)];
-      setDisplayMode(randomMode);
+    const NAMESPACE = "fykesimon.vercel.app";
+    const KEY = "visitors";
 
-      // Generate absurd numbers
-      const absurdNumbers = [
-        "9999999", // Over 9 million!
-        "1337420", // Leet + meme
-        "8008135", // Classic calculator
-        "4242424", // The answer times many
-        "6660666", // Spooky
-        "1234567", // Sequential
-        "7777777", // Lucky
-        "0000001", // Just started (obviously fake)
-        "9876543", // Reverse
-        "5318008", // Classic upside-down calculator
-        "1111111", // All ones
-        "3141592", // Pi
-        "2718281", // e
-        "1618033", // Golden ratio
-        "8675309", // Jenny's number
-      ];
+    // Fetch current count first
+    fetch(`https://api.countapi.xyz/get/${NAMESPACE}/${KEY}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setVisitorCount(data.value ?? 0);
+        setLoading(false);
+      })
+      .catch(() => {
+        setVisitorCount(null);
+        setLoading(false);
+      });
 
-      const randomNumber =
-        absurdNumbers[Math.floor(Math.random() * absurdNumbers.length)];
-
-      if (randomMode === "binary") {
-        // Convert to binary and pad
-        const num = parseInt(randomNumber);
-        setVisitorCount(num.toString(2).padStart(24, "0"));
-      } else if (randomMode === "hex") {
-        // Convert to hex and pad
-        const num = parseInt(randomNumber);
-        setVisitorCount("0x" + num.toString(16).toUpperCase().padStart(7, "0"));
-      } else {
-        setVisitorCount(randomNumber);
-      }
-    }, 3000);
-
-    return () => clearInterval(counterInterval);
+    // Increment only once per browser session
+    const hasCounted = sessionStorage.getItem("lab-visitor-counted");
+    if (!hasCounted) {
+      fetch(`https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`)
+        .then(() => {
+          sessionStorage.setItem("lab-visitor-counted", "true");
+        })
+        .catch(() => {
+          // Counter is best-effort; silently fail
+        });
+    }
   }, []);
 
-  const getLabel = () => {
-    switch (displayMode) {
-      case "binary":
-        return "Visitors (Binary)";
-      case "hex":
-        return "Visitors (Hexadecimal)";
-      default:
-        return "Total Lab Visitors";
-    }
-  };
+  const displayCount = visitorCount !== null ? visitorCount.toLocaleString() : "---";
 
   return (
     <motion.div
@@ -1125,32 +1098,28 @@ const RetroVisitorCounter = () => {
         <div className="space-y-2">
           <div className="flex items-center justify-center gap-2">
             <motion.span
-              className="text-lg"
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              🎉
-            </motion.span>
+              className="inline-block size-2 rounded-full bg-primary"
+              animate={{ opacity: [1, 0.3, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            />
             <p
               className={cn(
                 "retro ally-visitor-label text-center text-[0.6rem] uppercase tracking-[0.25em] sm:text-xs",
                 "text-[color:var(--foreground)]",
               )}
             >
-              {getLabel()}
+              Total Lab Visitors
             </p>
             <motion.span
-              className="text-lg"
-              animate={{ rotate: [0, -10, 10, 0] }}
+              className="inline-block size-2 rounded-full bg-primary"
+              animate={{ opacity: [1, 0.3, 1] }}
               transition={{
-                duration: 2,
+                duration: 1.5,
                 repeat: Infinity,
                 ease: "easeInOut",
-                delay: 0.5,
+                delay: 0.75,
               }}
-            >
-              🎊
-            </motion.span>
+            />
           </div>
 
           <div
@@ -1161,7 +1130,7 @@ const RetroVisitorCounter = () => {
           >
             <div className="max-w-full overflow-x-auto">
               <motion.div
-                key={visitorCount}
+                key={displayCount}
                 className={cn(
                   "retro ally-visitor-counter mx-auto text-center font-mono text-xl tabular-nums sm:text-2xl md:text-3xl",
                   "text-[color:var(--primary)]",
@@ -1171,13 +1140,12 @@ const RetroVisitorCounter = () => {
                 transition={{ duration: 0.3 }}
                 style={{
                   color: "var(--visitor-counter, oklch(0.6 0.25 140))",
-                  letterSpacing: displayMode === "binary" ? "0.08em" : "0.18em",
-                  fontSize: displayMode === "binary" ? "0.7rem" : undefined,
+                  letterSpacing: "0.18em",
                   wordBreak: "break-all",
                   whiteSpace: "nowrap",
                 }}
               >
-                {visitorCount}
+                {loading ? "LOADING..." : displayCount}
               </motion.div>
             </div>
           </div>
@@ -1193,11 +1161,7 @@ const RetroVisitorCounter = () => {
               }}
             />
             <p className="retro text-center text-[0.4rem] italic text-foreground">
-              {displayMode === "binary"
-                ? "Counting in machine language..."
-                : displayMode === "hex"
-                  ? "Elite hacker mode enabled"
-                  : "You are visitor number [REDACTED]"}
+              Live telemetry from the lab entrance
             </p>
             <motion.span
               className="inline-block size-1.5 rounded-full bg-red-600"
@@ -1212,19 +1176,18 @@ const RetroVisitorCounter = () => {
           </div>
         </div>
 
-        {/* Fake "since 1996" badge */}
-        <div className="mt-2 border-t-2 border-dashed border-yellow-800 pt-2 dark:border-yellow-400">
-          <div className="flex items-center justify-center gap-2 text-[0.4rem] text-foreground">
-            <span className="retro">EST. 1996</span>
+        <div className="mt-2 border-t-2 border-dashed border-border pt-2">
+          <div className="flex items-center justify-center gap-2 text-[0.4rem] text-muted-foreground">
+            <span className="retro">SINCE 2024</span>
             <span>•</span>
-            <span className="retro">GEOCITIES CERTIFIED</span>
+            <span className="retro">POWERED BY COUNTAPI</span>
             <span>•</span>
             <motion.span
               className="retro"
               animate={{ opacity: [1, 0.5, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              UNDER CONSTRUCTION
+              ONLINE
             </motion.span>
           </div>
         </div>
