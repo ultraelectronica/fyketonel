@@ -55,10 +55,12 @@ function spawnFood(snake: Segment[]) {
   return openCells[Math.floor(Math.random() * openCells.length)] ?? { row: 0, col: 0 };
 }
 
+const INITIAL_FOOD: Segment = { row: 3, col: 10 };
+
 function getStartingState(): SnakeState {
   return {
     snake: STARTING_SNAKE,
-    food: spawnFood(STARTING_SNAKE),
+    food: INITIAL_FOOD,
     direction: "right",
     queuedDirection: "right",
     score: 0,
@@ -114,14 +116,14 @@ export function SnakeGame({
   }, [bestScore]);
 
   const resetGame = useCallback(() => {
-    setGame(getStartingState());
+    setGame({ ...getStartingState(), food: spawnFood(STARTING_SNAKE) });
   }, []);
 
   const startGame = useCallback(() => {
     setGame((current) =>
       current.status === "running"
         ? current
-        : { ...getStartingState(), status: "running" }
+        : { ...getStartingState(), food: spawnFood(STARTING_SNAKE), status: "running" }
     );
   }, []);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { Calendar } from "@/components/ui/8bit/calendar";
 import { cn } from "@/lib/utils";
 
@@ -134,21 +134,30 @@ const generateMonthlyEvents = (currentDate: Date): DailyEvent[] => {
 };
 
 export function InteractiveCalendar({ className }: { className?: string }) {
-  const today = new Date();
-  const [selectedDate, setSelectedDate] = useState<Date>(today);
-  const [monthlyEvents] = useState<DailyEvent[]>(generateMonthlyEvents(today));
-  
-  // Get daily status (deterministic based on day of year)
-  const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
+  const [today, setToday] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [monthlyEvents, setMonthlyEvents] = useState<DailyEvent[]>([]);
+
+  useEffect(() => {
+    const now = new Date();
+    startTransition(() => {
+      setToday(now);
+      setSelectedDate(now);
+      setMonthlyEvents(generateMonthlyEvents(now));
+    });
+  }, []);
+
+  const dayOfYear = today
+    ? Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000)
+    : 0;
   const dailyStatus = dailyStatuses[dayOfYear % dailyStatuses.length];
-  
-  // Get daily quest (changes each day)
   const dailyQuest = dailyQuests[dayOfYear % dailyQuests.length];
-  
-  // Find event for selected date
-  const selectedEvent = monthlyEvents.find(
-    event => event.date.toDateString() === selectedDate.toDateString()
-  );
+
+  const selectedEvent = selectedDate
+    ? monthlyEvents.find(
+        event => event.date.toDateString() === selectedDate.toDateString()
+      )
+    : undefined;
 
   return (
     <div className={cn("space-y-3 sm:space-y-4", className)}>
@@ -175,7 +184,7 @@ export function InteractiveCalendar({ className }: { className?: string }) {
       <div className="relative calendar-with-events">
         <Calendar
           mode="single"
-          selected={selectedDate}
+          selected={selectedDate ?? undefined}
           onSelect={(date) => date && setSelectedDate(date)}
           className="text-center w-full max-w-none"
         />
@@ -223,7 +232,7 @@ export function InteractiveCalendar({ className }: { className?: string }) {
           selectedEvent.type === "coffee" && "border-amber-600 bg-amber-600/10 dark:border-amber-500"
         )}>
           <p className="retro mb-1 text-[0.45rem] font-bold uppercase tracking-[0.15em] text-foreground sm:text-[0.5rem] md:text-[0.55rem]">
-            {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {selectedEvent.label}
+            {selectedDate?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {selectedEvent.label}
           </p>
           <p className="retro text-[0.4rem] leading-relaxed tracking-[0.12em] text-muted-foreground sm:text-[0.45rem] md:text-[0.5rem]">
             {selectedEvent.description}

@@ -340,26 +340,6 @@ export function RetroBackground({
       )}
       
       <div className="relative z-10">{children}</div>
-
-      <style jsx>{`
-        @keyframes circuitFlow {
-          to {
-            stroke-dashoffset: -200; /* Arbitrary large offset to move dash across */
-          }
-        }
-        .animate-circuit-flow {
-            animation-name: circuitFlow;
-            animation-timing-function: linear;
-            animation-iteration-count: infinite;
-        }
-        .animate-pulse-slow {
-             animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
-      `}</style>
     </div>
   );
 }
