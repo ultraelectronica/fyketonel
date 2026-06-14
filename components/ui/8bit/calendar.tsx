@@ -1,4 +1,5 @@
 "use client";
+import { startTransition, useEffect, useState } from "react";
 import { type VariantProps, cva } from "class-variance-authority";
 import { DayPicker } from "react-day-picker";
 
@@ -32,6 +33,14 @@ export type CalendarProps = React.ComponentProps<typeof DayPicker> &
   VariantProps<typeof calendarVariants>;
 
 function Calendar({ className, classNames, font, ...props }: CalendarProps) {
+  const [currentYear, setCurrentYear] = useState(2025);
+
+  useEffect(() => {
+    startTransition(() => {
+      setCurrentYear(new Date().getFullYear());
+    });
+  }, []);
+
   return (
     <div
       className={cn(
@@ -104,7 +113,6 @@ function Calendar({ className, classNames, font, ...props }: CalendarProps) {
             );
           },
           YearsDropdown: ({ className }) => {
-            const currentYear = new Date().getFullYear();
             const years = Array.from(
               { length: currentYear - 1925 + 1 },
               (_, i) => 1925 + i

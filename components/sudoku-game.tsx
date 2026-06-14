@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { startTransition, useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/8bit/button";
 import { cn } from "@/lib/utils";
 
@@ -139,9 +139,15 @@ export function SudokuGame({
   className?: string;
   isFullscreen?: boolean;
 }) {
-  const [game, setGame] = useState<SudokuState>(() => createInitialState(GRID_CONFIGS[9]));
+  const [game, setGame] = useState<SudokuState | null>(null);
   const [difficulty] = useState<1 | 2 | 3>(2);
   const [gridSize, setGridSize] = useState<GridSize>(9);
+
+  useEffect(() => {
+    startTransition(() => {
+      setGame(createInitialState(GRID_CONFIGS[9]));
+    });
+  }, []);
 
   const config = GRID_CONFIGS[gridSize];
 
@@ -161,21 +167,21 @@ export function SudokuGame({
   }, [difficulty, gridSize]);
 
   const handleCellClick = useCallback((row: number, col: number) => {
-    if (game.isComplete) return;
-    setGame(current => ({
-      ...current,
-      selectedCell: [row, col],
-      isError: false,
-    }));
-  }, [game.isComplete]);
+    if (!game || game.isComplete) return;
+    setGame(current => {
+      if (!current) return current;
+      return { ...current, selectedCell: [row, col] as [number, number], isError: false };
+    });
+  }, [game]);
 
   const handleNumberClick = useCallback((num: number) => {
-    if (!game.selectedCell || game.isComplete) return;
+    if (!game || !game.selectedCell || game.isComplete) return;
 
     const [row, col] = game.selectedCell;
     if (game.board[row][col] !== null) return;
 
     setGame(current => {
+      if (!current) return current;
       const newBoard = current.board.map(r => [...r]);
       newBoard[row][col] = num;
 
@@ -200,21 +206,31 @@ export function SudokuGame({
         isError: false,
       };
     });
-  }, [game.selectedCell, game.isComplete, game.board, config]);
+  }, [game, config]);
 
   const handleClear = useCallback(() => {
-    if (!game.selectedCell || game.isComplete) return;
+    if (!game || !game.selectedCell || game.isComplete) return;
 
     const [row, col] = game.selectedCell;
     if (game.board[row][col] !== null) return;
 
-    setGame(current => ({
-      ...current,
-      statusText: "Cell cleared. Select a number to place.",
-    }));
-  }, [game.selectedCell, game.isComplete, game.board]);
+    setGame(current => {
+      if (!current) return current;
+      return { ...current, statusText: "Cell cleared. Select a number to place." };
+    });
+  }, [game]);
 
   const boardMaxWidth = isFullscreen ? "min(80vmin, 600px)" : "380px";
+
+  if (!game) {
+    return (
+      <div className={cn("flex flex-col gap-3", className)}>
+        <div className="retro p-8 text-center text-[10px] uppercase tracking-widest text-muted-foreground">
+          Generating puzzle...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
