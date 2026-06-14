@@ -22,7 +22,7 @@ import SkillTree from "@/components/skill-tree";
 import ResumeArchive from "@/components/resume-archive";
 import WorkExperienceContainer from "@/components/work-experience-container";
 import { ArcadeCenter } from "@/components/arcade-center";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { startTransition, useEffect, useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 import {
   Accordion,
@@ -86,13 +86,19 @@ function getMobileSnapshot() {
 export default function Home() {
   const [joke, setJoke] = useState("Loading joke...");
   const [isAllyMode, setIsAllyMode] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const isMobile = useSyncExternalStore(
     subscribeToMobileQuery,
     getMobileSnapshot,
     () => false
   );
 
-  // Fetch joke on mount
+  useEffect(() => {
+    startTransition(() => {
+      setIsMounted(true);
+    });
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     
@@ -130,7 +136,7 @@ export default function Home() {
   // Updated Panel styles - Denser, less padding
   const panelBaseClass = "relative bg-card text-card-foreground border-2 border-border shadow-[4px_4px_0_var(--border)] p-3 overflow-hidden";
   const headerClass = "retro text-xs uppercase tracking-[0.2em] text-primary mb-2 border-b-2 border-dashed border-border/50 pb-1";
-  const showMobileLayout = isMobile;
+  const showMobileLayout = isMounted && isMobile;
 
   const wishlistContent = (
     <ItemGroup className="flex flex-col gap-1.5">

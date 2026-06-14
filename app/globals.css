@@ -307,13 +307,29 @@ button:not(:disabled):hover {
 }
 
 @keyframes circuitFlow {
-  0% { transform: translate3d(-100%, 0, 0); }
-  100% { transform: translate3d(500%, 0, 0); } /* Move far enough */
+  to {
+    stroke-dashoffset: -200;
+  }
 }
 
-@keyframes circuitFlowVertical {
-  0% { transform: translate3d(0, -100%, 0); }
-  100% { transform: translate3d(0, 500%, 0); }
+@keyframes circuitPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-circuit-flow {
+  animation-name: circuitFlow;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.animate-pulse-slow {
+  animation: circuitPulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Prevent container overlap in Lab Control Center */
