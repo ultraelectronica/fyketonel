@@ -1266,7 +1266,7 @@ const RetroLoadingScreen = ({ tier }: { tier: string }) => {
                 transition={{ delay: index * 0.1 }}
               >
                 {index < loadingPhase && (
-                  <span className="retro text-green-500">✓</span>
+                  <span className="retro text-green-500">[x]</span>
                 )}
                 {index === loadingPhase && (
                   <motion.span
@@ -1793,7 +1793,7 @@ const ProjectDependenciesGraph = ({
                     }}
                     className="retro flex size-6 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-xs touch-manipulation active:bg-primary/20 sm:size-7 sm:text-sm sm:hover:bg-primary/20 dark:border-ring"
                   >
-                    ✕
+                    [X]
                   </button>
                 </div>
               </motion.div>
@@ -2358,7 +2358,7 @@ const TechStackConstellation = ({
                   }}
                   className="retro flex size-6 shrink-0 items-center justify-center rounded-sm border border-border bg-background text-[0.6rem] touch-manipulation active:bg-primary/20 sm:text-xs sm:hover:bg-primary/20 dark:border-ring"
                 >
-                  ✕
+                  [X]
                 </button>
               </div>
             </motion.div>

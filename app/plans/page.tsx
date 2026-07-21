@@ -88,7 +88,7 @@ export default function PlansPage() {
               As the Guardian of Chaotic Plans, I balance hands-on building with technical direction, mentorship, and architecture. Roadmaps shift, stakeholder needs evolve, and surprise fires appear at 3 AM—but guiding the team through that uncertainty, and still shipping meaningful work, is the core of the adventure.
             </p>
             <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-none border-2 border-border bg-background/80 px-4 py-2 shadow-[2px_2px_0_var(--border)] backdrop-blur-sm dark:border-ring sm:mt-5 sm:gap-2.5 sm:border-3 sm:px-5 sm:py-2.5 sm:shadow-[3px_3px_0_var(--border)] md:mt-6 md:gap-3 md:border-4 md:px-6 md:py-3 md:shadow-[4px_4px_0_var(--border)]">
-              <span className="text-xl sm:text-2xl md:text-3xl">⚔️</span>
+              <span className="retro text-xl sm:text-2xl md:text-3xl text-muted-foreground">[S]</span>
               <div className="text-left">
                 <p className="retro text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground sm:text-xs sm:tracking-[0.25em] md:text-sm">
                   Current Status

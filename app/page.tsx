@@ -602,7 +602,7 @@ export default function Home() {
                   </div>
                   <div className="mt-6 space-y-2 border-t-2 border-dashed border-border pt-4">
                       <div className="flex items-center gap-2">
-                          <span className="retro text-xs">📍</span>
+                          <span className="retro text-xs text-muted-foreground">LOCATION:</span>
                           <span className="retro text-xs uppercase tracking-wider text-muted-foreground">Metro Manila, Philippines</span>
                       </div>
                       <p className="retro text-xs leading-relaxed text-muted-foreground">
