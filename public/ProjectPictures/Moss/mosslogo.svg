@@ -1,0 +1,66 @@
+<svg width="990" height="989" viewBox="0 0 990 989" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="metallic" cx="35%" cy="30%" r="65%" fx="30%" fy="25%">
+    <stop offset="0%" stop-color="#FFFFFF"/>
+    <stop offset="15%" stop-color="#E8E8E8"/>
+    <stop offset="40%" stop-color="#A0A0A0"/>
+    <stop offset="60%" stop-color="#707070"/>
+    <stop offset="80%" stop-color="#B0B0B0"/>
+    <stop offset="100%" stop-color="#505050"/>
+  </radialGradient>
+  <radialGradient id="metallic-warm" cx="35%" cy="30%" r="65%" fx="30%" fy="25%">
+    <stop offset="0%" stop-color="#FFFFFF"/>
+    <stop offset="15%" stop-color="#EBE5DF"/>
+    <stop offset="40%" stop-color="#A89888"/>
+    <stop offset="60%" stop-color="#706050"/>
+    <stop offset="80%" stop-color="#B0A090"/>
+    <stop offset="100%" stop-color="#504030"/>
+  </radialGradient>
+</defs>
+<circle cx="204.449" cy="318.293" r="24.0672" transform="rotate(45 204.449 318.293)" fill="url(#metallic)"/>
+<circle cx="147.722" cy="375.02" r="24.0672" transform="rotate(45 147.722 375.02)" fill="url(#metallic-warm)"/>
+<circle cx="375.706" cy="147.627" r="24.0672" transform="rotate(45 375.706 147.627)" fill="url(#metallic)"/>
+<circle cx="318.979" cy="204.354" r="24.0672" transform="rotate(45 318.979 204.354)" fill="url(#metallic-warm)"/>
+<circle cx="375.958" cy="260.699" r="24.0672" transform="rotate(45 375.958 260.699)" fill="url(#metallic)"/>
+<circle cx="319.231" cy="317.426" r="24.0672" transform="rotate(45 319.231 317.426)" fill="url(#metallic-warm)"/>
+<circle cx="262.504" cy="374.153" r="24.0672" transform="rotate(45 262.504 374.153)" fill="url(#metallic)"/>
+<circle cx="262.432" cy="147.173" r="24.0672" transform="rotate(45 262.432 147.173)" fill="url(#metallic-warm)"/>
+<circle cx="148.978" cy="260.627" r="24.0672" transform="rotate(45 148.978 260.627)" fill="url(#metallic)"/>
+<circle cx="489.096" cy="147.564" r="24.0672" transform="rotate(-45 489.096 147.564)" fill="url(#metallic-warm)"/>
+<circle cx="545.823" cy="204.291" r="24.0672" transform="rotate(-45 545.823 204.291)" fill="url(#metallic)"/>
+<circle cx="602.55" cy="261.017" r="24.0672" transform="rotate(-45 602.55 261.017)" fill="url(#metallic-warm)"/>
+<circle cx="489.096" cy="147.564" r="24.0672" transform="rotate(-45 489.096 147.564)" fill="url(#metallic)"/>
+<circle cx="545.823" cy="204.291" r="24.0672" transform="rotate(-45 545.823 204.291)" fill="url(#metallic-warm)"/>
+<circle cx="602.55" cy="261.017" r="24.0672" transform="rotate(-45 602.55 261.017)" fill="url(#metallic)"/>
+<circle cx="489.096" cy="147.564" r="24.0672" transform="rotate(-45 489.096 147.564)" fill="url(#metallic-warm)"/>
+<circle cx="545.823" cy="204.291" r="24.0672" transform="rotate(-45 545.823 204.291)" fill="url(#metallic)"/>
+<circle cx="602.55" cy="261.017" r="24.0672" transform="rotate(-45 602.55 261.017)" fill="url(#metallic-warm)"/>
+<circle cx="147.564" cy="489.096" r="24.0672" transform="rotate(-45 147.564 489.096)" fill="url(#metallic)"/>
+<circle cx="204.291" cy="545.823" r="24.0672" transform="rotate(-45 204.291 545.823)" fill="url(#metallic-warm)"/>
+<circle cx="261.017" cy="602.55" r="24.0672" transform="rotate(-45 261.017 602.55)" fill="url(#metallic)"/>
+<circle cx="148.036" cy="148.036" r="24.0672" transform="rotate(45 148.036 148.036)" fill="url(#metallic-warm)"/>
+<circle cx="841.036" cy="841.036" r="24.0672" transform="rotate(45 841.036 841.036)" fill="url(#metallic)"/>
+<circle cx="295.036" cy="694.036" r="24.0672" transform="rotate(45 295.036 694.036)" fill="url(#metallic-warm)"/>
+<circle cx="693.036" cy="295.036" r="24.0672" transform="rotate(45 693.036 295.036)" fill="url(#metallic)"/>
+<circle cx="785.137" cy="670.293" r="24.0672" transform="rotate(-135 785.137 670.293)" fill="url(#metallic-warm)"/>
+<circle cx="841.864" cy="613.566" r="24.0672" transform="rotate(-135 841.864 613.566)" fill="url(#metallic)"/>
+<circle cx="613.88" cy="840.959" r="24.0672" transform="rotate(-135 613.88 840.959)" fill="url(#metallic-warm)"/>
+<circle cx="670.607" cy="784.232" r="24.0672" transform="rotate(-135 670.607 784.232)" fill="url(#metallic)"/>
+<circle cx="727.154" cy="841.413" r="24.0672" transform="rotate(-135 727.154 841.413)" fill="url(#metallic-warm)"/>
+<circle cx="840.608" cy="727.959" r="24.0672" transform="rotate(-135 840.608 727.959)" fill="url(#metallic)"/>
+<circle cx="500.49" cy="841.022" r="24.0672" transform="rotate(135 500.49 841.022)" fill="url(#metallic-warm)"/>
+<circle cx="443.763" cy="784.295" r="24.0672" transform="rotate(135 443.763 784.295)" fill="url(#metallic)"/>
+<circle cx="387.036" cy="727.569" r="24.0672" transform="rotate(135 387.036 727.569)" fill="url(#metallic-warm)"/>
+<circle cx="842.022" cy="499.49" r="24.0672" transform="rotate(135 842.022 499.49)" fill="url(#metallic)"/>
+<circle cx="785.296" cy="442.763" r="24.0672" transform="rotate(135 785.296 442.763)" fill="url(#metallic-warm)"/>
+<circle cx="728.569" cy="386.036" r="24.0672" transform="rotate(135 728.569 386.036)" fill="url(#metallic)"/>
+<circle cx="500.763" cy="726.763" r="24.0672" transform="rotate(-45 500.763 726.763)" fill="url(#metallic-warm)"/>
+<circle cx="557.49" cy="783.49" r="24.0672" transform="rotate(-45 557.49 783.49)" fill="url(#metallic)"/>
+<circle cx="726.763" cy="500.763" r="24.0672" transform="rotate(-45 726.763 500.763)" fill="url(#metallic-warm)"/>
+<circle cx="783.49" cy="557.49" r="24.0672" transform="rotate(-45 783.49 557.49)" fill="url(#metallic)"/>
+<circle cx="670.036" cy="670.036" r="24.0672" transform="rotate(-45 670.036 670.036)" fill="url(#metallic-warm)"/>
+<circle cx="319.036" cy="433.036" r="24.0672" transform="rotate(-45 319.036 433.036)" fill="url(#metallic)"/>
+<circle cx="375.763" cy="489.763" r="24.0672" transform="rotate(-45 375.763 489.763)" fill="url(#metallic-warm)"/>
+<circle cx="432.036" cy="308.036" r="24.0672" transform="rotate(-45 432.036 308.036)" fill="url(#metallic)"/>
+<circle cx="488.763" cy="364.763" r="24.0672" transform="rotate(-45 488.763 364.763)" fill="url(#metallic-warm)"/>
+</svg>
